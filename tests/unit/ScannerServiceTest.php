@@ -38,6 +38,10 @@ namespace {
         public function build(): array {
             return [
                 'groups' => ['Betriebsrat'],
+                'group_catalog' => [[
+                    'key' => 'Betriebsrat', 'label' => 'Betriebsrat', 'type' => 'group',
+                    'source_app' => null, 'family' => null, 'groups' => ['Betriebsrat'], 'count' => 1,
+                ]],
                 'apps' => [['app_id' => 'deck', 'display_name' => 'Deck', 'version' => '1.0', 'source' => 'appstore', 'restricted' => false, 'groups' => []]],
                 'rows' => [new MatrixRow('App', 'deck', 'Deck', 'App-Nutzung', 'App-Verfuegbarkeit', 'UNSUPPORTED', 'core-app-config', 'medium', ['Betriebsrat' => 'X'])],
                 'warnings' => ['deck: kein Detailadapter vorhanden.'],
@@ -115,6 +119,7 @@ namespace {
     assertSameValue(['deck'], $snapshot->unsupportedApps(), 'scanner should preserve unsupported apps');
     assertSameValue('red', $snapshot->summary()['compliance_status'], 'missing baseline should be red');
     assertSameValue('UNSUPPORTED', $snapshot->matrix()[0]->status(), 'scanner should not approve unsupported rows');
+    assertSameValue('Betriebsrat', $snapshot->groupCatalog()[0]['key'], 'scanner should preserve the presentation catalog without changing raw groups');
 
     echo 'ScannerService tests passed' . PHP_EOL;
 }

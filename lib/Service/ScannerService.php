@@ -41,7 +41,8 @@ class ScannerService {
             [],
             $this->config->metadata(),
             [],
-            $build['adapter_status']
+            $build['adapter_status'],
+            $build['group_catalog'] ?? []
         );
 
         [$matrix, $diffs] = $this->diffs->applyBaseline($snapshot, $baseline, $this->config->strictMode());
@@ -79,6 +80,10 @@ class ScannerService {
 
         return [
             'group_count' => count($snapshot->groups()),
+            'group_family_count' => count(array_filter(
+                $snapshot->groupCatalog(),
+                static fn(array $entry): bool => ($entry['type'] ?? '') === 'family'
+            )),
             'app_count' => count($snapshot->apps()),
             'restricted_app_count' => count($restrictedApps),
             'object_count' => count($matrix),

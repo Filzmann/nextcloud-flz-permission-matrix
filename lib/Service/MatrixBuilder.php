@@ -20,7 +20,8 @@ class MatrixBuilder {
         private FilesAdapter $files,
         private SharingAdapter $sharing,
         private GroupFoldersAdapter $groupFolders,
-        private FilesAccessControlAdapter $filesAccessControl
+        private FilesAccessControlAdapter $filesAccessControl,
+        private GroupCatalogService $groupCatalog
     ) {
     }
 
@@ -33,8 +34,11 @@ class MatrixBuilder {
             ->merge($this->groupFolders->collect())
             ->merge($this->filesAccessControl->collect());
 
+        $groups = $this->inventory->groups();
+
         return [
-            'groups' => $this->inventory->groups(),
+            'groups' => $groups,
+            'group_catalog' => $this->groupCatalog->catalog($groups),
             'apps' => $this->inventory->enabledApps(),
             'rows' => $result->rows(),
             'warnings' => $result->warnings(),

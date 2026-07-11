@@ -40,6 +40,12 @@ style('br_permission_matrix', 'style');
 
     <section id="pm-view-matrix" class="pm-view">
         <div class="pm-filters">
+            <label>Gruppenansicht
+                <select id="pm-group-mode">
+                    <option value="summary">Zusammengefasst</option>
+                    <option value="raw">Rohgruppen</option>
+                </select>
+            </label>
             <label>App <input id="pm-filter-app" type="search"></label>
             <label>Gruppe <select id="pm-filter-group"></select></label>
             <label>Status <select id="pm-filter-status"></select></label>

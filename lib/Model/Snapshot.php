@@ -22,7 +22,8 @@ class Snapshot {
         private array $diffToBaseline = [],
         private array $metadata = [],
         private array $summary = [],
-        private array $adapterStatus = []
+        private array $adapterStatus = [],
+        private array $groupCatalog = []
     ) {
         $this->groups = array_values(array_unique(array_map('strval', $groups)));
         sort($this->groups, SORT_NATURAL | SORT_FLAG_CASE);
@@ -57,7 +58,8 @@ class Snapshot {
             is_array($payload['diff_to_baseline'] ?? null) ? $payload['diff_to_baseline'] : [],
             is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [],
             is_array($payload['summary'] ?? null) ? $payload['summary'] : [],
-            is_array($payload['adapter_status'] ?? null) ? $payload['adapter_status'] : []
+            is_array($payload['adapter_status'] ?? null) ? $payload['adapter_status'] : [],
+            is_array($payload['group_catalog'] ?? null) ? $payload['group_catalog'] : []
         );
     }
 
@@ -74,7 +76,8 @@ class Snapshot {
             $diffToBaseline,
             $this->metadata,
             $summary,
-            $this->adapterStatus
+            $this->adapterStatus,
+            $this->groupCatalog
         );
     }
 
@@ -129,6 +132,10 @@ class Snapshot {
         return $this->adapterStatus;
     }
 
+    public function groupCatalog(): array {
+        return $this->groupCatalog;
+    }
+
     public function toArray(): array {
         return [
             'snapshot_id' => $this->snapshotId,
@@ -143,6 +150,7 @@ class Snapshot {
             'metadata' => $this->metadata,
             'summary' => $this->summary,
             'adapter_status' => $this->adapterStatus,
+            'group_catalog' => $this->groupCatalog,
         ];
     }
 }

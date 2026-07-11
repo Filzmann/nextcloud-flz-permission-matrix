@@ -9,6 +9,7 @@
         filters: {
             app: '',
             group: '',
+            groupMode: 'summary',
             status: '',
             text: ''
         }
@@ -50,6 +51,12 @@
             element.addEventListener('input', updateFilters);
             element.addEventListener('change', updateFilters);
         });
+        render.byId('pm-group-mode').addEventListener('change', () => {
+            state.filters.groupMode = render.byId('pm-group-mode').value;
+            state.filters.group = '';
+            render.fillFilters(state.snapshot, state.filters.groupMode);
+            updateFilters();
+        });
         render.byId('pm-snapshots').addEventListener('click', async (event) => {
             const button = event.target.closest('[data-baseline-id]');
             if (!button) {
@@ -67,7 +74,7 @@
             state.canManage = Boolean(data.can_manage);
             const snapshots = await api.snapshots();
             state.snapshots = snapshots.snapshots || [];
-            render.fillFilters(state.snapshot);
+            render.fillFilters(state.snapshot, state.filters.groupMode);
             draw();
             notice('');
         } catch (error) {
@@ -82,7 +89,7 @@
             state.snapshot = data.snapshot;
             const snapshots = await api.snapshots();
             state.snapshots = snapshots.snapshots || [];
-            render.fillFilters(state.snapshot);
+            render.fillFilters(state.snapshot, state.filters.groupMode);
             draw();
             notice('Scan abgeschlossen.', 'success');
         } catch (error) {
@@ -114,6 +121,7 @@
     function updateFilters() {
         state.filters.app = render.byId('pm-filter-app').value.trim();
         state.filters.group = render.byId('pm-filter-group').value;
+        state.filters.groupMode = render.byId('pm-group-mode').value;
         state.filters.status = render.byId('pm-filter-status').value;
         state.filters.text = render.byId('pm-filter-text').value.trim();
         render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);

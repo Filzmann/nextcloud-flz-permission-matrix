@@ -49,6 +49,7 @@ foreach ($lintFiles as $file) {
 foreach ([
     'tests/unit/MatrixRowTest.php',
     'tests/unit/GenericAppAdapterTest.php',
+    'tests/unit/GroupCatalogServiceTest.php',
     'tests/unit/DiffServiceTest.php',
     'tests/unit/ScannerServiceTest.php',
     'tests/unit/ExportServiceTest.php',

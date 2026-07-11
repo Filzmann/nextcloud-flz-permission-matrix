@@ -8,6 +8,12 @@ Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und erste gl
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
 
+## Gruppenfamilien
+
+Die Matrix fasst bekannte, massenhaft auftretende technische Gruppen standardmaessig zu fachlichen Familien zusammen. Aktuell werden die AdPlaner-Schemata `ad-ASN-<Kuerzel>`, `ad-ASN-<Kuerzel>-Urlaub` und `ad-EB-*` getrennt dargestellt. Die Matrix kann jederzeit auf die vollstaendige Rohgruppenansicht umgeschaltet werden.
+
+Die Zusammenfassung ersetzt weder in den gescannten Daten noch in Baselines, Diffs oder Exporten die Rohgruppen. Abweichende Rechte innerhalb einer Familie werden als Teilbelegung oder `gemischt` markiert; die zugehoerigen Rohwerte bleiben in der Ansicht nachvollziehbar. Nicht ausdruecklich erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
+
 ## Installation lokal
 
 Die App wird in der gemeinsamen DDEV-Nextcloud per Mount eingebunden:

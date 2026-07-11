@@ -31,6 +31,7 @@
             ['Nextcloud-Version', snapshot.nextcloud_version],
             ['Letzter Scan', snapshot.created_at],
             ['Gruppen', summary.group_count],
+            ['Gruppenfamilien', summary.group_family_count],
             ['Aktivierte Apps', summary.app_count],
             ['Gruppenbeschraenkte Apps', summary.restricted_app_count],
             ['Berechtigungsobjekte', summary.object_count],
@@ -61,7 +62,10 @@
             return empty('Keine Matrixdaten vorhanden.');
         }
         const groupFilter = filters.group || '';
-        const groups = groupFilter ? [groupFilter] : snapshot.groups;
+        const availableColumns = groupColumns(snapshot, filters.groupMode || 'summary');
+        const groups = groupFilter
+            ? availableColumns.filter((column) => column.key === groupFilter)
+            : availableColumns;
         const rows = (snapshot.matrix || []).filter((row) => {
             if (filters.app && !String(row.app_id).toLowerCase().includes(filters.app.toLowerCase())) {
                 return false;
@@ -86,8 +90,8 @@
             <div class="pm-table-wrap">
                 <table class="pm-table">
                     <thead><tr>
-                        <th>Objekttyp</th><th>App-ID</th><th>Objekt/Funktion</th><th>Berechtigungsart</th><th>Status</th>
-                        ${groups.map((group) => `<th>${esc(group)}</th>`).join('')}
+                        <th scope="col">Objekttyp</th><th scope="col">App-ID</th><th scope="col">Objekt/Funktion</th><th scope="col">Berechtigungsart</th><th scope="col">Status</th>
+                        ${groups.map((group) => `<th scope="col">${esc(group.label)}${group.type === 'family' ? `<small> ${group.count} Gruppen</small>` : ''}</th>`).join('')}
                     </tr></thead>
                     <tbody>
                         ${rows.map((row) => `
@@ -97,7 +101,10 @@
                                 <td>${esc(row.object)}</td>
                                 <td>${esc(row.permission_type)}</td>
                                 <td>${badge(row.status)}</td>
-                                ${groups.map((group) => `<td class="pm-cell pm-cell-${cellClass(row.cells[group])}">${esc(row.cells[group] ?? '-')}</td>`).join('')}
+                                ${groups.map((group) => {
+                                    const cell = aggregateCell(row.cells || {}, group);
+                                    return `<td class="pm-cell pm-cell-${cell.className}" title="${esc(cell.title)}">${esc(cell.value)}</td>`;
+                                }).join('')}
                             </tr>
                         `).join('')}
                     </tbody>
@@ -134,16 +141,25 @@
         }
         return `
             <div class="pm-list">
-                ${(snapshot.groups || []).map((group) => {
-                    const active = (snapshot.matrix || []).filter((row) => row.cells && !['-', 'n/a'].includes(String(row.cells[group] ?? '-')));
-                    const unknown = active.filter((row) => ['?', 'UNKNOWN', 'UNSUPPORTED'].includes(String(row.cells[group] ?? '')) || ['UNKNOWN', 'UNSUPPORTED'].includes(row.status));
+                ${groupColumns(snapshot, 'summary').map((entry) => {
+                    const active = (snapshot.matrix || []).filter((row) => {
+                        const cell = aggregateCell(row.cells || {}, entry);
+                        return !['-', 'n/a'].includes(cell.value);
+                    });
+                    const unknown = active.filter((row) => {
+                        const cell = aggregateCell(row.cells || {}, entry);
+                        return ['unknown', 'mixed'].includes(cell.className) || ['UNKNOWN', 'UNSUPPORTED'].includes(row.status);
+                    });
                     return `
                         <article class="pm-list-item">
-                            <h2>${esc(group)}</h2>
+                            <h2>${esc(entry.label)}</h2>
                             <dl>
+                                <dt>Typ</dt><dd>${entry.type === 'family' ? 'Gruppenfamilie' : 'Einzelgruppe'}</dd>
+                                <dt>Enthaltene Gruppen</dt><dd>${esc(entry.count)}</dd>
                                 <dt>Relevante Rechte</dt><dd>${esc(active.length)}</dd>
                                 <dt>Unklare Bereiche</dt><dd>${esc(unknown.length)}</dd>
                             </dl>
+                            ${entry.type === 'family' ? `<details><summary>Rohgruppen anzeigen</summary><ul>${entry.groups.map((group) => `<li>${esc(group)}</li>`).join('')}</ul></details>` : ''}
                         </article>
                     `;
                 }).join('')}
@@ -180,7 +196,7 @@
         return `
             <div class="pm-table-wrap">
                 <table class="pm-table">
-                    <thead><tr><th>Snapshot</th><th>Stand</th><th>Status</th><th>Objekte</th><th>Warnungen</th><th></th></tr></thead>
+                    <thead><tr><th scope="col">Snapshot</th><th scope="col">Stand</th><th scope="col">Status</th><th scope="col">Objekte</th><th scope="col">Warnungen</th><th scope="col">Aktion</th></tr></thead>
                     <tbody>
                         ${items.map((item) => `
                             <tr>
@@ -198,15 +214,19 @@
         `;
     }
 
-    function fillFilters(snapshot) {
+    function fillFilters(snapshot, mode = 'summary') {
         if (!snapshot) {
             return;
         }
         const groupSelect = byId('pm-filter-group');
         const statusSelect = byId('pm-filter-status');
+        const selectedStatus = statusSelect.value;
         const statuses = Array.from(new Set((snapshot.matrix || []).map((row) => row.status))).sort();
-        groupSelect.innerHTML = '<option value="">Alle</option>' + (snapshot.groups || []).map((group) => `<option value="${esc(group)}">${esc(group)}</option>`).join('');
+        groupSelect.innerHTML = '<option value="">Alle</option>' + groupColumns(snapshot, mode).map((group) => `<option value="${esc(group.key)}">${esc(group.label)}${group.type === 'family' ? ` (${group.count})` : ''}</option>`).join('');
         statusSelect.innerHTML = '<option value="">Alle</option>' + statuses.map((status) => `<option value="${esc(status)}">${esc(status)}</option>`).join('');
+        if (statuses.includes(selectedStatus)) {
+            statusSelect.value = selectedStatus;
+        }
     }
 
     function cellClass(value) {
@@ -224,6 +244,43 @@
         return raw.replace(/[^a-z0-9_-]/g, '-');
     }
 
+    function groupColumns(snapshot, mode = 'summary') {
+        if (mode === 'summary' && Array.isArray(snapshot.group_catalog) && snapshot.group_catalog.length > 0) {
+            return snapshot.group_catalog.map((entry) => ({
+                key: String(entry.key),
+                label: String(entry.label || entry.key),
+                type: entry.type === 'family' ? 'family' : 'group',
+                groups: Array.isArray(entry.groups) ? entry.groups.map(String) : [],
+                count: Number(entry.count || (entry.groups || []).length || 1)
+            }));
+        }
+        return (snapshot.groups || []).map((group) => ({
+            key: String(group), label: String(group), type: 'group', groups: [String(group)], count: 1
+        }));
+    }
+
+    function aggregateCell(cells, column) {
+        const values = column.groups.map((group) => String(cells[group] ?? '-'));
+        const unique = Array.from(new Set(values));
+        const title = column.groups.map((group, index) => `${group}: ${values[index]}`).join('; ');
+        if (unique.length === 1) {
+            return { value: unique[0], className: cellClass(unique[0]), title };
+        }
+        const relevant = values.filter((value) => !['-', 'n/a'].includes(value));
+        if (relevant.length === 0) {
+            return { value: '-', className: 'none', title };
+        }
+        const relevantUnique = Array.from(new Set(relevant));
+        if (relevantUnique.length === 1) {
+            return {
+                value: `${relevantUnique[0]} (${relevant.length}/${values.length})`,
+                className: cellClass(relevantUnique[0]),
+                title
+            };
+        }
+        return { value: `gemischt (${relevant.length}/${values.length})`, className: 'mixed', title };
+    }
+
     window.PermissionMatrix = window.PermissionMatrix || {};
     window.PermissionMatrix.render = {
         byId,
@@ -235,6 +292,8 @@
         renderGroups,
         renderDiffs,
         renderSnapshots,
-        fillFilters
+        fillFilters,
+        groupColumns,
+        aggregateCell
     };
 })();
