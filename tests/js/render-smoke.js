@@ -48,6 +48,7 @@ assert(overview.includes('Deck &lt;unklar&gt;'));
 assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
 assert(!matrix.includes('Deck <Test>'));
+assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar"'));
 assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
 assert(matrix.includes('<small> 1 Gruppe</small>'));
 assert(matrix.includes('X (1/2)'));

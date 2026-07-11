@@ -8,6 +8,17 @@ use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Service\AdapterCatalogService;
 use OCA\BrPermissionMatrix\Service\InventoryService;
 
+/**
+ * Zweck: Erzeugt fuer jede aktivierte App eine Zeile zur Nextcloud-App-Verfuegbarkeit.
+ *
+ * Zusammenspiel:
+ * - InventoryService liefert die App-Gruppenbeschraenkung; AdapterCatalogService kennzeichnet,
+ *   ob zusaetzlich belastbare Detailrechte aus einem spezialisierten Adapter vorliegen.
+ *
+ * Vertrag:
+ * - UNSUPPORTED bedeutet nur, dass Detailrechte fehlen. Die Zellen bleiben davon unabhaengig:
+ *   X/- bilden die gelesene App-Gruppenbeschraenkung ab, ? eine unklare Konfiguration.
+ */
 class GenericAppAdapter implements PermissionAdapterInterface {
     public function __construct(
         private InventoryService $inventory,

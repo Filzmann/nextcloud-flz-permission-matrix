@@ -36,6 +36,15 @@ class GenericAdapterFakeInventory extends InventoryService {
                 'groups' => [],
                 'source' => 'shipped',
             ],
+            [
+                'app_id' => 'notes',
+                'display_name' => 'Notes',
+                'version' => '1.0',
+                'enabled' => true,
+                'restricted' => false,
+                'groups' => [],
+                'source' => 'appstore',
+            ],
         ];
     }
 }
@@ -43,11 +52,14 @@ class GenericAdapterFakeInventory extends InventoryService {
 $result = (new GenericAppAdapter(new GenericAdapterFakeInventory(), new AdapterCatalogService()))->collect();
 $rows = $result->rows();
 
-assertSameValue(2, count($rows), 'generic adapter should create one app availability row per app');
+assertSameValue(3, count($rows), 'generic adapter should create one app availability row per app');
 assertSameValue('UNSUPPORTED', $rows[0]->status(), 'app without implemented adapter should be unsupported');
 assertSameValue('-', $rows[0]->cells()['Betriebsrat'], 'restricted app should deny non-listed group');
 assertSameValue('X', $rows[0]->cells()['IKT-Ausschuss'], 'restricted app should allow listed group');
 assertSameValue('NEW', $rows[1]->status(), 'implemented adapter app availability should be concrete before baseline comparison');
-assertSameValue(['deck'], $result->unsupportedApps(), 'unsupported app list should contain app without adapter');
+assertSameValue('UNSUPPORTED', $rows[2]->status(), 'globally available apps without detail adapters should remain unsupported');
+assertSameValue('X', $rows[2]->cells()['Betriebsrat'], 'unsupported status must not hide a globally available app from any scanned group');
+assertSameValue('X', $rows[2]->cells()['IKT-Ausschuss'], 'global app availability should be independent of detail-adapter support');
+assertSameValue(['deck', 'notes'], $result->unsupportedApps(), 'unsupported app list should contain every app without a detail adapter');
 
 echo 'GenericAppAdapter tests passed' . PHP_EOL;

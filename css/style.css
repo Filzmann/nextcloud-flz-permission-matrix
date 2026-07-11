@@ -1,8 +1,17 @@
+#content {
+    overflow-y: auto !important;
+    height: calc(100vh - var(--header-height, 50px)) !important;
+}
+
 #permission-matrix-app,
 .pm-admin {
+    box-sizing: border-box;
+    width: 100%;
     max-width: 1600px;
+    min-height: calc(100vh - var(--header-height, 50px));
     margin: 0 auto;
     padding: 24px;
+    padding-bottom: 120px;
     color: var(--color-main-text);
 }
 
@@ -128,6 +137,8 @@
 
 .pm-table-wrap {
     overflow: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 300px);
     border: 1px solid var(--color-border);
     border-radius: 6px;
 }

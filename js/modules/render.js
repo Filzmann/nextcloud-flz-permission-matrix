@@ -91,7 +91,7 @@
         }
 
         return `
-            <div class="pm-table-wrap">
+            <div class="pm-table-wrap" tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar">
                 <table class="pm-table">
                     <thead><tr>
                         <th scope="col">Objekttyp</th><th scope="col">App-ID</th><th scope="col">Objekt/Funktion</th><th scope="col">Berechtigungsart</th><th scope="col">Status</th>
@@ -201,7 +201,7 @@
             return empty('Keine Snapshots vorhanden.');
         }
         return `
-            <div class="pm-table-wrap">
+            <div class="pm-table-wrap" tabindex="0" aria-label="Snapshotliste, horizontal und vertikal scrollbar">
                 <table class="pm-table">
                     <thead><tr><th scope="col">Snapshot</th><th scope="col">Stand</th><th scope="col">Status</th><th scope="col">Objekte</th><th scope="col">Warnungen</th><th scope="col">Aktion</th></tr></thead>
                     <tbody>
