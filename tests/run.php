@@ -51,6 +51,7 @@ foreach ([
     'tests/unit/ApiControllerAccessTest.php',
     'tests/unit/ConfigServiceTest.php',
     'tests/unit/MatrixRowTest.php',
+    'tests/unit/SnapshotTest.php',
     'tests/unit/GenericAppAdapterTest.php',
     'tests/unit/GroupCatalogServiceTest.php',
     'tests/unit/DiffServiceTest.php',

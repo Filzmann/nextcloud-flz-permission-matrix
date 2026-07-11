@@ -10,9 +10,10 @@
         filters: {
             app: '',
             group: '',
-            groupMode: 'summary',
+            groupMode: 'teams',
             status: '',
-            text: ''
+            text: '',
+            collapsedApps: []
         }
     };
 
@@ -59,6 +60,7 @@
             render.fillFilters(state.snapshot, state.filters.groupMode);
             updateFilters();
         });
+        render.byId('pm-matrix').addEventListener('click', handleMatrixClick);
         render.byId('pm-snapshots').addEventListener('click', async (event) => {
             const button = event.target.closest('[data-baseline-id]');
             if (!button) {
@@ -128,6 +130,35 @@
         state.filters.status = render.byId('pm-filter-status').value;
         state.filters.text = render.byId('pm-filter-text').value.trim();
         render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);
+    }
+
+    function handleMatrixClick(event) {
+        const appToggle = event.target.closest('[data-app-toggle]');
+        if (appToggle) {
+            const appId = appToggle.dataset.appToggle;
+            const collapsed = new Set(state.filters.collapsedApps);
+            collapsed.has(appId) ? collapsed.delete(appId) : collapsed.add(appId);
+            state.filters.collapsedApps = Array.from(collapsed);
+            updateFilters();
+            return;
+        }
+
+        const groupFocus = event.target.closest('[data-group-focus]');
+        if (groupFocus) {
+            const groupSelect = render.byId('pm-filter-group');
+            groupSelect.value = state.filters.group === groupFocus.dataset.groupFocus ? '' : groupFocus.dataset.groupFocus;
+            updateFilters();
+            return;
+        }
+
+        const action = event.target.closest('[data-matrix-action]');
+        if (!action) {
+            return;
+        }
+        state.filters.collapsedApps = action.dataset.matrixAction === 'collapse-all'
+            ? Array.from(render.byId('pm-matrix').querySelectorAll('[data-app-toggle]')).map((button) => button.dataset.appToggle)
+            : [];
+        updateFilters();
     }
 
     function draw() {

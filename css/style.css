@@ -37,7 +37,8 @@
 
 .pm-actions,
 .pm-tabs,
-.pm-filters {
+.pm-filters,
+.pm-matrix-toolbar {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -90,6 +91,14 @@
 
 .pm-filters {
     margin-bottom: 12px;
+}
+
+.pm-matrix-toolbar {
+    margin-bottom: 8px;
+}
+
+.pm-matrix-toolbar span {
+    color: var(--color-text-maxcontrast);
 }
 
 .pm-filters label,
@@ -164,6 +173,71 @@
     top: 0;
     z-index: 1;
     background: var(--color-main-background);
+}
+
+.pm-table thead th:first-child,
+.pm-permission-cell {
+    position: sticky;
+    left: 0;
+    min-width: 260px;
+    max-width: 360px;
+    z-index: 2;
+    background: var(--color-main-background);
+}
+
+.pm-table thead th:first-child {
+    z-index: 3;
+}
+
+.pm-permission-cell {
+    white-space: normal !important;
+}
+
+.pm-permission-cell small,
+.pm-group-head small,
+.pm-app-heading small {
+    display: block;
+    color: var(--color-text-maxcontrast);
+    font-weight: 400;
+}
+
+.pm-group-head {
+    width: 100%;
+    min-width: 130px;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    white-space: normal;
+}
+
+.pm-group-head[aria-pressed="true"] {
+    color: var(--color-primary-element-text);
+    background: var(--color-primary-element);
+}
+
+.pm-app-heading th {
+    padding: 0;
+    background: var(--color-background-hover);
+}
+
+.pm-app-heading button {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.pm-app-heading code {
+    color: var(--color-text-maxcontrast);
+}
+
+.pm-app-heading small {
+    margin-left: auto;
 }
 
 .pm-cell {

@@ -10,9 +10,13 @@ Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodell
 
 ## Gruppenfamilien
 
-Die Matrix fasst bekannte, massenhaft auftretende technische Gruppen standardmaessig zu fachlichen Familien zusammen. Aktuell werden die AdPlaner-Schemata `ad-ASN-<Kuerzel>`, `ad-ASN-<Kuerzel>-Urlaub` und `ad-EB-*` getrennt dargestellt. Die Matrix kann jederzeit auf die vollstaendige Rohgruppenansicht umgeschaltet werden.
+Die Matrix kann bekannte, massenhaft auftretende technische Gruppen zu fachlichen Familien zusammenfassen. Fuer die AdPlaner-Schemata `ad-ASN-<Kuerzel>`, `ad-ASN-<Kuerzel>-Urlaub`, `ad-EB-*` und `ad-PFK-*` stehen Team-, Familien- und vollstaendige Rohgruppenansicht zur Verfuegung.
 
 Die Zusammenfassung ersetzt weder in den gescannten Daten noch in Baselines, Diffs oder Exporten die Rohgruppen. Abweichende Rechte innerhalb einer Familie werden als Teilbelegung oder `gemischt` markiert; die zugehoerigen Rohwerte bleiben in der Ansicht nachvollziehbar. Nicht ausdruecklich erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
+
+Die Standardansicht sortiert Berechtigungen streng nach App. App-Abschnitte lassen sich einzeln oder gemeinsam ein- und ausklappen; ein Klick auf eine Gruppenueberschrift fokussiert diese Spalte. Diese Interaktionen filtern nur die read-only Darstellung und veraendern keine Nextcloud-Rechte.
+
+Die Teamansicht ordnet bekannte technische Gruppen verstaendlich, zum Beispiel `Team A1 · Assistenz`, `Rolle EB · Koordination` oder `Rolle PFK · Pflege`. Die zugrunde liegenden `ad-ASN-*`, `ad-EB-*`, `ad-PFK-*` und Urlaubsgruppen bleiben getrennt. Eine N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team- und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu einem scheinbaren Einzelrecht verschmolzen.
 
 ## Installation lokal
 

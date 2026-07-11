@@ -42,7 +42,8 @@ style('br_permission_matrix', 'style');
         <div class="pm-filters">
             <label>Gruppenansicht
                 <select id="pm-group-mode">
-                    <option value="summary">Zusammengefasst</option>
+                    <option value="teams">Teams</option>
+                    <option value="summary">Gruppenfamilien</option>
                     <option value="raw">Rohgruppen</option>
                 </select>
             </label>

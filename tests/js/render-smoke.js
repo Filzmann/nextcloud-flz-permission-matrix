@@ -15,8 +15,13 @@ const snapshot = {
     nextcloud_version: '34.0.0',
     groups: ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta', 'ad-EB-Ada'],
     group_catalog: [
-        { key: 'family:adplaner_assistance_teams', label: 'AdPlaner · Assistenznehmer-Teams', type: 'family', groups: ['ad-ASN-Ada', 'ad-ASN-Berta'], count: 2 },
-        { key: 'family:adplaner_eb_roles', label: 'AdPlaner · Einsatzbegleitung', type: 'family', groups: ['ad-EB-Ada'], count: 1 },
+        { key: 'family:adplaner_assistance_teams', label: 'AdPlaner · Assistenznehmer-Teams', type: 'family', groups: ['ad-ASN-Ada', 'ad-ASN-Berta'], count: 2, members: [
+            { group: 'ad-ASN-Ada', label: 'Team Ada · Assistenz', team: 'Ada', role: 'assistant' },
+            { group: 'ad-ASN-Berta', label: 'Team Berta · Assistenz', team: 'Berta', role: 'assistant' }
+        ] },
+        { key: 'family:adplaner_eb_roles', label: 'AdPlaner · Einsatzbegleitung', type: 'family', groups: ['ad-EB-Ada'], count: 1, members: [
+            { group: 'ad-EB-Ada', label: 'Rolle EB · Ada', team: null, role: 'eb' }
+        ] },
         { key: 'Betriebsrat', label: 'Betriebsrat', type: 'group', groups: ['Betriebsrat'], count: 1 },
         { key: 'IKT-Ausschuss', label: 'IKT-Ausschuss', type: 'group', groups: ['IKT-Ausschuss'], count: 1 }
     ],
@@ -28,6 +33,7 @@ const snapshot = {
         object_type: 'App',
         app_id: 'deck',
         object: 'Deck <Test>',
+        detail: 'App-Nutzung',
         permission_type: 'App-Verfuegbarkeit',
         status: 'UNSUPPORTED',
         cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-', 'ad-EB-Ada': 'X' }
@@ -39,6 +45,8 @@ const render = window.PermissionMatrix.render;
 const overview = render.renderOverview(snapshot);
 const matrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'summary', status: '', text: '' });
 const rawMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'raw', status: '', text: '' });
+const teamMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'teams', status: '', text: '' });
+const collapsedMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'teams', status: '', text: '', collapsedApps: ['deck'] });
 const apps = render.renderApps(snapshot);
 const groups = render.renderGroups(snapshot);
 const diffs = render.renderDiffs(snapshot);
@@ -49,13 +57,20 @@ assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
 assert(!matrix.includes('Deck <Test>'));
 assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar"'));
+assert(matrix.includes('data-app-toggle="deck"'));
+assert(matrix.includes('<strong>Deck &lt;Test&gt;</strong>'));
+assert(matrix.includes('1 Berechtigung'));
 assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
-assert(matrix.includes('<small> 1 Gruppe</small>'));
+assert(matrix.includes('<small>1 Gruppe</small>'));
 assert(matrix.includes('X (1/2)'));
 assert(matrix.includes('ad-ASN-Ada: X; ad-ASN-Berta: -'));
 assert(matrix.includes('aria-label="AdPlaner · Assistenznehmer-Teams: X (1/2). Einzelwerte: ad-ASN-Ada: X; ad-ASN-Berta: -"'));
-assert(!matrix.includes('<th scope="col">ad-ASN-Ada</th>'));
-assert(rawMatrix.includes('<th scope="col">ad-ASN-Ada</th>'));
+assert(!matrix.includes('data-group-focus="ad-ASN-Ada"'));
+assert(rawMatrix.includes('data-group-focus="ad-ASN-Ada"'));
+assert(teamMatrix.includes('Team Ada · Assistenz'));
+assert(teamMatrix.includes('Rolle EB · Ada'));
+assert(teamMatrix.indexOf('Team Ada · Assistenz') < teamMatrix.indexOf('Rolle EB · Ada'));
+assert(!collapsedMatrix.includes('<td>App-Verfuegbarkeit</td>'));
 assert(apps.includes('Deck &lt;Test&gt;'));
 assert(groups.includes('<summary>Rohgruppen anzeigen</summary>'));
 assert(groups.includes('<li>ad-ASN-Ada</li>'));
@@ -70,5 +85,10 @@ assert.deepStrictEqual(mixed, {
     className: 'mixed',
     title: 'ad-ASN-Ada: X; ad-ASN-Berta: ?'
 });
+
+assert.deepStrictEqual(
+    render.matrixSections(snapshot, { app: 'Deck <Test>', status: '', text: '' }).map((section) => section.appId),
+    ['deck']
+);
 
 console.log('Permission Matrix render smoke test passed.');

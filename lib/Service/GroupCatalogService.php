@@ -40,6 +40,11 @@ class GroupCatalogService {
             'source_app' => 'adplaner',
             'pattern' => '/^ad-EB-.+$/u',
         ],
+        'adplaner_pfk_roles' => [
+            'label' => 'AdPlaner · Pflegefachkraefte',
+            'source_app' => 'adplaner',
+            'pattern' => '/^ad-PFK-.+$/u',
+        ],
     ];
 
     public function catalog(array $groups): array {
@@ -102,6 +107,38 @@ class GroupCatalogService {
             'family' => $family,
             'groups' => array_values($groups),
             'count' => count($groups),
+            'members' => array_map(fn(string $group): array => $this->member($group), $groups),
+        ];
+    }
+
+    /**
+     * Zweck: Liefert eine verstaendliche Beschriftung fuer technische Teamgruppen.
+     *
+     * Vertrag:
+     * - Die Rohgruppen-ID bleibt der Schluessel; Team und Rolle sind reine Anzeige-Metadaten.
+     * - Unbekannte Gruppen werden unveraendert und ohne erfundene Teamzuordnung geliefert.
+     *
+     * @return array{group: string, label: string, team: ?string, role: ?string}
+     */
+    private function member(string $group): array {
+        $team = null;
+        $role = null;
+        $roleLabel = null;
+
+        if (preg_match('/^ad-ASN-([\p{L}\p{N}]{1,16})(-Urlaub)?$/u', $group, $matches) === 1) {
+            $team = $matches[1];
+            $role = ($matches[2] ?? '') === '-Urlaub' ? 'vacation' : 'assistant';
+            $roleLabel = $role === 'vacation' ? 'Urlaub' : 'Assistenz';
+        } elseif (preg_match('/^ad-(EB|PFK)-(.+)$/u', $group, $matches) === 1) {
+            $role = strtolower($matches[1]);
+            $roleLabel = $matches[1] . ' · ' . $matches[2];
+        }
+
+        return [
+            'group' => $group,
+            'label' => $role === null ? $group : ($team === null ? 'Rolle ' . $roleLabel : 'Team ' . $team . ' · ' . $roleLabel),
+            'team' => $team,
+            'role' => $role,
         ];
     }
 }

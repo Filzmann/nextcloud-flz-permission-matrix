@@ -26,6 +26,10 @@
         return `${count} ${count === 1 ? 'Gruppe' : 'Gruppen'}`;
     }
 
+    function permissionCountLabel(count) {
+        return `${count} ${count === 1 ? 'Berechtigung' : 'Berechtigungen'}`;
+    }
+
     function renderOverview(snapshot) {
         if (!snapshot) {
             return empty('Noch kein Snapshot vorhanden.');
@@ -61,6 +65,55 @@
         return `<h2>Warnungen</h2><ul>${warnings.map((warning) => `<li>${esc(warning)}</li>`).join('')}</ul>`;
     }
 
+    /**
+     * Zweck: Ordnet gefilterte Berechtigungszeilen strikt nach App und innerhalb der App nach Fachbegriff.
+     *
+     * Vertrag:
+     * - Jede Matrixzeile erscheint genau in einem App-Abschnitt; die App-Anzeige stammt bevorzugt
+     *   aus dem Snapshot-Inventar und faellt sonst auf die App-ID zurueck.
+     */
+    function matrixSections(snapshot, filters) {
+        const labels = new Map((snapshot.apps || []).map((app) => [String(app.app_id), String(app.display_name || app.app_id)]));
+        const appFilter = String(filters.app || '').toLowerCase();
+        const textFilter = String(filters.text || '').toLowerCase();
+        const rows = (snapshot.matrix || []).filter((row) => {
+            const appId = String(row.app_id || '');
+            const appLabel = labels.get(appId) || appId;
+            if (appFilter && !`${appId} ${appLabel}`.toLowerCase().includes(appFilter)) {
+                return false;
+            }
+            if (filters.status && row.status !== filters.status) {
+                return false;
+            }
+            if (textFilter) {
+                const haystack = [row.object_type, appId, appLabel, row.object, row.detail, row.permission_type, row.status].join(' ').toLowerCase();
+                if (!haystack.includes(textFilter)) {
+                    return false;
+                }
+            }
+            return true;
+        }).sort((a, b) => {
+            const appComparison = String(a.app_id).localeCompare(String(b.app_id), 'de', { numeric: true, sensitivity: 'base' });
+            if (appComparison !== 0) {
+                return appComparison;
+            }
+            return `${a.object_type} ${a.object}`.localeCompare(`${b.object_type} ${b.object}`, 'de', { numeric: true, sensitivity: 'base' });
+        });
+
+        const sections = [];
+        rows.forEach((row) => {
+            const appId = String(row.app_id || 'unbekannt');
+            let section = sections[sections.length - 1];
+            if (!section || section.appId !== appId) {
+                section = { appId, label: labels.get(appId) || appId, rows: [] };
+                sections.push(section);
+            }
+            section.rows.push(row);
+        });
+
+        return sections;
+    }
+
     function renderMatrix(snapshot, filters) {
         if (!snapshot) {
             return empty('Keine Matrixdaten vorhanden.');
@@ -70,51 +123,56 @@
         const groups = groupFilter
             ? availableColumns.filter((column) => column.key === groupFilter)
             : availableColumns;
-        const rows = (snapshot.matrix || []).filter((row) => {
-            if (filters.app && !String(row.app_id).toLowerCase().includes(filters.app.toLowerCase())) {
-                return false;
-            }
-            if (filters.status && row.status !== filters.status) {
-                return false;
-            }
-            if (filters.text) {
-                const haystack = [row.object_type, row.app_id, row.object, row.detail, row.permission_type, row.status].join(' ').toLowerCase();
-                if (!haystack.includes(filters.text.toLowerCase())) {
-                    return false;
-                }
-            }
-            return true;
-        });
+        const sections = matrixSections(snapshot, filters);
+        const collapsedApps = new Set(filters.collapsedApps || []);
+        const columnCount = 4 + groups.length;
 
-        if (!rows.length) {
+        if (!sections.length) {
             return empty('Keine Matrixzeilen fuer diese Filter.');
         }
 
         return `
+            <div class="pm-matrix-toolbar" aria-label="Matrixdarstellung steuern">
+                <button type="button" data-matrix-action="expand-all">Alle Apps aufklappen</button>
+                <button type="button" data-matrix-action="collapse-all">Alle Apps einklappen</button>
+                <span>${esc(sections.length)} Apps · Gruppenueberschrift anklicken, um eine Gruppe zu fokussieren</span>
+            </div>
             <div class="pm-table-wrap" tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar">
                 <table class="pm-table">
                     <thead><tr>
-                        <th scope="col">Objekttyp</th><th scope="col">App-ID</th><th scope="col">Objekt/Funktion</th><th scope="col">Berechtigungsart</th><th scope="col">Status</th>
-                        ${groups.map((group) => `<th scope="col">${esc(group.label)}${group.type === 'family' ? `<small> ${groupCountLabel(group.count)}</small>` : ''}</th>`).join('')}
+                        <th scope="col">Berechtigung</th><th scope="col">Detail</th><th scope="col">Art</th><th scope="col">Status</th>
+                        ${groups.map((group) => `<th scope="col"><button type="button" class="pm-group-head" data-group-focus="${esc(group.key)}" aria-pressed="${groupFilter === group.key ? 'true' : 'false'}">${esc(group.label)}${group.type === 'family' ? `<small>${groupCountLabel(group.count)}</small>` : ''}</button></th>`).join('')}
                     </tr></thead>
-                    <tbody>
-                        ${rows.map((row) => `
-                            <tr>
-                                <th scope="row">${esc(row.object_type)}</th>
-                                <td>${esc(row.app_id)}</td>
-                                <td>${esc(row.object)}</td>
-                                <td>${esc(row.permission_type)}</td>
-                                <td>${badge(row.status)}</td>
-                                ${groups.map((group) => {
-                                    const cell = aggregateCell(row.cells || {}, group);
-                                    const accessibleValue = group.type === 'family'
-                                        ? `${group.label}: ${cell.value}. Einzelwerte: ${cell.title}`
-                                        : `${group.label}: ${cell.value}`;
-                                    return `<td class="pm-cell pm-cell-${cell.className}" title="${esc(cell.title)}" aria-label="${esc(accessibleValue)}">${esc(cell.value)}</td>`;
-                                }).join('')}
+                    ${sections.map((section) => {
+                        const collapsed = collapsedApps.has(section.appId);
+                        return `<tbody class="pm-app-section" data-app-section="${esc(section.appId)}">
+                            <tr class="pm-app-heading">
+                                <th colspan="${columnCount}">
+                                    <button type="button" data-app-toggle="${esc(section.appId)}" aria-expanded="${collapsed ? 'false' : 'true'}">
+                                        <span aria-hidden="true">${collapsed ? '▸' : '▾'}</span>
+                                        <strong>${esc(section.label)}</strong>
+                                        <code>${esc(section.appId)}</code>
+                                        <small>${esc(permissionCountLabel(section.rows.length))}</small>
+                                    </button>
+                                </th>
                             </tr>
-                        `).join('')}
-                    </tbody>
+                            ${collapsed ? '' : section.rows.map((row) => `
+                                <tr>
+                                    <th scope="row" class="pm-permission-cell">${esc(row.object)}<small>${esc(row.object_type)}</small></th>
+                                    <td>${esc(row.detail || '-')}</td>
+                                    <td>${esc(row.permission_type)}</td>
+                                    <td>${badge(row.status)}</td>
+                                    ${groups.map((group) => {
+                                        const cell = aggregateCell(row.cells || {}, group);
+                                        const accessibleValue = group.type === 'family'
+                                            ? `${group.label}: ${cell.value}. Einzelwerte: ${cell.title}`
+                                            : `${group.label}: ${cell.value}`;
+                                        return `<td class="pm-cell pm-cell-${cell.className}" title="${esc(cell.title)}" aria-label="${esc(accessibleValue)}">${esc(cell.value)}</td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>`;
+                    }).join('')}
                 </table>
             </div>
         `;
@@ -268,6 +326,35 @@
                 count: Number(entry.count || (entry.groups || []).length || 1)
             }));
         }
+        if (mode === 'teams' && Array.isArray(snapshot.group_catalog) && snapshot.group_catalog.length > 0) {
+            const members = new Map();
+            snapshot.group_catalog.forEach((entry) => {
+                (Array.isArray(entry.members) ? entry.members : []).forEach((member) => {
+                    members.set(String(member.group), member);
+                });
+            });
+            const roleOrder = { assistant: 0, vacation: 1, eb: 2, pfk: 3 };
+            return (snapshot.groups || []).map((group) => {
+                const raw = String(group);
+                const member = members.get(raw) || {};
+                return {
+                    key: raw,
+                    label: String(member.label || raw),
+                    type: 'group',
+                    groups: [raw],
+                    count: 1,
+                    team: member.team ? String(member.team) : '',
+                    role: member.role ? String(member.role) : ''
+                };
+            }).sort((a, b) => {
+                if (a.team && !b.team) return -1;
+                if (!a.team && b.team) return 1;
+                const teamComparison = a.team.localeCompare(b.team, 'de', { numeric: true, sensitivity: 'base' });
+                if (teamComparison !== 0) return teamComparison;
+                const roleComparison = (roleOrder[a.role] ?? 99) - (roleOrder[b.role] ?? 99);
+                return roleComparison !== 0 ? roleComparison : a.label.localeCompare(b.label, 'de', { numeric: true, sensitivity: 'base' });
+            });
+        }
         return (snapshot.groups || []).map((group) => ({
             key: String(group), label: String(group), type: 'group', groups: [String(group)], count: 1
         }));
@@ -317,6 +404,7 @@
         renderDiffs,
         renderSnapshots,
         fillFilters,
+        matrixSections,
         groupColumns,
         aggregateCell
     };

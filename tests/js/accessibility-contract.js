@@ -11,10 +11,13 @@ const style = readFileSync(join(root, 'css', 'style.css'), 'utf8');
 
 assert(template.includes('aria-controls="pm-view-matrix"'));
 assert(template.includes('aria-labelledby="pm-tab-matrix" hidden'));
+assert(template.includes('<option value="teams">Teams</option>'));
 assert(template.includes('id="pm-notice" class="pm-notice" role="status" aria-live="polite"'));
 assert(adminTemplate.includes('id="pm-admin-notice" class="pm-notice" role="status" aria-live="polite"'));
 assert(main.includes("button.setAttribute('aria-pressed', active ? 'true' : 'false')"));
 assert(main.includes('view.hidden = !active'));
+assert(main.includes("event.target.closest('[data-app-toggle]')"));
+assert(main.includes("event.target.closest('[data-group-focus]')"));
 assert(main.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("type === 'error' ? 'alert' : 'status'"));
 assert(style.includes('overflow-y: auto !important'));

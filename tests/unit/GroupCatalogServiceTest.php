@@ -14,6 +14,7 @@ $catalog = (new GroupCatalogService())->catalog([
     'ad-ASN-ThoJa-Urlaub',
     'ad-EB-Nord',
     'ad-EB-Süd-Team',
+    'ad-PFK-Team1',
     'ad-ASN-Team-mit-Bindestrich',
 ]);
 
@@ -33,6 +34,17 @@ assertSameValue(
     ['ad-EB-Nord', 'ad-EB-Süd-Team'],
     $byKey['family:adplaner_eb_roles']['groups'],
     'All group names accepted by AdPlaner EB detection should share the EB family.'
+);
+assertSameValue(1, $byKey['family:adplaner_pfk_roles']['count'], 'PFK team mappings should have their own family.');
+assertSameValue(
+    ['group' => 'ad-PFK-Team1', 'label' => 'Rolle PFK · Team1', 'team' => null, 'role' => 'pfk'],
+    $byKey['family:adplaner_pfk_roles']['members'][0],
+    'Role metadata must not invent a team assignment from the role-group suffix.'
+);
+assertSameValue(
+    'Team HaMü · Assistenz',
+    $byKey['family:adplaner_assistance_teams']['members'][0]['label'],
+    'Assistance groups should expose readable team labels.'
 );
 assertSameValue(
     ['ad-ASN-Team-mit-Bindestrich'],

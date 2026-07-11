@@ -13,14 +13,18 @@ use DateTimeImmutable;
  * - ScannerService baut den Snapshot, DiffService bewertet seine Matrix und SnapshotMapper
  *   persistiert die vollstaendige serialisierte Fassung.
  *
+ * Spiegelung:
+ * - JS: PermissionMatrix.render.matrixSections() erhaelt dieselbe Reihenfolge auch nach UI-Filtern.
+ *
  * Vertrag:
  * - groupCatalog ist nur eine verlustfreie Praesentationsschicht; groups und Matrixzellen
  *   behalten immer die vollstaendigen Rohgruppen fuer Baselines, Diffs und Exporte.
+ * - Matrixzeilen bleiben in allen Serialisierungen strikt nach App und danach nach Fachbegriff sortiert.
  */
 class Snapshot {
     /**
      * @param MatrixRow[] $matrix
-     * @param array<int, array{key: string, label: string, type: string, groups: string[], count: int}> $groupCatalog
+     * @param array<int, array{key: string, label: string, type: string, groups: string[], count: int, members?: array}> $groupCatalog
      */
     public function __construct(
         private string $snapshotId,
@@ -40,6 +44,14 @@ class Snapshot {
         $this->groups = array_values(array_unique(array_map('strval', $groups)));
         sort($this->groups, SORT_NATURAL | SORT_FLAG_CASE);
         $this->apps = array_values($apps);
+        usort($this->matrix, static function(MatrixRow $a, MatrixRow $b): int {
+            $appComparison = strnatcasecmp($a->appId(), $b->appId());
+            if ($appComparison !== 0) {
+                return $appComparison;
+            }
+
+            return strnatcasecmp($a->objectType() . ' ' . $a->objectName(), $b->objectType() . ' ' . $b->objectName());
+        });
         $this->warnings = array_values(array_unique(array_map('strval', $warnings)));
         $this->unsupportedApps = array_values(array_unique(array_map('strval', $unsupportedApps)));
         sort($this->unsupportedApps, SORT_NATURAL | SORT_FLAG_CASE);
