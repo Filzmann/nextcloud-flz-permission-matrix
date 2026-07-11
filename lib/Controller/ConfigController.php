@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class ConfigController extends Controller {
     public function __construct(
-        private IRequest $request,
+        IRequest $request,
         private AccessService $access,
         private ConfigService $config,
         private AuditLogService $auditLog,

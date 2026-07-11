@@ -16,7 +16,7 @@ namespace OCP\AppFramework {
     }
 
     class Controller {
-        public function __construct(string $appName, \OCP\IRequest $request) {
+        public function __construct(string $appName, protected \OCP\IRequest $request) {
         }
     }
 }
@@ -239,6 +239,11 @@ namespace {
     $missingDiff = $controller->diff('missing-a', 'missing-b');
     assertSameValue(404, $missingDiff->getStatus(), 'Missing snapshots must not be reported as authorization failures.');
     assertSameValue('api.diff.not_found', $audit->actions[3], 'Missing snapshot access must have a distinct audit outcome.');
+    assertSameValue(
+        true,
+        class_exists(\OCA\BrPermissionMatrix\Controller\ConfigController::class),
+        'ConfigController must remain compatible with the protected request property of the Nextcloud base controller.'
+    );
 
     echo 'ApiController access tests passed' . PHP_EOL;
 }
