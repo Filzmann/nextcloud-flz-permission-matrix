@@ -19,6 +19,7 @@
         const box = render.byId('pm-notice');
         box.textContent = message;
         box.className = `pm-notice pm-notice-${type}`;
+        box.setAttribute('role', type === 'error' ? 'alert' : 'status');
         box.hidden = !message;
     }
 
@@ -141,8 +142,16 @@
     }
 
     function activateTab(tab) {
-        document.querySelectorAll('.pm-tabs button').forEach((button) => button.classList.toggle('active', button.dataset.tab === tab));
-        document.querySelectorAll('.pm-view').forEach((view) => view.classList.toggle('active', view.id === `pm-view-${tab}`));
+        document.querySelectorAll('.pm-tabs button').forEach((button) => {
+            const active = button.dataset.tab === tab;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        document.querySelectorAll('.pm-view').forEach((view) => {
+            const active = view.id === `pm-view-${tab}`;
+            view.classList.toggle('active', active);
+            view.hidden = !active;
+        });
     }
 
     document.addEventListener('DOMContentLoaded', init);

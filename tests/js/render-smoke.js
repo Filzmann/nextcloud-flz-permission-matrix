@@ -50,6 +50,7 @@ assert(!matrix.includes('Deck <Test>'));
 assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
 assert(matrix.includes('X (1/2)'));
 assert(matrix.includes('ad-ASN-Ada: X; ad-ASN-Berta: -'));
+assert(matrix.includes('aria-label="AdPlaner · Assistenznehmer-Teams: X (1/2). Einzelwerte: ad-ASN-Ada: X; ad-ASN-Berta: -"'));
 assert(!matrix.includes('<th scope="col">ad-ASN-Ada</th>'));
 assert(rawMatrix.includes('<th scope="col">ad-ASN-Ada</th>'));
 assert(apps.includes('Deck &lt;Test&gt;'));

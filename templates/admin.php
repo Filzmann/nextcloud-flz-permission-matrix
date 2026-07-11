@@ -38,5 +38,5 @@ $config = $_['config'];
         </label>
         <button type="submit">Speichern</button>
     </form>
-    <div id="pm-admin-notice" class="pm-notice" hidden></div>
+    <div id="pm-admin-notice" class="pm-notice" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 </div>

@@ -59,6 +59,18 @@
     font-weight: 700;
 }
 
+#permission-matrix-app button:focus-visible,
+#permission-matrix-app input:focus-visible,
+#permission-matrix-app select:focus-visible,
+#permission-matrix-app summary:focus-visible,
+.pm-admin button:focus-visible,
+.pm-admin input:focus-visible,
+.pm-admin select:focus-visible,
+.pm-admin textarea:focus-visible {
+    outline: 3px solid var(--color-primary-element);
+    outline-offset: 2px;
+}
+
 .pm-view {
     display: none;
 }

@@ -9,6 +9,7 @@
         const box = byId('pm-admin-notice');
         box.textContent = message;
         box.className = `pm-notice pm-notice-${type}`;
+        box.setAttribute('role', type === 'error' ? 'alert' : 'status');
         box.hidden = !message;
     }
 

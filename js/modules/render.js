@@ -103,7 +103,10 @@
                                 <td>${badge(row.status)}</td>
                                 ${groups.map((group) => {
                                     const cell = aggregateCell(row.cells || {}, group);
-                                    return `<td class="pm-cell pm-cell-${cell.className}" title="${esc(cell.title)}">${esc(cell.value)}</td>`;
+                                    const accessibleValue = group.type === 'family'
+                                        ? `${group.label}: ${cell.value}. Einzelwerte: ${cell.title}`
+                                        : `${group.label}: ${cell.value}`;
+                                    return `<td class="pm-cell pm-cell-${cell.className}" title="${esc(cell.title)}" aria-label="${esc(accessibleValue)}">${esc(cell.value)}</td>`;
                                 }).join('')}
                             </tr>
                         `).join('')}
