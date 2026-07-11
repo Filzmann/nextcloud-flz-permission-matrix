@@ -5,19 +5,37 @@ declare(strict_types=1);
 namespace OCA\BrPermissionMatrix\Service;
 
 use InvalidArgumentException;
+use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 
 class ExportService {
+    private const IMPLEMENTED_FORMATS = ['json', 'csv', 'md', 'html'];
+
+    public function __construct(
+        private ConfigService $config
+    ) {
+    }
+
+    public function allowedFormats(): array {
+        return $this->config->exportFormats();
+    }
+
     public function export(Snapshot $snapshot, string $format): array {
         $format = strtolower($format);
+        $format = $format === 'markdown' ? 'md' : $format;
+        if (!in_array($format, self::IMPLEMENTED_FORMATS, true)) {
+            throw new InvalidArgumentException('Exportformat nicht unterstuetzt.');
+        }
+        if (!in_array($format, $this->allowedFormats(), true)) {
+            throw new ExportFormatNotAllowedException('Exportformat ist nicht freigegeben.');
+        }
 
         return match ($format) {
             'json' => $this->json($snapshot),
             'csv' => $this->csv($snapshot),
-            'md', 'markdown' => $this->markdown($snapshot),
+            'md' => $this->markdown($snapshot),
             'html' => $this->html($snapshot),
-            default => throw new InvalidArgumentException('Exportformat nicht unterstuetzt.'),
         };
     }
 

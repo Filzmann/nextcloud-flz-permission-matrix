@@ -6,7 +6,18 @@ require_once __DIR__ . '/helpers.php';
 
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
+use OCA\BrPermissionMatrix\Service\ConfigService;
 use OCA\BrPermissionMatrix\Service\ExportService;
+
+class ExportTestConfig extends ConfigService {
+    public function __construct(private array $formats) {
+    }
+
+    public function exportFormats(): array {
+        return $this->formats;
+    }
+}
 
 $snapshot = new Snapshot(
     'pm-test',
@@ -25,7 +36,7 @@ $snapshot = new Snapshot(
     ['compliance_status' => 'green', 'baseline_snapshot' => 'base']
 );
 
-$service = new ExportService();
+$service = new ExportService(new ExportTestConfig(['md', 'csv', 'json', 'html']));
 $json = $service->export($snapshot, 'json');
 $csv = $service->export($snapshot, 'csv');
 $md = $service->export($snapshot, 'md');
@@ -36,5 +47,22 @@ assertContainsText('Objekttyp,App-ID', $csv['content'], 'csv export should conta
 assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown export should contain title');
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
 assertContainsText('<table>', $html['content'], 'html export should contain table');
+
+$restrictedService = new ExportService(new ExportTestConfig(['md']));
+assertSameValue(['md'], $restrictedService->allowedFormats(), 'The UI/API contract should expose only configured export formats.');
+assertContainsText('# Berechtigungsmatrix Nextcloud', $restrictedService->export($snapshot, 'markdown')['content'], 'markdown alias should honor the canonical md policy.');
+try {
+    $restrictedService->export($snapshot, 'json');
+    throw new RuntimeException('Disabled export formats must not be generated.');
+} catch (ExportFormatNotAllowedException $e) {
+    assertSameValue('Exportformat ist nicht freigegeben.', $e->getMessage(), 'Disabled formats need a safe error message.');
+}
+
+try {
+    $service->export($snapshot, 'pdf');
+    throw new RuntimeException('Unimplemented export formats must not be accepted.');
+} catch (InvalidArgumentException $e) {
+    assertSameValue('Exportformat nicht unterstuetzt.', $e->getMessage(), 'Unimplemented formats need a distinct validation error.');
+}
 
 echo 'ExportService tests passed' . PHP_EOL;

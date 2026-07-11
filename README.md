@@ -46,7 +46,7 @@ Admin-Einstellungen:
 - `include_users`: Standard `false`.
 - `redact_paths`: Standard `true`.
 - `include_share_metadata`: Standard `false`.
-- `export_formats`: `md,csv,json,html` sowie spaeter optional `xlsx,pdf`.
+- `export_formats`: serverseitig erlaubte Exportformate aus `md,csv,json,html`.
 - `retention`: Anzahl aufzubewahrender Snapshots.
 
 `occ`-Kommandos:

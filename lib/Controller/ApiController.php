@@ -10,6 +10,7 @@ use OCA\BrPermissionMatrix\AppInfo\Application;
 use OCA\BrPermissionMatrix\Db\ExportMapper;
 use OCA\BrPermissionMatrix\Db\SnapshotMapper;
 use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
+use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
 use OCA\BrPermissionMatrix\Service\AccessService;
 use OCA\BrPermissionMatrix\Service\AuditLogService;
 use OCA\BrPermissionMatrix\Service\BaselineService;
@@ -54,6 +55,7 @@ class ApiController extends Controller {
                 'snapshot' => $latest?->toArray(),
                 'baseline_snapshot' => $this->baseline->currentBaselineId(),
                 'can_manage' => $this->access->canManageCurrentUser(),
+                'export_formats' => $this->exports->allowedFormats(),
             ];
         });
     }
@@ -141,6 +143,9 @@ class ApiController extends Controller {
             $this->auditLog->record('api.export', true, $snapshot->snapshotId(), ['format' => $format]);
 
             return new DataDownloadResponse($export['content'], $export['filename'], $export['content_type']);
+        } catch (ExportFormatNotAllowedException $e) {
+            $this->auditLog->record('api.export.denied', false, null, ['reason' => 'format_disabled']);
+            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
         } catch (InvalidArgumentException $e) {
             $this->auditLog->record('api.export.rejected', false, null, ['reason' => 'invalid_format']);
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);

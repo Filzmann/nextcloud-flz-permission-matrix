@@ -89,6 +89,7 @@ namespace {
     use OCA\BrPermissionMatrix\Service\AccessService;
     use OCA\BrPermissionMatrix\Service\AuditLogService;
     use OCA\BrPermissionMatrix\Service\BaselineService;
+    use OCA\BrPermissionMatrix\Service\ConfigService;
     use OCA\BrPermissionMatrix\Service\DiffService;
     use OCA\BrPermissionMatrix\Service\ExportService;
     use OCA\BrPermissionMatrix\Service\ScannerService;
@@ -168,6 +169,15 @@ namespace {
         }
     }
 
+    class ApiAccessTestConfig extends ConfigService {
+        public function __construct() {
+        }
+
+        public function exportFormats(): array {
+            return ['md', 'csv', 'json', 'html'];
+        }
+    }
+
     class ApiAccessTestAudit extends AuditLogService {
         public array $actions = [];
 
@@ -202,7 +212,7 @@ namespace {
         $scanner,
         new ApiAccessTestBaseline(),
         new DiffService(),
-        new ExportService(),
+        new ExportService(new ApiAccessTestConfig()),
         new ApiAccessTestExportMapper(),
         $audit,
         new ApiAccessTestLogger()
@@ -223,6 +233,7 @@ namespace {
     assertSameValue(200, $allowedState->getStatus(), 'Configured viewers may call the state API.');
     assertSameValue(1, $snapshots->latestCalls, 'Allowed state requests should read the latest snapshot.');
     assertSameValue(true, $allowedState->getData()['ok'], 'Allowed state requests should return the regular payload.');
+    assertSameValue(['md', 'csv', 'json', 'html'], $allowedState->getData()['export_formats'], 'State responses should expose the enforced export policy to the UI.');
     assertSameValue('api.state', $audit->actions[2], 'Allowed state access must be audited separately.');
 
     $missingDiff = $controller->diff('missing-a', 'missing-b');

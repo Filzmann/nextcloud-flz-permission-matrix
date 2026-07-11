@@ -6,6 +6,7 @@
         snapshots: [],
         baseline: '',
         canManage: false,
+        exportFormats: ['md', 'csv', 'json', 'html'],
         filters: {
             app: '',
             group: '',
@@ -73,6 +74,7 @@
             state.snapshot = data.snapshot;
             state.baseline = data.baseline_snapshot || '';
             state.canManage = Boolean(data.can_manage);
+            state.exportFormats = Array.isArray(data.export_formats) ? data.export_formats : state.exportFormats;
             const snapshots = await api.snapshots();
             state.snapshots = snapshots.snapshots || [];
             render.fillFilters(state.snapshot, state.filters.groupMode);
@@ -139,6 +141,9 @@
         render.byId('pm-groups').innerHTML = render.renderGroups(state.snapshot);
         render.byId('pm-diffs').innerHTML = render.renderDiffs(state.snapshot);
         render.byId('pm-snapshots').innerHTML = render.renderSnapshots(state.snapshots, state.baseline, state.canManage);
+        document.querySelectorAll('[data-export]').forEach((button) => {
+            button.hidden = !state.exportFormats.includes(button.dataset.export);
+        });
     }
 
     function activateTab(tab) {

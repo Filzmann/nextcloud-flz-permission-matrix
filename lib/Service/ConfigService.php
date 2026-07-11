@@ -56,7 +56,9 @@ class ConfigService {
     }
 
     public function exportFormats(): array {
-        return $this->stringList('export_formats', self::DEFAULT_EXPORT_FORMATS);
+        return $this->normalizeFormats(
+            $this->config->getValueArray(Application::APP_ID, 'export_formats', self::DEFAULT_EXPORT_FORMATS, true)
+        );
     }
 
     public function retention(): int {
@@ -126,8 +128,10 @@ class ConfigService {
     }
 
     private function normalizeFormats(array|string $value): array {
-        $formats = $this->normalizeStringList($value);
-        $allowed = ['md', 'csv', 'json', 'html', 'xlsx', 'pdf'];
+        $formats = array_map('strtolower', $this->normalizeStringList($value));
+        $formats = array_values(array_unique($formats));
+        sort($formats, SORT_NATURAL | SORT_FLAG_CASE);
+        $allowed = ['md', 'csv', 'json', 'html'];
         $formats = array_values(array_filter($formats, static fn(string $format): bool => in_array($format, $allowed, true)));
 
         return $formats === [] ? self::DEFAULT_EXPORT_FORMATS : $formats;
