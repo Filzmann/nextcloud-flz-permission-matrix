@@ -27,6 +27,7 @@ class PageController extends Controller {
     #[NoCSRFRequired]
     public function index(): TemplateResponse {
         if (!$this->access->canViewCurrentUser()) {
+            $this->auditLog->record('page.index.denied');
             $response = new TemplateResponse(Application::APP_ID, 'denied');
             $response->setStatus(Http::STATUS_FORBIDDEN);
 

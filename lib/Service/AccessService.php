@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\Service;
 
-use DomainException;
+use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 
@@ -44,13 +44,13 @@ class AccessService {
 
     public function assertCanView(): void {
         if (!$this->canViewCurrentUser()) {
-            throw new DomainException('Zugriff verweigert.');
+            throw new AccessDeniedException('Zugriff verweigert.');
         }
     }
 
     public function assertCanManage(): void {
         if (!$this->canManageCurrentUser()) {
-            throw new DomainException('Zugriff verweigert.');
+            throw new AccessDeniedException('Zugriff verweigert.');
         }
     }
 

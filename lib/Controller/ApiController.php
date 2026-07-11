@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use OCA\BrPermissionMatrix\AppInfo\Application;
 use OCA\BrPermissionMatrix\Db\ExportMapper;
 use OCA\BrPermissionMatrix\Db\SnapshotMapper;
+use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
 use OCA\BrPermissionMatrix\Service\AccessService;
 use OCA\BrPermissionMatrix\Service\AuditLogService;
 use OCA\BrPermissionMatrix\Service\BaselineService;
@@ -44,7 +45,7 @@ class ApiController extends Controller {
     #[NoAdminRequired]
     #[NoCSRFRequired]
     public function state(): DataResponse {
-        return $this->respondView(function(): array {
+        return $this->respondView('api.state', function(): array {
             $latest = $this->snapshots->latest();
             $this->auditLog->record('api.state', false, $latest?->snapshotId());
 
@@ -59,7 +60,7 @@ class ApiController extends Controller {
 
     #[NoAdminRequired]
     public function scan(): DataResponse {
-        return $this->respondManage(function(): array {
+        return $this->respondManage('api.scan', function(): array {
             $snapshot = $this->scanner->scan($this->access->currentUserId());
             $this->auditLog->record('api.scan', false, $snapshot->snapshotId());
 
@@ -73,7 +74,7 @@ class ApiController extends Controller {
     #[NoAdminRequired]
     #[NoCSRFRequired]
     public function snapshots(): DataResponse {
-        return $this->respondView(function(): array {
+        return $this->respondView('api.snapshots', function(): array {
             $this->auditLog->record('api.snapshots');
 
             return [
@@ -86,7 +87,7 @@ class ApiController extends Controller {
 
     #[NoAdminRequired]
     public function setBaseline(string $snapshotId): DataResponse {
-        return $this->respondManage(function() use ($snapshotId): array {
+        return $this->respondManage('api.baseline.set', function() use ($snapshotId): array {
             $snapshot = $this->baseline->setBaseline($snapshotId);
             $this->auditLog->record('api.baseline.set', false, $snapshotId);
 
@@ -100,7 +101,7 @@ class ApiController extends Controller {
     #[NoAdminRequired]
     #[NoCSRFRequired]
     public function diff(string $snapshotA, string $snapshotB): DataResponse {
-        return $this->respondView(function() use ($snapshotA, $snapshotB): array {
+        return $this->respondView('api.diff', function() use ($snapshotA, $snapshotB): array {
             $a = $this->snapshots->find($snapshotA);
             $b = $this->snapshots->find($snapshotB);
             if ($a === null || $b === null) {
@@ -132,6 +133,7 @@ class ApiController extends Controller {
             $this->access->assertCanView();
             $snapshot = $snapshotId === null ? $this->snapshots->latest() : $this->snapshots->find($snapshotId);
             if ($snapshot === null) {
+                $this->auditLog->record('api.export.not_found');
                 return new DataResponse(['ok' => false, 'message' => 'Snapshot nicht gefunden.'], Http::STATUS_NOT_FOUND);
             }
             $export = $this->exports->export($snapshot, $format);
@@ -140,38 +142,51 @@ class ApiController extends Controller {
 
             return new DataDownloadResponse($export['content'], $export['filename'], $export['content_type']);
         } catch (InvalidArgumentException $e) {
+            $this->auditLog->record('api.export.rejected', false, null, ['reason' => 'invalid_format']);
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-        } catch (DomainException $e) {
+        } catch (AccessDeniedException $e) {
+            $this->auditLog->record('api.export.denied');
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
         } catch (\Throwable $e) {
+            $this->auditLog->record('api.export.failed');
             $this->logger->error('Permission matrix export failed', ['app' => Application::APP_ID, 'exception' => $e]);
 
             return new DataResponse(['ok' => false, 'message' => 'Export konnte nicht erzeugt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private function respondView(callable $callback): DataResponse {
+    private function respondView(string $action, callable $callback): DataResponse {
         try {
             $this->access->assertCanView();
 
             return new DataResponse($callback());
-        } catch (DomainException $e) {
+        } catch (AccessDeniedException $e) {
+            $this->auditLog->record($action . '.denied');
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+        } catch (DomainException $e) {
+            $this->auditLog->record($action . '.not_found');
+            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_NOT_FOUND);
         } catch (\Throwable $e) {
+            $this->auditLog->record($action . '.failed');
             $this->logger->error('Permission matrix API failed', ['app' => Application::APP_ID, 'exception' => $e]);
 
             return new DataResponse(['ok' => false, 'message' => 'Aktion konnte nicht ausgefuehrt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private function respondManage(callable $callback): DataResponse {
+    private function respondManage(string $action, callable $callback): DataResponse {
         try {
             $this->access->assertCanManage();
 
             return new DataResponse($callback());
-        } catch (DomainException $e) {
+        } catch (AccessDeniedException $e) {
+            $this->auditLog->record($action . '.denied');
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+        } catch (DomainException $e) {
+            $this->auditLog->record($action . '.not_found');
+            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_NOT_FOUND);
         } catch (\Throwable $e) {
+            $this->auditLog->record($action . '.failed');
             $this->logger->error('Permission matrix API failed', ['app' => Application::APP_ID, 'exception' => $e]);
 
             return new DataResponse(['ok' => false, 'message' => 'Aktion konnte nicht ausgefuehrt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
