@@ -23,17 +23,43 @@ $snapshot = new Snapshot(
     'pm-test',
     '2026-07-05T12:00:00+00:00',
     '34.0.0',
-    ['Betriebsrat', 'IKT-Ausschuss'],
+    ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta'],
     [['app_id' => 'files', 'display_name' => 'Dateien', 'version' => '1.0', 'source' => 'shipped', 'restricted' => false, 'groups' => []]],
-    [new MatrixRow('App', 'files', 'Dateien', 'App-Nutzung', 'App-Verfuegbarkeit', 'APPROVED', 'core-app-config', 'high', [
-        'Betriebsrat' => 'X',
-        'IKT-Ausschuss' => 'X',
-    ])],
+    [
+        new MatrixRow('App', 'files', 'Dateien', 'App-Nutzung', 'App-Verfuegbarkeit', 'APPROVED', 'core-app-config', 'high', [
+            'Betriebsrat' => 'X',
+            'IKT-Ausschuss' => 'X',
+            'ad-ASN-Ada' => 'X',
+            'ad-ASN-Berta' => '-',
+        ]),
+        new MatrixRow('Policy', 'core', 'Teilen', 'Dateioperation', 'Sharing', 'UNKNOWN', 'core-sharing', 'medium', [
+            'Betriebsrat' => 'S',
+            'IKT-Ausschuss' => 'S',
+            'ad-ASN-Ada' => 'S',
+            'ad-ASN-Berta' => '?',
+        ]),
+    ],
     [],
     [],
     [],
     ['redacted' => true],
-    ['compliance_status' => 'green', 'baseline_snapshot' => 'base']
+    ['compliance_status' => 'green', 'baseline_snapshot' => 'base'],
+    [],
+    [[
+        'key' => 'family:adplaner_assistance_teams',
+        'label' => 'AdPlaner · Assistenznehmer-Teams',
+        'type' => 'family',
+        'source_app' => 'adplaner',
+        'family' => 'adplaner_assistance_teams',
+        'groups' => ['ad-ASN-Ada', 'ad-ASN-Berta'],
+        'count' => 2,
+    ], [
+        'key' => 'Betriebsrat', 'label' => 'Betriebsrat', 'type' => 'group',
+        'source_app' => null, 'family' => null, 'groups' => ['Betriebsrat'], 'count' => 1,
+    ], [
+        'key' => 'IKT-Ausschuss', 'label' => 'IKT-Ausschuss', 'type' => 'group',
+        'source_app' => null, 'family' => null, 'groups' => ['IKT-Ausschuss'], 'count' => 1,
+    ]]
 );
 
 $service = new ExportService(new ExportTestConfig(['md', 'csv', 'json', 'html']));
@@ -46,7 +72,16 @@ assertContainsText('"snapshot_id": "pm-test"', $json['content'], 'json export sh
 assertContainsText('Objekttyp,App-ID', $csv['content'], 'csv export should contain header');
 assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown export should contain title');
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
+assertContainsText('## Hauptmatrix (Gruppenfamilien)', $md['content'], 'markdown should lead with the summarized group-family matrix.');
+assertContainsText('AdPlaner · Assistenznehmer-Teams (2 Gruppen)', $md['content'], 'markdown should identify summarized group families.');
+assertContainsText('X (1/2)', $md['content'], 'markdown should make partial family permissions explicit.');
+assertContainsText('gemischt (2/2)', $md['content'], 'markdown should expose conflicting values within a family.');
+assertContainsText('## Rohmatrix', $md['content'], 'markdown should retain the complete auditable raw matrix.');
+assertContainsText('ad-ASN-Ada', $md['content'], 'markdown should name raw family members.');
 assertContainsText('<table>', $html['content'], 'html export should contain table');
+assertContainsText('Hauptmatrix (Gruppenfamilien)', $html['content'], 'html should lead with the summarized group-family matrix.');
+assertContainsText('title="ad-ASN-Ada: X; ad-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
+assertContainsText('<h2>Rohmatrix</h2>', $html['content'], 'html should retain the complete auditable raw matrix.');
 
 $restrictedService = new ExportService(new ExportTestConfig(['md']));
 assertSameValue(['md'], $restrictedService->allowedFormats(), 'The UI/API contract should expose only configured export formats.');

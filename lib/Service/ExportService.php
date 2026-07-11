@@ -107,9 +107,19 @@ class ExportService {
             '',
             strtoupper((string)($summary['compliance_status'] ?? 'UNKNOWN')),
             '',
-            '## Hauptmatrix',
+            $this->hasGroupFamilies($snapshot) ? '## Hauptmatrix (Gruppenfamilien)' : '## Hauptmatrix',
             '',
-            $this->markdownTable($snapshot),
+            $this->markdownTable($snapshot, $this->groupColumns($snapshot)),
+            ...($this->hasGroupFamilies($snapshot) ? [
+                '',
+                '## Enthaltene Rohgruppen',
+                '',
+                $this->groupCatalogMarkdown($snapshot),
+                '',
+                '## Rohmatrix',
+                '',
+                $this->markdownTable($snapshot, $this->rawGroupColumns($snapshot)),
+            ] : []),
             '',
             '## App-spezifische Detailtabellen',
             '',
@@ -145,7 +155,12 @@ class ExportService {
         $body = '<h1>' . $this->esc($title) . '</h1>'
             . '<p>Stand: ' . $this->esc($snapshot->createdAt()) . '<br>Scan-ID: ' . $this->esc($snapshot->snapshotId()) . '</p>'
             . '<h2>Compliance-Status</h2><p>' . $this->esc(strtoupper((string)($snapshot->summary()['compliance_status'] ?? 'UNKNOWN'))) . '</p>'
-            . '<h2>Hauptmatrix</h2>' . $this->htmlTable($snapshot)
+            . '<h2>' . ($this->hasGroupFamilies($snapshot) ? 'Hauptmatrix (Gruppenfamilien)' : 'Hauptmatrix') . '</h2>'
+            . $this->htmlTable($snapshot, $this->groupColumns($snapshot))
+            . ($this->hasGroupFamilies($snapshot)
+                ? '<h2>Enthaltene Rohgruppen</h2>' . $this->groupCatalogHtml($snapshot)
+                    . '<h2>Rohmatrix</h2>' . $this->htmlTable($snapshot, $this->rawGroupColumns($snapshot))
+                : '')
             . '<h2>Technische Hinweise</h2><p>Keine Dateiinhalte, Passwoerter, Tokens oder privaten Schluessel enthalten.</p>';
 
         return [
@@ -155,8 +170,8 @@ class ExportService {
         ];
     }
 
-    private function markdownTable(Snapshot $snapshot): string {
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...$snapshot->groups()];
+    private function markdownTable(Snapshot $snapshot, array $columns): string {
+        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...array_column($columns, 'label')];
         $lines = [
             '| ' . implode(' | ', array_map([$this, 'mdCell'], $header)) . ' |',
             '| ' . implode(' | ', array_fill(0, count($header), '---')) . ' |',
@@ -169,7 +184,7 @@ class ExportService {
                 $row->objectName(),
                 $row->permissionType(),
                 $row->status(),
-                ...array_map(fn(string $group): string => (string)($row->cells()[$group] ?? '-'), $snapshot->groups()),
+                ...array_map(fn(array $column): string => $this->aggregateCell($row->cells(), $column)['value'], $columns),
             ])) . ' |';
         }
 
@@ -205,29 +220,121 @@ class ExportService {
         return implode("\n", array_map(static fn(string $warning): string => '- ' . $warning, $items));
     }
 
-    private function htmlTable(Snapshot $snapshot): string {
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...$snapshot->groups()];
+    private function htmlTable(Snapshot $snapshot, array $columns): string {
+        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...array_column($columns, 'label')];
         $html = '<table><thead><tr>';
         foreach ($header as $cell) {
-            $html .= '<th>' . $this->esc($cell) . '</th>';
+            $html .= '<th scope="col">' . $this->esc($cell) . '</th>';
         }
         $html .= '</tr></thead><tbody>';
         foreach ($snapshot->matrix() as $row) {
-            $html .= '<tr>';
+            $html .= '<tr><th scope="row">' . $this->esc($row->objectType()) . '</th>';
             foreach ([
-                $row->objectType(),
                 $row->appId(),
                 $row->objectName(),
                 $row->permissionType(),
                 $row->status(),
-                ...array_map(fn(string $group): string => (string)($row->cells()[$group] ?? '-'), $snapshot->groups()),
             ] as $cell) {
                 $html .= '<td>' . $this->esc($cell) . '</td>';
+            }
+            foreach ($columns as $column) {
+                $cell = $this->aggregateCell($row->cells(), $column);
+                $html .= '<td title="' . $this->esc($cell['detail']) . '">' . $this->esc($cell['value']) . '</td>';
             }
             $html .= '</tr>';
         }
 
         return $html . '</tbody></table>';
+    }
+
+    private function hasGroupFamilies(Snapshot $snapshot): bool {
+        foreach ($snapshot->groupCatalog() as $entry) {
+            if (($entry['type'] ?? '') === 'family') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function groupColumns(Snapshot $snapshot): array {
+        if ($snapshot->groupCatalog() === []) {
+            return $this->rawGroupColumns($snapshot);
+        }
+
+        return array_map(static function(array $entry): array {
+            $groups = array_values(array_map('strval', is_array($entry['groups'] ?? null) ? $entry['groups'] : []));
+            $isFamily = ($entry['type'] ?? '') === 'family';
+            $label = (string)($entry['label'] ?? $entry['key'] ?? 'Gruppe');
+            if ($isFamily) {
+                $label .= ' (' . count($groups) . ' Gruppen)';
+            }
+
+            return ['label' => $label, 'groups' => $groups];
+        }, $snapshot->groupCatalog());
+    }
+
+    private function rawGroupColumns(Snapshot $snapshot): array {
+        return array_map(
+            static fn(string $group): array => ['label' => $group, 'groups' => [$group]],
+            $snapshot->groups()
+        );
+    }
+
+    private function aggregateCell(array $cells, array $column): array {
+        $groups = $column['groups'];
+        $values = array_map(static fn(string $group): string => (string)($cells[$group] ?? '-'), $groups);
+        $unique = array_values(array_unique($values));
+        $details = [];
+        foreach ($groups as $index => $group) {
+            $details[] = $group . ': ' . $values[$index];
+        }
+        $detail = implode('; ', $details);
+        if (count($unique) === 1) {
+            return ['value' => $unique[0], 'detail' => $detail];
+        }
+
+        $relevant = array_values(array_filter($values, static fn(string $value): bool => !in_array($value, ['-', 'n/a'], true)));
+        if ($relevant === []) {
+            return ['value' => '-', 'detail' => $detail];
+        }
+        $relevantUnique = array_values(array_unique($relevant));
+        if (count($relevantUnique) === 1) {
+            return [
+                'value' => $relevantUnique[0] . ' (' . count($relevant) . '/' . count($values) . ')',
+                'detail' => $detail,
+            ];
+        }
+
+        return ['value' => 'gemischt (' . count($relevant) . '/' . count($values) . ')', 'detail' => $detail];
+    }
+
+    private function groupCatalogMarkdown(Snapshot $snapshot): string {
+        $lines = [];
+        foreach ($snapshot->groupCatalog() as $entry) {
+            if (($entry['type'] ?? '') !== 'family') {
+                continue;
+            }
+            $groups = is_array($entry['groups'] ?? null) ? $entry['groups'] : [];
+            $lines[] = '- **' . $this->mdCell((string)($entry['label'] ?? $entry['key'] ?? 'Gruppenfamilie'))
+                . ':** ' . implode(', ', array_map(fn($group): string => $this->mdCell((string)$group), $groups));
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function groupCatalogHtml(Snapshot $snapshot): string {
+        $html = '<ul>';
+        foreach ($snapshot->groupCatalog() as $entry) {
+            if (($entry['type'] ?? '') !== 'family') {
+                continue;
+            }
+            $groups = is_array($entry['groups'] ?? null) ? $entry['groups'] : [];
+            $html .= '<li><strong>' . $this->esc((string)($entry['label'] ?? $entry['key'] ?? 'Gruppenfamilie'))
+                . ':</strong> ' . $this->esc(implode(', ', array_map('strval', $groups))) . '</li>';
+        }
+
+        return $html . '</ul>';
     }
 
     private function mdCell(string $value): string {
