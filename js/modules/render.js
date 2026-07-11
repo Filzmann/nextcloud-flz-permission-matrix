@@ -22,6 +22,10 @@
         return `<p class="pm-empty">${esc(message)}</p>`;
     }
 
+    function groupCountLabel(count) {
+        return `${count} ${count === 1 ? 'Gruppe' : 'Gruppen'}`;
+    }
+
     function renderOverview(snapshot) {
         if (!snapshot) {
             return empty('Noch kein Snapshot vorhanden.');
@@ -91,7 +95,7 @@
                 <table class="pm-table">
                     <thead><tr>
                         <th scope="col">Objekttyp</th><th scope="col">App-ID</th><th scope="col">Objekt/Funktion</th><th scope="col">Berechtigungsart</th><th scope="col">Status</th>
-                        ${groups.map((group) => `<th scope="col">${esc(group.label)}${group.type === 'family' ? `<small> ${group.count} Gruppen</small>` : ''}</th>`).join('')}
+                        ${groups.map((group) => `<th scope="col">${esc(group.label)}${group.type === 'family' ? `<small> ${groupCountLabel(group.count)}</small>` : ''}</th>`).join('')}
                     </tr></thead>
                     <tbody>
                         ${rows.map((row) => `
@@ -247,6 +251,13 @@
         return raw.replace(/[^a-z0-9_-]/g, '-');
     }
 
+    /**
+     * Zweck: Uebersetzt Rohgruppen oder den serverseitigen Gruppenkatalog in darstellbare Spalten.
+     *
+     * Zusammenspiel:
+     * - GroupCatalogService erzeugt snapshot.group_catalog; Matrix, Gruppenansicht und Filter
+     *   verwenden hier dieselbe normalisierte Spaltenstruktur.
+     */
     function groupColumns(snapshot, mode = 'summary') {
         if (mode === 'summary' && Array.isArray(snapshot.group_catalog) && snapshot.group_catalog.length > 0) {
             return snapshot.group_catalog.map((entry) => ({
@@ -262,6 +273,16 @@
         }));
     }
 
+    /**
+     * Zweck: Verdichtet Rohzellen einer Gruppenfamilie, ohne Teilbelegungen zu verbergen.
+     *
+     * Spiegelung:
+     * - PHP: ExportService::aggregateCell() bildet denselben Vertrag fuer Markdown und HTML ab.
+     *
+     * Vertrag:
+     * - Einheitliche Werte bleiben unveraendert, Teilbelegungen tragen n/m und Konflikte werden
+     *   als gemischt markiert; title enthaelt weiterhin jeden Rohwert.
+     */
     function aggregateCell(cells, column) {
         const values = column.groups.map((group) => String(cells[group] ?? '-'));
         const unique = Array.from(new Set(values));

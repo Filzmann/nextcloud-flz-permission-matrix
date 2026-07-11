@@ -9,6 +9,13 @@ use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 
+/**
+ * Zweck: Erzeugt freigegebene, datensparsame Snapshot-Exporte ohne den fachlichen Stand zu veraendern.
+ *
+ * Zusammenspiel:
+ * - ConfigService erzwingt die Format-Allowlist; API und CLI liefern bzw. speichern das Ergebnis.
+ * - Menschenlesbare Exporte zeigen zuerst Gruppenfamilien und danach die vollstaendige Rohmatrix.
+ */
 class ExportService {
     private const IMPLEMENTED_FORMATS = ['json', 'csv', 'md', 'html'];
 
@@ -267,7 +274,8 @@ class ExportService {
             $isFamily = ($entry['type'] ?? '') === 'family';
             $label = (string)($entry['label'] ?? $entry['key'] ?? 'Gruppe');
             if ($isFamily) {
-                $label .= ' (' . count($groups) . ' Gruppen)';
+                $count = count($groups);
+                $label .= ' (' . $count . ' ' . ($count === 1 ? 'Gruppe' : 'Gruppen') . ')';
             }
 
             return ['label' => $label, 'groups' => $groups];
@@ -281,6 +289,18 @@ class ExportService {
         );
     }
 
+    /**
+     * Zweck: Verdichtet Rohzellen einer Familie, ohne Teilbelegungen oder Konflikte zu verbergen.
+     *
+     * Spiegelung:
+     * - JS: PermissionMatrix.render.aggregateCell() bildet dieselben Werte fuer die Browsermatrix.
+     *
+     * Vertrag:
+     * - Einheitliche Werte bleiben unveraendert; Teilbelegungen tragen n/m, unterschiedliche
+     *   relevante Werte werden als gemischt markiert. detail behaelt alle Rohwerte.
+     *
+     * @return array{value: string, detail: string}
+     */
     private function aggregateCell(array $cells, array $column): array {
         $groups = $column['groups'];
         $values = array_map(static fn(string $group): string => (string)($cells[$group] ?? '-'), $groups);

@@ -13,9 +13,10 @@ const snapshot = {
     snapshot_id: 'pm-test',
     created_at: '2026-07-05T12:00:00+00:00',
     nextcloud_version: '34.0.0',
-    groups: ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta'],
+    groups: ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta', 'ad-EB-Ada'],
     group_catalog: [
         { key: 'family:adplaner_assistance_teams', label: 'AdPlaner · Assistenznehmer-Teams', type: 'family', groups: ['ad-ASN-Ada', 'ad-ASN-Berta'], count: 2 },
+        { key: 'family:adplaner_eb_roles', label: 'AdPlaner · Einsatzbegleitung', type: 'family', groups: ['ad-EB-Ada'], count: 1 },
         { key: 'Betriebsrat', label: 'Betriebsrat', type: 'group', groups: ['Betriebsrat'], count: 1 },
         { key: 'IKT-Ausschuss', label: 'IKT-Ausschuss', type: 'group', groups: ['IKT-Ausschuss'], count: 1 }
     ],
@@ -29,7 +30,7 @@ const snapshot = {
         object: 'Deck <Test>',
         permission_type: 'App-Verfuegbarkeit',
         status: 'UNSUPPORTED',
-        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-' }
+        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-', 'ad-EB-Ada': 'X' }
     }],
     diff_to_baseline: [{ severity: 'critical', type: 'APP_GROUP_EXPANDED', message: 'Deck <Test>', old: '-', new: 'X', group: 'Betriebsrat' }]
 };
@@ -48,6 +49,7 @@ assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
 assert(!matrix.includes('Deck <Test>'));
 assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
+assert(matrix.includes('<small> 1 Gruppe</small>'));
 assert(matrix.includes('X (1/2)'));
 assert(matrix.includes('ad-ASN-Ada: X; ad-ASN-Berta: -'));
 assert(matrix.includes('aria-label="AdPlaner · Assistenznehmer-Teams: X (1/2). Einzelwerte: ad-ASN-Ada: X; ad-ASN-Berta: -"'));

@@ -8,6 +8,13 @@ use OCP\App\IAppManager;
 use OCP\IConfig;
 use OCP\IGroupManager;
 
+/**
+ * Zweck: Liefert das normalisierte read-only Inventar der aktuellen Nextcloud-Instanz.
+ *
+ * Zusammenspiel:
+ * - MatrixBuilder und Adapter verwenden dieselbe Quelle fuer Gruppen, aktivierte Apps,
+ *   App-Gruppenbeschraenkungen, Versionen und Installationsquelle.
+ */
 class InventoryService {
     public function __construct(
         private IGroupManager $groupManager,

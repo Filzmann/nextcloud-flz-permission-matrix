@@ -7,6 +7,13 @@ namespace OCA\BrPermissionMatrix\Service;
 use OCA\BrPermissionMatrix\AppInfo\Application;
 use OCP\IAppConfig;
 
+/**
+ * Zweck: Zentralisiert sichere Defaults, Normalisierung und Persistenz der App-Konfiguration.
+ *
+ * Zusammenspiel:
+ * - AccessService nutzt Gruppenrollen, ScannerService Scan-/Retention-Regeln und ExportService
+ *   die serverseitig erzwungene Format-Allowlist.
+ */
 class ConfigService {
     private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutz', 'IT-Administration'];
     private const DEFAULT_ADMIN_GROUPS = ['IT-Administration'];

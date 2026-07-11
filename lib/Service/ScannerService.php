@@ -9,6 +9,17 @@ use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Zweck: Fuehrt den vollstaendigen Scan-Workflow aus und erzeugt den fachlich bewerteten Snapshot.
+ *
+ * Zusammenspiel:
+ * - MatrixBuilder sammelt Rohdaten, DiffService bewertet sie gegen BaselineService und
+ *   SnapshotMapper persistiert den fertigen Snapshot samt Retention.
+ *
+ * Vertrag:
+ * - Ohne Baseline bleibt der Snapshot bewusst rot und wird nie stillschweigend freigegeben.
+ * - persist=false erzeugt denselben fachlichen Stand ohne Datenbank-Schreibwirkung.
+ */
 class ScannerService {
     public function __construct(
         private MatrixBuilder $matrixBuilder,

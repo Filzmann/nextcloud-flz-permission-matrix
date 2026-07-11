@@ -12,6 +12,14 @@ use OCA\BrPermissionMatrix\Adapter\GenericAppAdapter;
 use OCA\BrPermissionMatrix\Adapter\GroupFoldersAdapter;
 use OCA\BrPermissionMatrix\Adapter\SharingAdapter;
 
+/**
+ * Zweck: Orchestriert alle Berechtigungsadapter zu einem noch unbewerteten Matrix-Rohbau.
+ *
+ * Zusammenspiel:
+ * - InventoryService liefert Gruppen und Apps, AdapterResult vereinigt die Adapterdaten und
+ *   GroupCatalogService ergaenzt die verlustfreie Gruppendarstellung fuer UI und Exporte.
+ * - ScannerService fuegt anschliessend Baseline-Bewertung, Summary und Persistenz hinzu.
+ */
 class MatrixBuilder {
     public function __construct(
         private InventoryService $inventory,

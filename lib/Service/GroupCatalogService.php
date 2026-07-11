@@ -4,7 +4,26 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\Service;
 
+/**
+ * Zweck: Fasst bekannte technische Massengruppen fuer die Darstellung zu fachlichen Familien zusammen.
+ *
+ * Zusammenspiel:
+ * - MatrixBuilder speichert den Katalog zusaetzlich zu den Rohgruppen im Snapshot; UI und
+ *   ExportService aggregieren nur die Darstellung anhand der enthaltenen Gruppen.
+ *
+ * Vertrag:
+ * - Keine Rohgruppe oder Matrixzelle wird ersetzt.
+ * - Nicht exakt erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
+ */
 class GroupCatalogService {
+    /**
+     * Bedeutung: Explizit bestaetigte Namensvertraege der Quell-Apps; die Reihenfolge bestimmt
+     * zugleich die stabile Reihenfolge der Familien in UI und Export.
+     *
+     * Zusammenspiel:
+     * - Die Muster folgen AdPlaner TeamAccessService::teamsForCurrentUser(),
+     *   TeamAccessService::currentUserIsEbForTeam() und den dort erzeugten Urlaubsgruppen.
+     */
     private const FAMILIES = [
         'adplaner_vacation_visibility' => [
             'label' => 'AdPlaner · Urlaubssichtbarkeit',

@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\Model;
 
+/**
+ * Zweck: Kanonische, unveraenderliche Zeile einer Berechtigungsmatrix.
+ *
+ * Zusammenspiel:
+ * - Adapter erzeugen Zeilen, DiffService ordnet sie ueber key() zwischen Snapshots zu,
+ *   Snapshot und Mapper serialisieren bzw. persistieren sie.
+ *
+ * Vertrag:
+ * - Die Identitaet umfasst das fachliche Objekt, aber weder Status noch Gruppenwerte;
+ *   dadurch bleibt dieselbe Berechtigung auch nach einer Rechteaenderung vergleichbar.
+ */
 class MatrixRow {
     public function __construct(
         private string $objectType,

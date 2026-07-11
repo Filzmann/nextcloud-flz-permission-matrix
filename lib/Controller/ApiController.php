@@ -27,6 +27,16 @@ use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Zweck: Duennes HTTP-Gateway fuer Matrixdaten, Scans, Baselines, Diffs und Exporte.
+ *
+ * Zusammenspiel:
+ * - AccessService autorisiert vor jedem Service-/Mapperzugriff; die Facharbeit bleibt in den
+ *   Services, AuditLogService dokumentiert jeden Ausgang.
+ *
+ * Vertrag:
+ * - Lese- und Verwaltungswege bleiben getrennt; UI-Ausblendungen ersetzen nie die Pruefung hier.
+ */
 class ApiController extends Controller {
     public function __construct(
         IRequest $request,

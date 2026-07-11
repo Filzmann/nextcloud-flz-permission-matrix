@@ -7,6 +7,17 @@ namespace OCA\BrPermissionMatrix\Service;
 use OCA\BrPermissionMatrix\Db\AuditLogMapper;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Zweck: Protokolliert erlaubte, verweigerte und fehlgeschlagene App-Zugriffe datensparsam.
+ *
+ * Zusammenspiel:
+ * - Controller liefern Aktion und optionalen Snapshot-Kontext; AuditLogMapper schreibt nur
+ *   in die app-eigene Audit-Tabelle.
+ *
+ * Vertrag:
+ * - Auditfehler duerfen die angeforderte Fachaktion nicht blockieren.
+ * - Potenziell geheime oder strukturierte Detailwerte werden nicht unveraendert gespeichert.
+ */
 class AuditLogService {
     public function __construct(
         private AccessService $access,

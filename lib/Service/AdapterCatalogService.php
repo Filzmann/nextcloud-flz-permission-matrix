@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\Service;
 
+/**
+ * Zweck: Trennt tatsaechlich implementierte Detailadapter vom fachlich geforderten Mindestumfang.
+ *
+ * Zusammenspiel:
+ * - GenericAppAdapter nutzt den Katalog, um aktivierte Apps ohne belastbare Detailauswertung
+ *   sichtbar als UNSUPPORTED statt versehentlich als freigegeben zu markieren.
+ */
 class AdapterCatalogService {
     private const IMPLEMENTED_APP_IDS = [
         'core',

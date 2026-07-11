@@ -6,9 +6,21 @@ namespace OCA\BrPermissionMatrix\Model;
 
 use DateTimeImmutable;
 
+/**
+ * Zweck: Unveraenderlicher Gesamtstand eines Matrix-Scans inklusive Bewertung und Anzeige-Metadaten.
+ *
+ * Zusammenspiel:
+ * - ScannerService baut den Snapshot, DiffService bewertet seine Matrix und SnapshotMapper
+ *   persistiert die vollstaendige serialisierte Fassung.
+ *
+ * Vertrag:
+ * - groupCatalog ist nur eine verlustfreie Praesentationsschicht; groups und Matrixzellen
+ *   behalten immer die vollstaendigen Rohgruppen fuer Baselines, Diffs und Exporte.
+ */
 class Snapshot {
     /**
      * @param MatrixRow[] $matrix
+     * @param array<int, array{key: string, label: string, type: string, groups: string[], count: int}> $groupCatalog
      */
     public function __construct(
         private string $snapshotId,

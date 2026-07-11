@@ -23,7 +23,7 @@ $snapshot = new Snapshot(
     'pm-test',
     '2026-07-05T12:00:00+00:00',
     '34.0.0',
-    ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta'],
+    ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta', 'ad-EB-Ada'],
     [['app_id' => 'files', 'display_name' => 'Dateien', 'version' => '1.0', 'source' => 'shipped', 'restricted' => false, 'groups' => []]],
     [
         new MatrixRow('App', 'files', 'Dateien', 'App-Nutzung', 'App-Verfuegbarkeit', 'APPROVED', 'core-app-config', 'high', [
@@ -31,12 +31,14 @@ $snapshot = new Snapshot(
             'IKT-Ausschuss' => 'X',
             'ad-ASN-Ada' => 'X',
             'ad-ASN-Berta' => '-',
+            'ad-EB-Ada' => 'X',
         ]),
         new MatrixRow('Policy', 'core', 'Teilen', 'Dateioperation', 'Sharing', 'UNKNOWN', 'core-sharing', 'medium', [
             'Betriebsrat' => 'S',
             'IKT-Ausschuss' => 'S',
             'ad-ASN-Ada' => 'S',
             'ad-ASN-Berta' => '?',
+            'ad-EB-Ada' => 'S',
         ]),
     ],
     [],
@@ -53,6 +55,14 @@ $snapshot = new Snapshot(
         'family' => 'adplaner_assistance_teams',
         'groups' => ['ad-ASN-Ada', 'ad-ASN-Berta'],
         'count' => 2,
+    ], [
+        'key' => 'family:adplaner_eb_roles',
+        'label' => 'AdPlaner · Einsatzbegleitung',
+        'type' => 'family',
+        'source_app' => 'adplaner',
+        'family' => 'adplaner_eb_roles',
+        'groups' => ['ad-EB-Ada'],
+        'count' => 1,
     ], [
         'key' => 'Betriebsrat', 'label' => 'Betriebsrat', 'type' => 'group',
         'source_app' => null, 'family' => null, 'groups' => ['Betriebsrat'], 'count' => 1,
@@ -74,6 +84,7 @@ assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown 
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
 assertContainsText('## Hauptmatrix (Gruppenfamilien)', $md['content'], 'markdown should lead with the summarized group-family matrix.');
 assertContainsText('AdPlaner · Assistenznehmer-Teams (2 Gruppen)', $md['content'], 'markdown should identify summarized group families.');
+assertContainsText('AdPlaner · Einsatzbegleitung (1 Gruppe)', $md['content'], 'markdown should use the singular label for one-member families.');
 assertContainsText('X (1/2)', $md['content'], 'markdown should make partial family permissions explicit.');
 assertContainsText('gemischt (2/2)', $md['content'], 'markdown should expose conflicting values within a family.');
 assertContainsText('## Rohmatrix', $md['content'], 'markdown should retain the complete auditable raw matrix.');

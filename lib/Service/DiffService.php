@@ -7,8 +7,21 @@ namespace OCA\BrPermissionMatrix\Service;
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 
+/**
+ * Zweck: Vergleicht Matrixzeilen mit einer freigegebenen Baseline und leitet Status sowie Diffs ab.
+ *
+ * Zusammenspiel:
+ * - ScannerService nutzt applyBaseline() fuer die Compliance-Bewertung; API und CLI verwenden
+ *   compareSnapshots() fuer reine Snapshot-Vergleiche.
+ *
+ * Vertrag:
+ * - Neue oder erweiterte Rechte sind im Strict Mode nicht freigegeben.
+ * - UNKNOWN, UNSUPPORTED und n/a duerfen nicht als Rechteausweitung fehlinterpretiert werden.
+ */
 class DiffService {
     /**
+     * Zweck: Liefert die bewerteten Zeilen und die maschinenlesbaren Abweichungen als Paar.
+     *
      * @return array{0: MatrixRow[], 1: array}
      */
     public function applyBaseline(Snapshot $snapshot, ?Snapshot $baseline, bool $strictMode): array {

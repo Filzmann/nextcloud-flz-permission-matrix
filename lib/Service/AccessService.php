@@ -8,6 +8,17 @@ use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 
+/**
+ * Zweck: Zentrale serverseitige Autoritaet fuer Viewer- und Verwaltungsrechte der App.
+ *
+ * Zusammenspiel:
+ * - Controller pruefen hier vor jedem Datenzugriff; Navigation nutzt dieselbe Regel nur fuer
+ *   die Sichtbarkeit. ConfigService liefert die konfigurierten Gruppen.
+ *
+ * Vertrag:
+ * - Deny by default: anonyme und nicht zugeordnete Nutzer*innen erhalten keinen Zugriff.
+ * - Nextcloud-Admins und konfigurierte App-Admins duerfen verwalten; Verwaltung umfasst Lesen.
+ */
 class AccessService {
     public function __construct(
         private IUserSession $userSession,

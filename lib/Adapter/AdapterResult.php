@@ -6,6 +6,13 @@ namespace OCA\BrPermissionMatrix\Adapter;
 
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 
+/**
+ * Zweck: Unveraenderliches Sammelergebnis eines oder mehrerer read-only Adapter.
+ *
+ * Zusammenspiel:
+ * - MatrixBuilder fuehrt die Einzelergebnisse per merge() zusammen und uebergibt Zeilen,
+ *   Warnungen sowie Adapterstatus als einen konsistenten Scan-Baustein an ScannerService.
+ */
 class AdapterResult {
     /**
      * @param MatrixRow[] $rows
