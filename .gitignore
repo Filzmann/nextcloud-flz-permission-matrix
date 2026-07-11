@@ -1,0 +1,23 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Dependencies
+vendor/
+node_modules/
+
+# Build / runtime
+build/
+dist/
+coverage/
+*.log
+*.tmp
+*.bak
+*.bak-*
+
+# Environment
+.env
+.env.local

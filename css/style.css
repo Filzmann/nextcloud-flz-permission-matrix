@@ -1,0 +1,278 @@
+#permission-matrix-app,
+.pm-admin {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px;
+    color: var(--color-main-text);
+}
+
+.pm-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.pm-head h1,
+.pm-admin h2 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.pm-head p {
+    margin: 0;
+    color: var(--color-text-maxcontrast);
+}
+
+.pm-actions,
+.pm-tabs,
+.pm-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.pm-actions button,
+.pm-tabs button,
+.pm-table button,
+.pm-admin button {
+    min-height: 36px;
+}
+
+.pm-tabs {
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 18px;
+}
+
+.pm-tabs button {
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    border-radius: 0;
+}
+
+.pm-tabs button.active {
+    border-bottom-color: var(--color-primary-element);
+    font-weight: 700;
+}
+
+.pm-view {
+    display: none;
+}
+
+.pm-view.active {
+    display: block;
+}
+
+.pm-filters {
+    margin-bottom: 12px;
+}
+
+.pm-filters label,
+.pm-admin label {
+    display: grid;
+    gap: 4px;
+    font-weight: 600;
+}
+
+.pm-filters input,
+.pm-filters select,
+.pm-admin input,
+.pm-admin select,
+.pm-admin textarea {
+    min-width: 180px;
+}
+
+.pm-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 14px 0 20px;
+}
+
+.pm-stat,
+.pm-list-item,
+.pm-diff {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 12px;
+    background: var(--color-main-background);
+}
+
+.pm-stat span {
+    display: block;
+    color: var(--color-text-maxcontrast);
+    font-size: 12px;
+}
+
+.pm-stat strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 20px;
+}
+
+.pm-table-wrap {
+    overflow: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+}
+
+.pm-table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: collapse;
+    background: var(--color-main-background);
+}
+
+.pm-table th,
+.pm-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.pm-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-main-background);
+}
+
+.pm-cell {
+    font-weight: 700;
+}
+
+.pm-cell-x,
+.pm-cell-allow,
+.pm-cell-r,
+.pm-cell-r-w,
+.pm-cell-r-w-c-d-s,
+.pm-badge-green,
+.pm-badge-approved {
+    color: #136f3a;
+}
+
+.pm-cell-none,
+.pm-cell-deny,
+.pm-badge-red,
+.pm-badge-not_approved,
+.pm-badge-not-approved {
+    color: #b00020;
+}
+
+.pm-cell-unknown,
+.pm-cell-na,
+.pm-badge-yellow,
+.pm-badge-unknown,
+.pm-badge-unsupported,
+.pm-badge-changed {
+    color: #8a5a00;
+}
+
+.pm-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 2px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.pm-compliance {
+    margin-bottom: 8px;
+}
+
+.pm-list,
+.pm-diff-list {
+    display: grid;
+    gap: 10px;
+}
+
+.pm-list-item h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.pm-list-item dl {
+    display: grid;
+    grid-template-columns: minmax(120px, 220px) 1fr;
+    gap: 5px 10px;
+    margin: 0;
+}
+
+.pm-list-item dt {
+    color: var(--color-text-maxcontrast);
+}
+
+.pm-list-item dd {
+    margin: 0;
+}
+
+.pm-diff p {
+    margin: 8px 0 4px;
+}
+
+.pm-diff-critical {
+    border-left: 4px solid #b00020;
+}
+
+.pm-diff-warning {
+    border-left: 4px solid #b87500;
+}
+
+.pm-notice {
+    margin: 10px 0 16px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+}
+
+.pm-notice-success {
+    border-color: #136f3a;
+}
+
+.pm-notice-error {
+    border-color: #b00020;
+}
+
+.pm-empty,
+.pm-denied {
+    color: var(--color-text-maxcontrast);
+}
+
+.pm-admin form {
+    display: grid;
+    gap: 14px;
+    max-width: 680px;
+}
+
+@media (max-width: 720px) {
+    #permission-matrix-app,
+    .pm-admin {
+        padding: 14px;
+    }
+
+    .pm-head {
+        display: grid;
+    }
+
+    .pm-actions,
+    .pm-tabs,
+    .pm-filters {
+        align-items: stretch;
+    }
+
+    .pm-actions button,
+    .pm-tabs button,
+    .pm-filters label {
+        flex: 1 1 150px;
+    }
+}
