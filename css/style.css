@@ -240,11 +240,28 @@
     margin-left: auto;
 }
 
+.pm-coverage {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pm-rule-list {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.pm-rule-list small {
+    display: block;
+    color: var(--color-text-maxcontrast);
+}
+
 .pm-cell {
     font-weight: 700;
 }
 
 .pm-cell-x,
+.pm-cell-and,
 .pm-cell-allow,
 .pm-cell-r,
 .pm-cell-r-w,

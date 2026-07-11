@@ -26,10 +26,12 @@ class MatrixRow {
         private string $source,
         private string $confidence,
         private array $cells,
-        private array $warnings = []
+        private array $warnings = [],
+        private array $accessRules = []
     ) {
         ksort($this->cells);
         $this->warnings = array_values(array_unique(array_map('strval', $warnings)));
+        $this->accessRules = AccessRule::get_all($accessRules);
     }
 
     public static function get(?array $payload): ?self {
@@ -47,7 +49,8 @@ class MatrixRow {
             (string)($payload['source'] ?? 'adapter'),
             (string)($payload['confidence'] ?? 'low'),
             is_array($payload['cells'] ?? null) ? $payload['cells'] : [],
-            is_array($payload['warnings'] ?? null) ? $payload['warnings'] : []
+            is_array($payload['warnings'] ?? null) ? $payload['warnings'] : [],
+            is_array($payload['access_rules'] ?? null) ? $payload['access_rules'] : []
         );
     }
 
@@ -77,7 +80,8 @@ class MatrixRow {
             $this->source,
             $this->confidence,
             $this->cells,
-            $this->warnings
+            $this->warnings,
+            $this->accessRules
         );
     }
 
@@ -131,6 +135,13 @@ class MatrixRow {
         return $this->warnings;
     }
 
+    /**
+     * @return AccessRule[]
+     */
+    public function accessRules(): array {
+        return $this->accessRules;
+    }
+
     public function toArray(): array {
         return [
             'row_key' => $this->key(),
@@ -144,6 +155,7 @@ class MatrixRow {
             'confidence' => $this->confidence,
             'cells' => $this->cells,
             'warnings' => $this->warnings,
+            'access_rules' => array_map(static fn(AccessRule $rule): array => $rule->toArray(), $this->accessRules),
         ];
     }
 }

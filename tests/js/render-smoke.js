@@ -28,6 +28,10 @@ const snapshot = {
     summary: { compliance_status: 'yellow', group_count: 4, group_family_count: 1, app_count: 1, object_count: 1, warning_count: 1, unsupported_count: 1 },
     warnings: ['Deck <unklar>'],
     unsupported_apps: ['deck'],
+    adapter_status: [
+        { app_id: 'deck', adapter: 'GenericAppAdapter', status: 'AVAILABILITY_ONLY', confidence: 'high', warnings: [] },
+        { app_id: 'deck', adapter: 'AdapterCatalogService', status: 'UNSUPPORTED', confidence: 'low', warnings: ['Keine Detailrechte'] }
+    ],
     apps: [{ app_id: 'deck', display_name: 'Deck <Test>', version: '1.0', source: 'appstore', restricted: true, groups: ['IKT-Ausschuss'] }],
     matrix: [{
         object_type: 'App',
@@ -35,15 +39,21 @@ const snapshot = {
         object: 'Deck <Test>',
         detail: 'App-Nutzung',
         permission_type: 'App-Verfuegbarkeit',
-        status: 'UNSUPPORTED',
-        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-', 'ad-EB-Ada': 'X' }
+        status: 'NEW',
+        source: 'core-app-config',
+        confidence: 'high',
+        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-', 'ad-EB-Ada': 'X' },
+        access_rules: [{
+            permission: 'app.use', effect: 'allow', scope: 'app:deck',
+            condition_text: 'Gruppe IKT-Ausschuss', source: 'core-app-config', confidence: 'high'
+        }]
     }],
     diff_to_baseline: [{ severity: 'critical', type: 'APP_GROUP_EXPANDED', message: 'Deck <Test>', old: '-', new: 'X', group: 'Betriebsrat' }]
 };
 
 const render = window.PermissionMatrix.render;
 const overview = render.renderOverview(snapshot);
-const matrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'summary', status: '', text: '' });
+const matrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'summary', status: '', coverage: '', text: '' });
 const rawMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'raw', status: '', text: '' });
 const teamMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'teams', status: '', text: '' });
 const collapsedMatrix = render.renderMatrix(snapshot, { app: '', group: '', groupMode: 'teams', status: '', text: '', collapsedApps: ['deck'] });
@@ -60,6 +70,9 @@ assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal
 assert(matrix.includes('data-app-toggle="deck"'));
 assert(matrix.includes('<strong>Deck &lt;Test&gt;</strong>'));
 assert(matrix.includes('1 Berechtigung'));
+assert(matrix.includes('Details <span class="pm-badge pm-badge-unsupported">UNSUPPORTED</span>'));
+assert(matrix.includes('<strong>Bedingung:</strong> Gruppe IKT-Ausschuss'));
+assert(matrix.includes('core-app-config · high'));
 assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
 assert(matrix.includes('<small>1 Gruppe</small>'));
 assert(matrix.includes('X (1/2)'));
@@ -72,6 +85,7 @@ assert(teamMatrix.includes('Rolle EB · Ada'));
 assert(teamMatrix.indexOf('Team Ada · Assistenz') < teamMatrix.indexOf('Rolle EB · Ada'));
 assert(!collapsedMatrix.includes('<td>App-Verfuegbarkeit</td>'));
 assert(apps.includes('Deck &lt;Test&gt;'));
+assert(apps.includes('<dt>Detailabdeckung</dt><dd><span class="pm-badge pm-badge-unsupported">UNSUPPORTED</span></dd>'));
 assert(groups.includes('<summary>Rohgruppen anzeigen</summary>'));
 assert(groups.includes('<li>ad-ASN-Ada</li>'));
 assert(diffs.includes('APP_GROUP_EXPANDED'));
@@ -90,5 +104,8 @@ assert.deepStrictEqual(
     render.matrixSections(snapshot, { app: 'Deck <Test>', status: '', text: '' }).map((section) => section.appId),
     ['deck']
 );
+assert.strictEqual(render.adapterCoverage(snapshot, 'deck'), 'UNSUPPORTED');
+assert.deepStrictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: 'PARTIAL', text: '' }), []);
+assert.strictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: '', text: 'IKT-Ausschuss' }).length, 1);
 
 console.log('Permission Matrix render smoke test passed.');

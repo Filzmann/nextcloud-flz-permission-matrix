@@ -66,6 +66,40 @@
     }
 
     /**
+     * Zweck: Trennt die Abdeckung app-spezifischer Detailrechte vom Status einzelner Matrixzeilen.
+     *
+     * Vertrag:
+     * - AVAILABILITY_ONLY belegt nur die bekannte App-Sichtbarkeit und ist kein Detailadapter.
+     */
+    function adapterCoverage(snapshot, appId) {
+        const statuses = (snapshot.adapter_status || [])
+            .filter((entry) => String(entry.app_id) === String(appId) && entry.status !== 'AVAILABILITY_ONLY')
+            .map((entry) => String(entry.status || 'UNKNOWN'));
+        if (statuses.includes('IMPLEMENTED')) return 'IMPLEMENTED';
+        if (statuses.includes('PARTIAL')) return 'PARTIAL';
+        if (statuses.includes('UNSUPPORTED')) return 'UNSUPPORTED';
+        return 'UNKNOWN';
+    }
+
+    /**
+     * Zweck: Zeigt die technische Zugriffsbedingung mit Quelle und Aussagesicherheit.
+     *
+     * Spiegelung:
+     * - PHP: AccessRule::toArray() liefert condition_text, source und confidence.
+     */
+    function renderAccessRules(row) {
+        const rules = Array.isArray(row.access_rules) ? row.access_rules : [];
+        if (!rules.length) {
+            return esc(row.detail || '-');
+        }
+
+        return `${esc(row.detail || '-')}<ul class="pm-rule-list">${rules.map((rule) => `
+            <li><strong>Bedingung:</strong> ${esc(rule.condition_text || '')}
+                <small>${esc(rule.effect || 'allow')} · ${esc(rule.source || row.source || '')} · ${esc(rule.confidence || row.confidence || 'low')}</small>
+            </li>`).join('')}</ul>`;
+    }
+
+    /**
      * Zweck: Ordnet gefilterte Berechtigungszeilen strikt nach App und innerhalb der App nach Fachbegriff.
      *
      * Vertrag:
@@ -85,8 +119,12 @@
             if (filters.status && row.status !== filters.status) {
                 return false;
             }
+            if (filters.coverage && adapterCoverage(snapshot, appId) !== filters.coverage) {
+                return false;
+            }
             if (textFilter) {
-                const haystack = [row.object_type, appId, appLabel, row.object, row.detail, row.permission_type, row.status].join(' ').toLowerCase();
+                const rules = (row.access_rules || []).flatMap((rule) => [rule.condition_text, rule.source, rule.permission, rule.scope]);
+                const haystack = [row.object_type, appId, appLabel, row.object, row.detail, row.permission_type, row.status, ...rules].join(' ').toLowerCase();
                 if (!haystack.includes(textFilter)) {
                     return false;
                 }
@@ -145,6 +183,7 @@
                     </tr></thead>
                     ${sections.map((section) => {
                         const collapsed = collapsedApps.has(section.appId);
+                        const coverage = adapterCoverage(snapshot, section.appId);
                         return `<tbody class="pm-app-section" data-app-section="${esc(section.appId)}">
                             <tr class="pm-app-heading">
                                 <th colspan="${columnCount}">
@@ -152,6 +191,7 @@
                                         <span aria-hidden="true">${collapsed ? '▸' : '▾'}</span>
                                         <strong>${esc(section.label)}</strong>
                                         <code>${esc(section.appId)}</code>
+                                        <span class="pm-coverage">Details ${badge(coverage)}</span>
                                         <small>${esc(permissionCountLabel(section.rows.length))}</small>
                                     </button>
                                 </th>
@@ -159,7 +199,7 @@
                             ${collapsed ? '' : section.rows.map((row) => `
                                 <tr>
                                     <th scope="row" class="pm-permission-cell">${esc(row.object)}<small>${esc(row.object_type)}</small></th>
-                                    <td>${esc(row.detail || '-')}</td>
+                                    <td>${renderAccessRules(row)}</td>
                                     <td>${esc(row.permission_type)}</td>
                                     <td>${badge(row.status)}</td>
                                     ${groups.map((group) => {
@@ -193,6 +233,7 @@
                             <dt>Quelle</dt><dd>${esc(app.source)}</dd>
                             <dt>Gruppenbeschraenkt</dt><dd>${esc(app.restricted ? 'ja' : 'nein')}</dd>
                             <dt>Gruppen</dt><dd>${esc(app.groups && app.groups.length ? app.groups.join(', ') : 'global')}</dd>
+                            <dt>Detailabdeckung</dt><dd>${badge(adapterCoverage(snapshot, app.app_id))}</dd>
                         </dl>
                     </article>
                 `).join('')}
@@ -404,6 +445,7 @@
         renderDiffs,
         renderSnapshots,
         fillFilters,
+        adapterCoverage,
         matrixSections,
         groupColumns,
         aggregateCell

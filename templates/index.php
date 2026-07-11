@@ -50,6 +50,15 @@ style('br_permission_matrix', 'style');
             <label>App <input id="pm-filter-app" type="search"></label>
             <label>Gruppe <select id="pm-filter-group"></select></label>
             <label>Status <select id="pm-filter-status"></select></label>
+            <label>Detailabdeckung
+                <select id="pm-filter-coverage">
+                    <option value="">Alle</option>
+                    <option value="IMPLEMENTED">Vollstaendig</option>
+                    <option value="PARTIAL">Teilweise</option>
+                    <option value="UNSUPPORTED">Nicht unterstuetzt</option>
+                    <option value="UNKNOWN">Unklar</option>
+                </select>
+            </label>
             <label>Text <input id="pm-filter-text" type="search"></label>
         </div>
         <div id="pm-matrix"></div>

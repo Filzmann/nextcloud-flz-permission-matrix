@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\BrPermissionMatrix\Service;
 
 use OCA\BrPermissionMatrix\Adapter\AdapterResult;
+use OCA\BrPermissionMatrix\Adapter\AdPlanerAdapter;
 use OCA\BrPermissionMatrix\Adapter\CoreAdapter;
 use OCA\BrPermissionMatrix\Adapter\FilesAccessControlAdapter;
 use OCA\BrPermissionMatrix\Adapter\FilesAdapter;
@@ -29,6 +30,7 @@ class MatrixBuilder {
         private SharingAdapter $sharing,
         private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
+        private AdPlanerAdapter $adPlaner,
         private GroupCatalogService $groupCatalog
     ) {
     }
@@ -40,7 +42,8 @@ class MatrixBuilder {
             ->merge($this->files->collect())
             ->merge($this->sharing->collect())
             ->merge($this->groupFolders->collect())
-            ->merge($this->filesAccessControl->collect());
+            ->merge($this->filesAccessControl->collect())
+            ->merge($this->adPlaner->collect());
 
         $groups = $this->inventory->groups();
 

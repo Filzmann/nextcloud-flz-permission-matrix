@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\Adapter;
 
+use OCA\BrPermissionMatrix\Model\AccessCondition;
+use OCA\BrPermissionMatrix\Model\AccessRule;
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Service\AdapterCatalogService;
 use OCA\BrPermissionMatrix\Service\InventoryService;
@@ -16,8 +18,8 @@ use OCA\BrPermissionMatrix\Service\InventoryService;
  *   ob zusaetzlich belastbare Detailrechte aus einem spezialisierten Adapter vorliegen.
  *
  * Vertrag:
- * - UNSUPPORTED bedeutet nur, dass Detailrechte fehlen. Die Zellen bleiben davon unabhaengig:
- *   X/- bilden die gelesene App-Gruppenbeschraenkung ab, ? eine unklare Konfiguration.
+ * - Der Adapterstatus UNSUPPORTED bedeutet nur, dass Detailrechte fehlen. Der Zeilenstatus und
+ *   die Zellen bleiben davon unabhaengig: X/- bilden die App-Gruppenbeschraenkung ab, ? eine unklare Konfiguration.
  */
 class GenericAppAdapter implements PermissionAdapterInterface {
     public function __construct(
@@ -55,19 +57,32 @@ class GenericAppAdapter implements PermissionAdapterInterface {
             }
 
             $rowWarnings = [];
+            $accessRules = [];
             $status = 'NEW';
             $confidence = 'high';
+            $coverageWarnings = [];
             if ($restrictionUnknown) {
                 $status = 'UNKNOWN';
                 $confidence = 'low';
                 $rowWarnings[] = 'App-Gruppenbeschraenkung konnte nicht eindeutig gelesen werden.';
                 $warnings[] = $appId . ': App-Gruppenbeschraenkung unklar.';
             } elseif (!$hasAdapter) {
-                $status = 'UNSUPPORTED';
-                $confidence = 'medium';
-                $rowWarnings[] = 'Keine Detailrechte auswertbar; App muss fachlich geprueft werden.';
+                $coverageWarnings[] = 'Keine Detailrechte auswertbar; App muss fachlich geprueft werden.';
                 $warnings[] = $appId . ': kein Detailadapter vorhanden.';
                 $unsupported[] = $appId;
+            }
+            if (!$restrictionUnknown && $restriction !== []) {
+                $accessRules[] = new AccessRule(
+                    'app.use',
+                    'allow',
+                    'app:' . $appId,
+                    AccessCondition::any(array_map(
+                        static fn(string $group): AccessCondition => AccessCondition::group($group),
+                        $restriction
+                    )),
+                    'nextcloud:IAppManager::getAppRestriction',
+                    'high'
+                );
             }
 
             $rows[] = new MatrixRow(
@@ -80,15 +95,16 @@ class GenericAppAdapter implements PermissionAdapterInterface {
                 'core-app-config',
                 $confidence,
                 $cells,
-                $rowWarnings
+                $rowWarnings,
+                $accessRules
             );
 
             $adapterStatus[] = [
                 'app_id' => $appId,
-                'adapter' => $hasAdapter ? 'ImplementedAdapter' : 'GenericAppAdapter',
-                'status' => $hasAdapter ? 'IMPLEMENTED' : 'UNSUPPORTED',
+                'adapter' => 'GenericAppAdapter',
+                'status' => $hasAdapter ? 'AVAILABILITY_ONLY' : 'UNSUPPORTED',
                 'confidence' => $hasAdapter ? 'high' : 'medium',
-                'warnings' => $rowWarnings,
+                'warnings' => $coverageWarnings,
             ];
         }
 

@@ -53,13 +53,15 @@ $result = (new GenericAppAdapter(new GenericAdapterFakeInventory(), new AdapterC
 $rows = $result->rows();
 
 assertSameValue(3, count($rows), 'generic adapter should create one app availability row per app');
-assertSameValue('UNSUPPORTED', $rows[0]->status(), 'app without implemented adapter should be unsupported');
+assertSameValue('NEW', $rows[0]->status(), 'known app visibility should remain concrete even without a detail adapter');
 assertSameValue('-', $rows[0]->cells()['Betriebsrat'], 'restricted app should deny non-listed group');
 assertSameValue('X', $rows[0]->cells()['IKT-Ausschuss'], 'restricted app should allow listed group');
+assertSameValue('(Gruppe IKT-Ausschuss)', $rows[0]->accessRules()[0]->conditionText(), 'restricted app visibility should expose its OR condition as a machine-readable rule');
 assertSameValue('NEW', $rows[1]->status(), 'implemented adapter app availability should be concrete before baseline comparison');
-assertSameValue('UNSUPPORTED', $rows[2]->status(), 'globally available apps without detail adapters should remain unsupported');
+assertSameValue('NEW', $rows[2]->status(), 'global app visibility should be separate from unsupported detail coverage');
 assertSameValue('X', $rows[2]->cells()['Betriebsrat'], 'unsupported status must not hide a globally available app from any scanned group');
 assertSameValue('X', $rows[2]->cells()['IKT-Ausschuss'], 'global app availability should be independent of detail-adapter support');
 assertSameValue(['deck', 'notes'], $result->unsupportedApps(), 'unsupported app list should contain every app without a detail adapter');
+assertSameValue('UNSUPPORTED', $result->adapterStatus()[0]['status'], 'detail coverage should remain unsupported independently of row access status');
 
 echo 'GenericAppAdapter tests passed' . PHP_EOL;

@@ -5,6 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/helpers.php';
 
 use OCA\BrPermissionMatrix\Model\MatrixRow;
+use OCA\BrPermissionMatrix\Model\AccessCondition;
+use OCA\BrPermissionMatrix\Model\AccessRule;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
 use OCA\BrPermissionMatrix\Service\ConfigService;
@@ -32,7 +34,17 @@ $snapshot = new Snapshot(
             'ad-ASN-Ada' => 'X',
             'ad-ASN-Berta' => '-',
             'ad-EB-Ada' => 'X',
-        ]),
+        ], [], [new AccessRule(
+            'app.use',
+            'allow',
+            'app:files',
+            AccessCondition::all([
+                AccessCondition::group('ad-ASN-Ada'),
+                AccessCondition::group('ad-EB-Ada'),
+            ]),
+            'test:files-policy',
+            'high'
+        )]),
         new MatrixRow('Policy', 'core', 'Teilen', 'Dateioperation', 'Sharing', 'UNKNOWN', 'core-sharing', 'medium', [
             'Betriebsrat' => 'S',
             'IKT-Ausschuss' => 'S',
@@ -80,8 +92,13 @@ $html = $service->export($snapshot, 'html');
 
 assertContainsText('"snapshot_id": "pm-test"', $json['content'], 'json export should contain snapshot id');
 assertContainsText('Objekttyp,App-ID', $csv['content'], 'csv export should contain header');
+assertContainsText('Bedingung,"Technische Quelle",Aussagesicherheit', $csv['content'], 'csv should expose the evidence columns separately from status.');
+assertContainsText('"(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)",test:files-policy,high', $csv['content'], 'csv should preserve composite access conditions and their source.');
 assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown export should contain title');
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
+assertContainsText('AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein', $md['content'], 'markdown should explain composite group cells.');
+assertContainsText('Technische Quelle', $md['content'], 'markdown should expose the evidence source.');
+assertContainsText('(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)', $md['content'], 'markdown should preserve composite access conditions.');
 assertContainsText('## Hauptmatrix (Gruppenfamilien)', $md['content'], 'markdown should lead with the summarized group-family matrix.');
 assertContainsText('AdPlaner · Assistenznehmer-Teams (2 Gruppen)', $md['content'], 'markdown should identify summarized group families.');
 assertContainsText('AdPlaner · Einsatzbegleitung (1 Gruppe)', $md['content'], 'markdown should use the singular label for one-member families.');
@@ -90,6 +107,7 @@ assertContainsText('gemischt (2/2)', $md['content'], 'markdown should expose con
 assertContainsText('## Rohmatrix', $md['content'], 'markdown should retain the complete auditable raw matrix.');
 assertContainsText('ad-ASN-Ada', $md['content'], 'markdown should name raw family members.');
 assertContainsText('<table>', $html['content'], 'html export should contain table');
+assertContainsText('<th scope="col">Bedingung</th>', $html['content'], 'html should expose access conditions as their own column.');
 assertContainsText('Hauptmatrix (Gruppenfamilien)', $html['content'], 'html should lead with the summarized group-family matrix.');
 assertContainsText('title="ad-ASN-Ada: X; ad-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
 assertContainsText('<h2>Rohmatrix</h2>', $html['content'], 'html should retain the complete auditable raw matrix.');

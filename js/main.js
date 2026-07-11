@@ -12,6 +12,7 @@
             group: '',
             groupMode: 'teams',
             status: '',
+            coverage: '',
             text: '',
             collapsedApps: []
         }
@@ -49,7 +50,7 @@
         if (baseline) {
             baseline.addEventListener('click', setLatestBaseline);
         }
-        ['pm-filter-app', 'pm-filter-group', 'pm-filter-status', 'pm-filter-text'].forEach((id) => {
+        ['pm-filter-app', 'pm-filter-group', 'pm-filter-status', 'pm-filter-coverage', 'pm-filter-text'].forEach((id) => {
             const element = render.byId(id);
             element.addEventListener('input', updateFilters);
             element.addEventListener('change', updateFilters);
@@ -128,6 +129,7 @@
         state.filters.group = render.byId('pm-filter-group').value;
         state.filters.groupMode = render.byId('pm-group-mode').value;
         state.filters.status = render.byId('pm-filter-status').value;
+        state.filters.coverage = render.byId('pm-filter-coverage').value;
         state.filters.text = render.byId('pm-filter-text').value.trim();
         render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);
     }

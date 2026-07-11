@@ -56,7 +56,7 @@ class ExportService {
 
     private function csv(Snapshot $snapshot): array {
         $handle = fopen('php://temp', 'w+');
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...$snapshot->groups()];
+        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Bedingung', 'Technische Quelle', 'Aussagesicherheit', 'Status', ...$snapshot->groups()];
         fputcsv($handle, $header);
 
         foreach ($snapshot->matrix() as $row) {
@@ -65,6 +65,9 @@ class ExportService {
                 $row->appId(),
                 $row->objectName(),
                 $row->permissionType(),
+                $this->accessRuleText($row),
+                $this->accessRuleSources($row),
+                $this->accessRuleConfidence($row),
                 $row->status(),
                 ...array_map(fn(string $group): string => (string)($row->cells()[$group] ?? '-'), $snapshot->groups()),
             ]);
@@ -99,7 +102,7 @@ class ExportService {
             '',
             '## Legende',
             '',
-            'X = App oder Funktion nutzbar / sichtbar; R = Lesen; W = Schreiben / Bearbeiten; C = Erstellen / Hochladen; D = Loeschen; S = Teilen / Freigeben; A = Administrieren / Verwalten; - = kein Recht; ? = technisch nicht eindeutig auslesbar; UNSUPPORTED = App oder Berechtigungsmodell noch nicht unterstuetzt; NOT_APPROVED = nicht in der Positivliste freigegeben; n/a = nicht anwendbar.',
+            'X = App oder Funktion nutzbar / sichtbar; AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein; R = Lesen; W = Schreiben / Bearbeiten; C = Erstellen / Hochladen; D = Loeschen; S = Teilen / Freigeben; A = Administrieren / Verwalten; - = kein Recht; ? = technisch nicht eindeutig auslesbar; UNSUPPORTED = App oder Berechtigungsmodell noch nicht unterstuetzt; NOT_APPROVED = nicht in der Positivliste freigegeben; n/a = nicht anwendbar.',
             '',
             '## Zusammenfassung',
             '',
@@ -178,7 +181,7 @@ class ExportService {
     }
 
     private function markdownTable(Snapshot $snapshot, array $columns): string {
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...array_column($columns, 'label')];
+        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Bedingung', 'Technische Quelle', 'Aussagesicherheit', 'Status', ...array_column($columns, 'label')];
         $lines = [
             '| ' . implode(' | ', array_map([$this, 'mdCell'], $header)) . ' |',
             '| ' . implode(' | ', array_fill(0, count($header), '---')) . ' |',
@@ -190,6 +193,9 @@ class ExportService {
                 $row->appId(),
                 $row->objectName(),
                 $row->permissionType(),
+                $this->accessRuleText($row),
+                $this->accessRuleSources($row),
+                $this->accessRuleConfidence($row),
                 $row->status(),
                 ...array_map(fn(array $column): string => $this->aggregateCell($row->cells(), $column)['value'], $columns),
             ])) . ' |';
@@ -228,7 +234,7 @@ class ExportService {
     }
 
     private function htmlTable(Snapshot $snapshot, array $columns): string {
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Status', ...array_column($columns, 'label')];
+        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Bedingung', 'Technische Quelle', 'Aussagesicherheit', 'Status', ...array_column($columns, 'label')];
         $html = '<table><thead><tr>';
         foreach ($header as $cell) {
             $html .= '<th scope="col">' . $this->esc($cell) . '</th>';
@@ -240,6 +246,9 @@ class ExportService {
                 $row->appId(),
                 $row->objectName(),
                 $row->permissionType(),
+                $this->accessRuleText($row),
+                $this->accessRuleSources($row),
+                $this->accessRuleConfidence($row),
                 $row->status(),
             ] as $cell) {
                 $html .= '<td>' . $this->esc($cell) . '</td>';
@@ -252,6 +261,37 @@ class ExportService {
         }
 
         return $html . '</tbody></table>';
+    }
+
+    /**
+     * Zweck: Macht verschachtelte Gruppenbedingungen in menschenlesbaren Exporten pruefbar.
+     *
+     * Vertrag:
+     * - Mehrere Regeln einer Zeile bleiben einzeln erkennbar; Zeilen ohne AccessRule bleiben leer.
+     */
+    private function accessRuleText(MatrixRow $row): string {
+        return implode('; ', array_map(
+            static fn($rule): string => $rule->conditionText(),
+            $row->accessRules()
+        ));
+    }
+
+    private function accessRuleSources(MatrixRow $row): string {
+        $sources = array_map(
+            static fn($rule): string => $rule->source(),
+            $row->accessRules()
+        );
+
+        return implode('; ', array_values(array_unique($sources === [] ? [$row->source()] : $sources)));
+    }
+
+    private function accessRuleConfidence(MatrixRow $row): string {
+        $confidence = array_map(
+            static fn($rule): string => $rule->confidence(),
+            $row->accessRules()
+        );
+
+        return implode('; ', array_values(array_unique($confidence === [] ? [$row->confidence()] : $confidence)));
     }
 
     private function hasGroupFamilies(Snapshot $snapshot): bool {
