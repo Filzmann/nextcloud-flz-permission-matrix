@@ -1,11 +1,14 @@
 <?php
+script('orgsuite', 'suite-navigation');
 script('br_permission_matrix', 'modules/api');
 script('br_permission_matrix', 'modules/render');
 script('br_permission_matrix', 'main');
 style('br_permission_matrix', 'style');
+style('orgsuite', 'suite-navigation');
 ?>
 
 <div id="permission-matrix-app" data-can-manage="<?php p($_['can_manage'] ? '1' : '0'); ?>">
+    <div class="orgsuite-host" data-orgsuite data-suite="br" data-current-app="br_permission_matrix"></div>
     <header class="pm-head">
         <div>
             <h1>Berechtigungsmatrix</h1>

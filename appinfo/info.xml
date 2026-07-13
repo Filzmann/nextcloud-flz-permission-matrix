@@ -5,13 +5,14 @@
     <name>Berechtigungsmatrix</name>
     <summary>Read-only Berechtigungsmatrix und Positivlisten-Audit fuer Nextcloud-Gruppenrechte.</summary>
     <description>Dokumentiert gruppenbezogene App-Verfuegbarkeit, bekannte Berechtigungsquellen, Snapshots, Baselines, Diffs und Exporte ohne Nextcloud-Berechtigungen zu veraendern.</description>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <licence>agpl</licence>
     <author>Simon</author>
     <namespace>BrPermissionMatrix</namespace>
     <category>organization</category>
     <dependencies>
         <nextcloud min-version="29" max-version="35"/>
+        <app>orgsuite</app>
     </dependencies>
     <settings>
         <admin>OCA\BrPermissionMatrix\Settings\Admin</admin>

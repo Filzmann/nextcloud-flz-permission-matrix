@@ -82,6 +82,12 @@ Neue oder refaktorierte Fachlogik bekommt passende Tests fuer Scanner, Matrixauf
 
 ## Learnings pflegen
 
+### Gemeinsame Suite-Navigation
+
+- Die Berechtigungsmatrix registriert keinen eigenen Nextcloud-Hauptnavigationseintrag. `orgsuite` stellt den gemeinsamen Einstieg `BR` bereit.
+- Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="br"` und `data-current-app="br_permission_matrix"` ein.
+- Die bestehende serverseitige View-/Manage-Pruefung bleibt alleinige Autoritaet; Menuesichtbarkeit ist keine Berechtigung.
+
 - App-spezifische Learnings werden in dieser `AGENTS.md` gespeichert.
 - App-uebergreifende Learnings werden im Parent-Workspace dokumentiert und bei Bedarf hier wiederholt.
 - Ergaenzungen erfolgen erst nach ausdruecklicher Freigabe.
