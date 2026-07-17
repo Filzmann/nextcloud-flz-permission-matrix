@@ -24,14 +24,12 @@ Kernprinzipien:
 - Standardexporte enthalten keine Passwoerter, Tokens, privaten Schluessel, Dateiinhalte oder personenbezogenen Dateipfade.
 - Personenbezogene Daten werden im Standardmodus vermieden; `include_users` bleibt standardmaessig `false`.
 
-## Git- und Arbeitsregeln
+## Repository und gemeinsamer Arbeitsablauf
 
 - Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `br_permission_matrix`.
 - Andere Apps und der Parent-Workspace werden nicht aus diesem Repo heraus gestaged oder committed.
-- Keine Commits, kein Push und kein Deployment ohne ausdrueckliche Freigabe durch Simon.
-- Vor Commits immer `git status --short`, `git diff --stat` und `git diff --name-only` zeigen.
-- Nicht `git add .` verwenden; Dateien gezielt stagen.
-- Aenderungen klein, pruefbar und rueckbaubar halten.
+- Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.
+- Fuer Git-, Sandbox-, DDEV-/`occ`-Sicherheit, Verifikation und Learning Candidates gilt der lokal mitgefuehrte Skill `work-in-nextcloud-app`; die folgenden Matrix-Regeln und Pruefungen ergaenzen ihn.
 
 ## DDEV
 
@@ -46,10 +44,6 @@ Wichtige Pruefungen:
     ddev exec -d /var/www/html/html php occ app:enable br_permission_matrix
     ddev exec -d /var/www/html/html php occ permission-matrix:status
     ddev exec -d /var/www/html/html php occ permission-matrix:scan
-
-Diese lokale Nextcloud-Version hat keinen `occ migrations:migrate`-Befehl. App-Migrationen laufen beim Aktivieren der App bzw. ueber `occ upgrade`, wenn Nextcloud einen DB-Upgrade-Bedarf meldet.
-
-In Codex-Sessions koennen DDEV-Befehle im normalen Sandbox-Kontext nicht zuverlaessig auf Docker zugreifen. Wenn `ddev` mit Docker-/Stream-FD-Fehlern scheitert, den gleichen Befehl mit eskaliertem Zugriff erneut ausfuehren.
 
 ## Architekturregeln
 
@@ -88,6 +82,4 @@ Neue oder refaktorierte Fachlogik bekommt passende Tests fuer Scanner, Matrixauf
 - Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="br"` und `data-current-app="br_permission_matrix"` ein.
 - Die bestehende serverseitige View-/Manage-Pruefung bleibt alleinige Autoritaet; Menuesichtbarkeit ist keine Berechtigung.
 
-- App-spezifische Learnings werden in dieser `AGENTS.md` gespeichert.
-- App-uebergreifende Learnings werden im Parent-Workspace dokumentiert und bei Bedarf hier wiederholt.
-- Ergaenzungen erfolgen erst nach ausdruecklicher Freigabe.
+- App-spezifische Kandidaten zielen auf diese Datei; app-uebergreifende Kandidaten werden dem Parent nur als unverbindlicher Vorschlag berichtet. Bewertung und Freigabe folgen dem lokalen Skill `work-in-nextcloud-app`.
