@@ -52,14 +52,22 @@ Stop immediately if production systems, Git history rewriting, new production de
 
 ## Test-first and coverage
 
-- New development and bug fixes normally follow Red – Green – Refactor. Start a bug fix with a regression test and a refactoring with characterization tests. Develop domain logic, permissions, hierarchies, conflicts, and validation test-first.
+- Use the locally available sibling skill `test-driven-change` for every new feature, bug fix, domain rule, permission change, API behavior, data change, or contract change. It is the sole detailed Red–Green–Refactor workflow; this section adds only Nextcloud-app test selection and coverage requirements.
 - API changes cover success, validation failure, and typical Allow/Deny cases. Cross-app contracts have provider and consumer contract tests. Use integration/DDEV tests for migrations and repository behavior when unit tests cannot represent the real contract.
 - Develop executable UI logic test-first; additionally cover layout, accessibility, and Nextcloud integration with suitable smoke or browser checks.
-- Permitted test-first entry exceptions are time-boxed exploratory spikes, purely declarative text/metadata or trivial presentation changes, and hard-to-isolate Nextcloud integration where a broader integration test is more truthful. Discard spike code or characterize it before adoption; give declarative changes appropriate syntax, contract, layout, or visibility checks.
+- Treat a time-boxed exploratory spike or hard-to-isolate Nextcloud integration as an explicitly justified deviation. Discard spike code or characterize it before adoption; choose the truthful broader integration level when isolation would hide the real contract.
 - Use the local fast entries named by `AGENTS.md`, normally `php tests/run.php` and `node tests/run-js.mjs`; dependency-light PHP smokes run in isolated processes. Run LocalBase and every affected consumer contract/smoke suite after a LocalBase contract change.
 - In local pre-production, app tests may use shared LocalBase test helpers through relative repository paths. Add heavier packaging/autoload structure or a larger test framework only when path handling, runners, assertions, mocks, or fixtures are materially duplicated or impair readability.
 - Known overall and app coverage must not decline unnoticed. Aim for at least 85 percent line coverage for new or materially changed executable code, report PHP and JavaScript separately, and fully cover security invariants regardless of percentages. Coverage is a warning and delivery indicator, not a substitute for meaningful assertions.
 - Do not prepare a commit or release with red relevant fast tests, contract tests, security checks, coverage gates, or delivery gates.
+
+## Persistent state and migrations
+
+- Before implementing a feature that changes persistent domain objects, determine the complete state model: allowed and forbidden starting states, preconditions, target state, side effects, error states, retry or repetition behavior, and relevant concurrency conflicts.
+- Do not expose unrestricted generic setters for status changes governed by domain transition rules. Encapsulate allowed transitions in the domain model or one clearly responsible application service and cover positive, negative, and failure cases.
+- Before a database change that can encounter existing data, document the old and new schema, transformation rules, known existing-data variants, integrity conditions, transaction boundary, resumability, and rollback limits.
+- Such a database change requires at least a fresh-install test, an upgrade test from the relevant previous version with synthetic existing data, domain data- and relationship-integrity checks, handling of invalid or contradictory legacy data, and an application test on the migrated schema.
+- Never modify a published migration after the fact. Correct it with a new migration.
 
 ## DDEV, Nextcloud, and hosting safety
 

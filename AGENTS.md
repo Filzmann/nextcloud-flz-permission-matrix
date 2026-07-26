@@ -33,9 +33,10 @@ Kernprinzipien:
 
 ## DDEV
 
-Die gemeinsame lokale Nextcloud-DDEV-Umgebung liegt ausserhalb dieses Repos:
-
-    ~/projects/br-nextcloud-apps/nextcloud-dev
+Die gemeinsame Nextcloud-DDEV-Umgebung wird aus dem dokumentierten
+Parent-Unterverzeichnis `nextcloud-dev` gesteuert. Bei einem eigenständigen
+Checkout ist der lokale DDEV-Pfad zuerst anhand der realen Umgebung zu
+ermitteln.
 
 Wichtige Pruefungen:
 
@@ -74,12 +75,8 @@ Schnelle lokale Einstiegspunkte:
 
 Neue oder refaktorierte Fachlogik bekommt passende Tests fuer Scanner, Matrixaufbau, Diff und Exporte. Bei Controller-, DI-, Migrations-, Background-Job- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
 
-## Learnings pflegen
-
-### Gemeinsame Suite-Navigation
+## Verbindliche Suite-Navigation
 
 - Die Berechtigungsmatrix registriert keinen eigenen Nextcloud-Hauptnavigationseintrag. `orgsuite` stellt den gemeinsamen Einstieg `BR` bereit.
 - Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="br"` und `data-current-app="br_permission_matrix"` ein.
 - Die bestehende serverseitige View-/Manage-Pruefung bleibt alleinige Autoritaet; Menuesichtbarkeit ist keine Berechtigung.
-
-- App-spezifische Kandidaten zielen auf diese Datei; app-uebergreifende Kandidaten werden dem Parent nur als unverbindlicher Vorschlag berichtet. Bewertung und Freigabe folgen dem lokalen Skill `work-in-nextcloud-app`.

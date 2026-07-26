@@ -23,14 +23,15 @@ Die Teamansicht ordnet bekannte technische Gruppen verstaendlich, zum Beispiel `
 Die App wird in der gemeinsamen DDEV-Nextcloud per Mount eingebunden:
 
 ```text
-~/projects/br-nextcloud-apps/br_permission_matrix
+<WORKSPACE-ROOT>/br_permission_matrix
 -> /var/www/html/html/custom_apps/br_permission_matrix
 ```
 
 Aktivieren:
 
+Aus dem dokumentierten `nextcloud-dev`-Root:
+
 ```bash
-cd ~/projects/br-nextcloud-apps/nextcloud-dev
 ddev exec -d /var/www/html/html php occ app:enable br_permission_matrix
 ddev exec -d /var/www/html/html php occ status
 ddev exec -d /var/www/html/html php occ app:list | grep -i br_permission_matrix
@@ -88,12 +89,8 @@ MVP:
 - `occ`-Kommandos.
 - JSON/CSV/Markdown/HTML-Export.
 
-Noch bewusst konservativ bzw. als Klaerung markiert:
-
-- Konkrete Team-/Group-Folder-Rechte.
-- Files-Access-Control-Regelgruppen.
-- App-spezifische Detailrechte fuer Deck, Collectives, Tables, Talk, Calendar, Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und Two-Factor.
-- XLSX/PDF-Export.
+Geplante Adapter, weitere Exportformate und die Prüfung des gemeinsamen
+AD-Gruppenvertrags stehen in der [Roadmap](ROADMAP.md).
 
 ## Tests
 
