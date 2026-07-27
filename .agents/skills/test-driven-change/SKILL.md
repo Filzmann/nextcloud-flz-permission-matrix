@@ -55,13 +55,17 @@ For permission changes, verify at least:
 
 - unauthorized access is rejected;
 - authorized access succeeds;
-- a foreign or manipulated object ID causes no data change.
+- a foreign or manipulated object ID grants no access and causes no data
+  change;
+- a rejected request changes no data;
+- UI visibility is never used as a substitute for server-side access control.
 
 For database or migration changes, verify at least:
 
 - fresh installation on an empty schema;
 - upgrade from at least the immediately relevant prior version;
 - preservation or correct migration of existing data;
+- required constraints and indexes exist and preserve integrity;
 - no incomplete state after failure.
 
 For shared libraries or contracts, verify:
