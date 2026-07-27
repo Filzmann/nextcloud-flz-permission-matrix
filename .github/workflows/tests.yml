@@ -1,0 +1,108 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.5']
+    steps:
+      - name: App auschecken
+        uses: actions/checkout@v7
+        with:
+          path: app
+      - name: LocalBase-Referenz bestimmen
+        id: localbase-ref
+        env:
+          CANDIDATE_REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git ls-remote --exit-code --heads https://github.com/Filzmann/nextcloud-localbase.git "refs/heads/$CANDIDATE_REF" >/dev/null 2>&1; then
+            echo "ref=$CANDIDATE_REF" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+      - name: LocalBase-Testhilfe auschecken
+        uses: actions/checkout@v7
+        with:
+          repository: Filzmann/nextcloud-localbase
+          ref: ${{ steps.localbase-ref.outputs.ref }}
+          path: localbase
+      - name: PHP einrichten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.php-version == '8.3' && 'xdebug' || 'none' }}
+          tools: none
+      - name: PHP-Tests
+        if: matrix.php-version == '8.5'
+        working-directory: app
+        run: php tests/run.php
+      - name: PHP-Coverage-Tooling installieren
+        if: matrix.php-version == '8.3'
+        run: composer install --working-dir=localbase/tests/coverage --no-interaction --no-progress --prefer-dist
+      - name: PHP-Coverage
+        if: matrix.php-version == '8.3'
+        working-directory: app
+        run: |
+          mkdir -p "$RUNNER_TEMP/php-coverage"
+          PHP_COVERAGE_COMMAND="$GITHUB_WORKSPACE/localbase/tests/coverage/vendor/bin/phpcov" \
+          PHP_COVERAGE_OUTPUT_DIR="$RUNNER_TEMP/php-coverage" \
+          php tests/run.php
+          php "$GITHUB_WORKSPACE/localbase/tests/coverage/merge-clover.php" br_permission_matrix "$RUNNER_TEMP/php-coverage" 47.13
+
+  javascript:
+    name: JavaScript
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: App auschecken
+        uses: actions/checkout@v7
+        with:
+          path: app
+      - name: LocalBase-Referenz bestimmen
+        id: localbase-ref
+        env:
+          CANDIDATE_REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git ls-remote --exit-code --heads https://github.com/Filzmann/nextcloud-localbase.git "refs/heads/$CANDIDATE_REF" >/dev/null 2>&1; then
+            echo "ref=$CANDIDATE_REF" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+      - name: LocalBase-Testhilfe auschecken
+        uses: actions/checkout@v7
+        with:
+          repository: Filzmann/nextcloud-localbase
+          ref: ${{ steps.localbase-ref.outputs.ref }}
+          path: localbase
+      - name: Node.js einrichten
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: JavaScript-Coverage-Tooling installieren
+        run: npm ci --prefix localbase/tests/coverage --ignore-scripts
+      - name: JavaScript-Tests mit Coverage
+        working-directory: app
+        run: |
+          ../localbase/tests/coverage/node_modules/.bin/c8 \
+            --all \
+            '--include=js/**/*.js' \
+            --check-coverage \
+            --lines=50.94 \
+            node tests/run-js.mjs
