@@ -102,3 +102,8 @@ node tests/run-js.mjs
 ```
 
 Bei Controller-, DI-, Migration-, Background-Job- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
+
+Für die fachliche, visuelle und sicherheitsbezogene Staging-Prüfung steht ein
+ausfüllbares [manuelles Abnahmeformular](docs/manual-acceptance.md) bereit.
+Belege werden darin ausschließlich synthetisch beziehungsweise redigiert
+dokumentiert.

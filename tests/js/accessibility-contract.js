@@ -26,7 +26,9 @@ assert(main.includes("event.target.closest('[data-app-toggle]')"));
 assert(main.includes("event.target.closest('[data-group-focus]')"));
 assert(main.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("type === 'error' ? 'alert' : 'status'"));
-assert(style.includes('overflow-y: auto !important'));
+assert(!style.includes('#content'));
+assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
+assert(/\.pm-admin\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none/s.test(style));
 assert(style.includes('max-height: calc(100vh - 300px)'));
 
 console.log('Permission Matrix accessibility contract test passed.');

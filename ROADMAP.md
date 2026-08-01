@@ -64,6 +64,8 @@ Status: bereit nach Stabilisierung des Matrixmodells
 
 ## Aktueller Fokus
 
+- Die manuellen Prüfungen werden im ausfüllbaren
+  [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
 - Die heutige Gruppenfamilienerkennung gegen den konfigurierbaren
   AD-Organisationsvertrag prüfen.
 - Sicherstellen, dass unbekannte, nicht eindeutige oder nicht unterstützte
