@@ -48,9 +48,12 @@ Status: bereit für adapterweise Umsetzung
   unbekannte Quelle, deaktivierte App, Redaction und unveränderte
   Nextcloud-Rechte testen.
 
+## Zukunftsplanung – nicht freigegeben
+
 ### BPM-L10N – Berechtigungsmatrix vollständig lokalisieren
 
-Status: bereit nach Stabilisierung des Matrixmodells
+Status: später, nicht freigegeben; Matrixmodell, Pilot-App, Reihenfolge und
+Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
 
 - Oberfläche, Status-, Warn-, Export- und Fehlermeldungen auf
   Nextcloud-l10n umstellen.
