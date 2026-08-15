@@ -28,18 +28,24 @@ If the concrete request does not already and explicitly include the affected ris
 
 The rollback path being unclear is a separate stop reason. Without approval, only read-only analysis and a minimal change plan are allowed for these areas.
 
+Also stop before a structural change when competing sources exist and their future authority is unclear, no safe migration or roll-forward path is evident, existing data would be destructively or irreversibly endangered, or missing diagnostics make a critical protection boundary impossible to implement or verify safely. Report the concrete locations, conflict, options, effects, recommendation, and required decision rather than asking an unanalysed question.
+
 Stop immediately if production systems, Git history rewriting, new production dependencies, changes outside the commissioned repositories, or loss of a binding domain rule would be required. Unexpectedly required external services also trigger a stop. An explicitly commissioned access to a named staging or hosting system is not unexpected, but remains limited to the approved system, operation, and credentials scope.
 
 ## Architecture, rights, and data safety
 
 - Keep controllers thin and separate domain logic, data access, rendering, document generation, and file storage. Use repositories, mappers, stores, or services for data access; keep JavaScript API adapters, models/view-models, workflows, and rendering/event binding separated.
 - Apply DRY and KISS together. Extract shared code or test helpers only after at least two repositories need the same contract, assertions, fakes, fixtures, or setup steps **semantically identically**, and the shared contract is testable.
+- For each relevant domain or technical fact, identify and reuse the existing canonical source. Derive or validate projections from it instead of independently maintaining roles, permissions, configuration, status, schema/version, navigation, repository lists, mappings, synchronized data, or shared constants twice. Deliberately independent local data stays local; code duplication alone does not justify an abstraction.
 - Nextcloud-native group, user, session, AppConfig, share, file, capability, configuration, and request mechanisms must be used by default. A parallel custom mechanism is allowed only when the native option is demonstrably insufficient, the deviation is documented as a reasoned architecture decision, its effects on permissions, migration, maintenance, and interoperability have been checked, and the decision was approved before implementation. Without that documented, checked, and pre-approved architecture decision, stop before implementation.
 - Enforce deny by default, least privilege, and server-side first. UI visibility and navigation never grant rights. Centralize permission decisions and scope repository/service results to the actor.
 - Distinguish Nextcloud admin, app admin, group membership, ordinary users, read-only/edit roles, shares/capabilities, and background jobs. Validate and type requests, bind QueryBuilder values, escape output, protect writes with CSRF, and justify `NoCSRFRequired` explicitly.
 - Temporary local permission simplifications are allowed only when named as pre-production constraints and when they do not obstruct a later granular rights architecture.
 - Never construct SQL fragments from request data. Use synthetic, neutral, privacy-sparse data in tests, fixtures, screenshots, logs, examples, and documentation; do not reuse real employee, works-council, customer, mail, health, conflict, decision, or internal-document data.
-- Normalize file paths and never compose them unchecked from input. Keep secrets and unnecessary personal data out of repositories, logs, documentation, and test fixtures. Test relevant Allow, Deny, and direct unauthorized API calls.
+- Normalize file paths and never compose them unchecked from input. Keep secrets and unnecessary personal data out of repositories, logs, documentation, and test fixtures.
+- For every new or changed failure state, check how it is detected, reproduced, narrowed down, and verified after a fix. Reuse Nextcloud or project error handling and logging; prefer specific exceptions, stable domain error states or codes, and minimal structured context. Do not silently swallow exceptions or log passwords, tokens, secrets, full sensitive requests, or unnecessary personal data. Add no logging or telemetry architecture without concrete need.
+
+Apply these decisions proportionately during relevant implementation: reuse the existing architecture and platform, avoid a parallel source or mechanism, account for persistent existing data, prove meaningful positive and negative boundaries, keep failures diagnosable, and choose the smallest clean solution. Do not turn this into ceremony for a trivial change, speculative infrastructure, or adjacent refactoring.
 
 ## UI and accessibility contract
 
@@ -53,7 +59,7 @@ Stop immediately if production systems, Git history rewriting, new production de
 ## Test-first and coverage
 
 - Use the locally available sibling skill `test-driven-change` for every new feature, bug fix, domain rule, permission change, API behavior, data change, or contract change. It is the sole detailed Red–Green–Refactor workflow; this section adds only Nextcloud-app test selection and coverage requirements.
-- API changes cover success, validation failure, and typical Allow/Deny cases. Cross-app contracts have provider and consumer contract tests. Use integration/DDEV tests for migrations and repository behavior when unit tests cannot represent the real contract.
+- API changes cover success, validation failure, and typical Allow/Deny cases. For every affected domain or security boundary, test a meaningful denied, invalid, manipulated, foreign-object, or failure path and the absence of forbidden side effects; do not invent a negative test where no meaningful negative state exists. If a relevant path cannot be automated, name the gap and the suitable integration or manual check. Cross-app contracts have provider and consumer contract tests. Use integration/DDEV tests for migrations and repository behavior when unit tests cannot represent the real contract.
 - Develop executable UI logic test-first; additionally cover layout, accessibility, and Nextcloud integration with suitable smoke or browser checks.
 - Treat a time-boxed exploratory spike or hard-to-isolate Nextcloud integration as an explicitly justified deviation. Discard spike code or characterize it before adoption; choose the truthful broader integration level when isolation would hide the real contract.
 - Use the local fast entries named by `AGENTS.md`, normally `php tests/run.php` and `node tests/run-js.mjs`; dependency-light PHP smokes run in isolated processes. Run LocalBase and every affected consumer contract/smoke suite after a LocalBase contract change.
@@ -67,7 +73,8 @@ Stop immediately if production systems, Git history rewriting, new production de
 
 - Before implementing a feature that changes persistent domain objects, determine the complete state model: allowed and forbidden starting states, preconditions, target state, side effects, error states, retry or repetition behavior, and relevant concurrency conflicts.
 - Do not expose unrestricted generic setters for status changes governed by domain transition rules. Encapsulate allowed transitions in the domain model or one clearly responsible application service and cover positive, negative, and failure cases.
-- Before a database change that can encounter existing data, document the old and new schema, transformation rules, known existing-data variants, integrity conditions, transaction boundary, resumability, and rollback limits.
+- Before a database change that can encounter existing data, document the old and new schema, transformation rules, known existing-data variants including `NULL`, special, and partially migrated states, integrity conditions, schema/code compatibility, transaction boundary, resumability, repeatability, backfill strategy, and roll-forward and rollback limits.
+- For a non-trivial structural change, prefer and verify an additive Expand, controlled Migrate/Backfill, then Contract sequence, retaining temporary compatibility where needed and removing the old structure only after code and data are verified. Do not force this sequence onto a trivial additive migration.
 - Such a database change requires at least a fresh-install test, an upgrade test from the relevant previous version with synthetic existing data, domain data- and relationship-integrity checks, handling of invalid or contradictory legacy data, and an application test on the migrated schema.
 - Never modify a published migration after the fact. Correct it with a new migration.
 
@@ -88,10 +95,12 @@ Stop immediately if production systems, Git history rewriting, new production de
 - Do not commit, push, release, deploy, or use `git add .` without Simon's explicit authorization. Stage individual files only when staging was requested.
 - Before a commit, show `git status --short`, `git diff --stat`, and `git diff --name-only`. Never use `git reset --hard`, `git clean`, force-push, history rewrite, or versioned backup copies.
 - Run relevant local tests, `git diff --check`, and the repository's own structure/fast check. For an explicitly authorized cross-app contract change, validate every provider and consumer repository from its own root and use the Parent workspace check only as an additional coordinator.
-- Finish with the repository root, loaded local instruction chain, locally resolved skills, checks with results, skipped checks with reasons, remaining risks, and the final `git status --short`, diff statistics, and complete changed-file list.
+- Finish with the repository root, loaded local instruction chain, locally resolved skills, checks with results, skipped checks with reasons, remaining risks, and the final `git status --short`, diff statistics, and complete changed-file list. Where actually relevant, fold canonical-source decisions or conflicts, existing-data/migration evidence, tested negative boundaries, diagnosability of changed failure states, and additional learning candidates into that report without adding empty checklist noise.
 
 ## Learning candidates
 
 Do not turn observations automatically into rules. A candidate must be reproducible or evidenced, reusable in future work, and assigned to the correct level. One-off state, guesses, temporary workarounds, task-specific to-dos, sensitive content, and details better enforced by tests, scripts, code comments, or ordinary documentation are not durable rules.
 
 Classify a valid observation as a local app rule, executable test/script/check, or cross-app candidate. Keep it explicitly unconfirmed until Simon approves it. A cross-app candidate may be proposed to the Parent, but a direct app run must not edit or depend on Parent files merely to record it.
+
+If an out-of-scope duplicate source is discovered, do not widen the implementation scope. Report its concrete benefit and correct target and evaluate it as a learning candidate only when the observation is evidenced and reusable.

@@ -10,6 +10,31 @@ ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
 
 ## Freigegebene Umsetzungsaufgaben
 
+### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
+
+Status: fachlicher Zielvertrag; appübergreifende Umsetzung noch ausstehend
+
+- Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
+  Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
+  öffentliche Schnittstelle bereit.
+- Die Berechtigungsmatrix ruft diese Detailberechtigungen ausschließlich bei
+  der jeweils zuständigen App ab. Sie liest dafür weder deren Tabellen,
+  Entitäten, interne Services oder Konfiguration direkt noch führt sie eine
+  zweite, unabhängig gepflegte Abbildung der App-Berechtigungen.
+- Die Custom App bleibt die kanonische Quelle und liefert die fachliche
+  Bedeutung sowie die effektiv geltenden Rechte, Scopes und Einschränkungen.
+  Nicht eindeutig gelieferte Zustände werden als `UNKNOWN` oder `UNSUPPORTED`
+  ausgewiesen und niemals als erlaubt ergänzt.
+- Besitzt eine App keine eigene Berechtigungssteuerung, bewertet die Matrix
+  ausschließlich die native Nextcloud-Gruppeneinschränkung der App. Mit einer
+  solchen Einschränkung ist die App nur für die dort eingetragenen Gruppen
+  verfügbar; ohne Einschränkung steht die App vollständig allen
+  Nextcloud-Benutzern zur Verfügung und wird für alle erfassten Gruppen als
+  nutzbar ausgewiesen.
+- Provider-/Consumer-Vertrag, Versionierung, Fehlerfälle sowie positive und
+  negative Berechtigungsfälle werden vor der ersten appübergreifenden
+  Umsetzung gemeinsam festgelegt und getestet.
+
 ### BPM-AD-ORG-SNAPSHOT – Gruppen fachlich aus dem Organisationssnapshot deuten
 
 Status: bereit nach `LB-AD-ORG-SNAPSHOT`
