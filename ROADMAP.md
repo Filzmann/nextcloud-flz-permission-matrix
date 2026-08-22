@@ -12,7 +12,7 @@ ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
 
 ### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
 
-Status: fachlicher Zielvertrag; appübergreifende Umsetzung noch ausstehend
+Status: installierte Apps geprüft; öffentliche Providerverträge und appübergreifende Umsetzung noch ausstehend
 
 - Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
   Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
@@ -37,7 +37,7 @@ Status: fachlicher Zielvertrag; appübergreifende Umsetzung noch ausstehend
 
 ### BPM-FOLDER-RIGHTS – Konkrete Ordnerrechte ausweisen
 
-Status: bereit für adapterweise Umsetzung
+Status: native Nextcloud-Gruppenfreigaben umgesetzt; weitere Adapter offen
 
 - Für jeden belastbar auslesbaren konkreten Ordner und jede erfasste Gruppe
   getrennt Lesen, Schreiben beziehungsweise Ändern, Ausführen und Löschen
@@ -53,6 +53,19 @@ Status: bereit für adapterweise Umsetzung
 - Pro Adapter positive Rechte, Deny, Vererbung, widersprüchliche Regeln,
   unbekannte Quelle, deaktivierte App, Redaction und unveränderte
   Nextcloud-Rechte testen.
+
+Umgesetzt für native Nextcloud-Gruppenfreigaben:
+
+- Öffentliche `OCP\Share\IManager`-Quelle mit read-only Abfrage einschließlich
+  direkter Freigaben und Weiterfreigaben.
+- Getrennte R/W/C/D/S-Zeilen, explizites `n/a` für Ausführen sowie
+  fail-closed Behandlung von Teilständen, unbekannten Gruppen, Permission-Bits,
+  Node-Typen, Pfaden und widersprüchlichen Datensätzen.
+- Standardmäßig deaktivierte Einzelfreigaben-Erfassung und pfadredigierte
+  JSON-/CSV-/Markdown-/HTML-Exporte einschließlich Diffangaben.
+
+Offen bleiben Group Folders, Files Access Control und externe Speicher. Sie
+werden nicht aus internen App-Klassen oder fremden Tabellen gelesen.
 
 ## Zukunftsplanung – nicht freigegeben
 
@@ -84,7 +97,7 @@ Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
 
 ## Geplante Erweiterungen
 
-- Konkrete Team- und Group-Folder-Rechte.
+- Konkrete Team- und Group-Folder-Rechte sowie externe Speicherrechte.
 - Files-Access-Control-Regelgruppen.
 - App-spezifische Detailadapter für Deck, Collectives, Tables, Talk,
   Calendar, Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und

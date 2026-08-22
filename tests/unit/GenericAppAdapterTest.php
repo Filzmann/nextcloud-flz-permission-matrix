@@ -43,6 +43,15 @@ class GenericAdapterFakeInventory extends InventoryService {
                 'groups' => [],
                 'source' => 'appstore',
             ],
+            [
+                'app_id' => 'adplaner',
+                'display_name' => 'AD-Planer',
+                'version' => '1.0',
+                'enabled' => true,
+                'restricted' => false,
+                'groups' => [],
+                'source' => 'custom',
+            ],
         ];
     }
 }
@@ -50,7 +59,7 @@ class GenericAdapterFakeInventory extends InventoryService {
 $result = (new GenericAppAdapter(new GenericAdapterFakeInventory(), new AdapterCatalogService()))->collect();
 $rows = $result->rows();
 
-assertSameValue(3, count($rows), 'generic adapter should create one app availability row per app');
+assertSameValue(4, count($rows), 'generic adapter should create one app availability row per app');
 assertSameValue('NEW', $rows[0]->status(), 'known app visibility should remain concrete even without a detail adapter');
 assertSameValue('-', $rows[0]->cells()['Betriebsrat'], 'restricted app should deny non-listed group');
 assertSameValue('X', $rows[0]->cells()['IKT-Ausschuss'], 'restricted app should allow listed group');
@@ -59,7 +68,8 @@ assertSameValue('NEW', $rows[1]->status(), 'implemented adapter app availability
 assertSameValue('NEW', $rows[2]->status(), 'global app visibility should be separate from unsupported detail coverage');
 assertSameValue('X', $rows[2]->cells()['Betriebsrat'], 'unsupported status must not hide a globally available app from any scanned group');
 assertSameValue('X', $rows[2]->cells()['IKT-Ausschuss'], 'global app availability should be independent of detail-adapter support');
-assertSameValue(['deck', 'notes'], $result->unsupportedApps(), 'unsupported app list should contain every app without a detail adapter');
+assertSameValue(['deck', 'notes', 'adplaner'], $result->unsupportedApps(), 'Apps without a public detail contract must remain unsupported, including custom apps with internal permission services.');
 assertSameValue('UNSUPPORTED', $result->adapterStatus()[0]['status'], 'detail coverage should remain unsupported independently of row access status');
+assertContainsText('öffentliche versionierte read-only Schnittstelle', implode(' ', $result->adapterStatus()[3]['warnings']), 'Custom apps should explain the missing public provider contract precisely.');
 
 echo 'GenericAppAdapter tests passed' . PHP_EOL;

@@ -18,6 +18,7 @@ use OCA\BrPermissionMatrix\Model\Snapshot;
  */
 class ExportService {
     private const IMPLEMENTED_FORMATS = ['json', 'csv', 'md', 'html'];
+    private const PATH_OBJECT_TYPES = ['SharedFolder', 'SharedFile', 'ExternalPath', 'TeamFolderPath'];
 
     public function __construct(
         private ConfigService $config
@@ -47,8 +48,54 @@ class ExportService {
     }
 
     private function json(Snapshot $snapshot): array {
+        $payload = $snapshot->toArray();
+        if ($this->config->redactPaths()) {
+            $aliases = $this->pathAliases($snapshot);
+            $rowKeys = [];
+            foreach ($payload['matrix'] as &$row) {
+                $identity = $this->pathIdentityFromArray($row);
+                if ($identity === null || !isset($aliases[$identity])) {
+                    continue;
+                }
+                $oldKey = (string)($row['row_key'] ?? '');
+                $row['object'] = $aliases[$identity];
+                $row['row_key'] = hash('sha256', implode('|', [
+                    (string)($row['object_type'] ?? ''),
+                    (string)($row['app_id'] ?? ''),
+                    (string)$row['object'],
+                    (string)($row['detail'] ?? ''),
+                    (string)($row['permission_type'] ?? ''),
+                ]));
+                if ($oldKey !== '') {
+                    $rowKeys[$oldKey] = $row['row_key'];
+                }
+            }
+            unset($row);
+            foreach ($payload['diff_to_baseline'] as &$diff) {
+                $identity = $this->pathIdentityFromArray($diff);
+                if ($identity !== null && isset($aliases[$identity])) {
+                    $original = (string)($diff['object'] ?? '');
+                    $diff['object'] = $aliases[$identity];
+                    $diff['message'] = str_replace($original, $aliases[$identity], (string)($diff['message'] ?? ''));
+                    $diff['row_key'] = hash('sha256', implode('|', [
+                        (string)($diff['object_type'] ?? ''),
+                        (string)($diff['app_id'] ?? ''),
+                        (string)$diff['object'],
+                        (string)($diff['group'] ?? ''),
+                        (string)($diff['type'] ?? ''),
+                    ]));
+                }
+                $diff['message'] = $this->redactText($snapshot, (string)($diff['message'] ?? ''));
+                $oldKey = (string)($diff['row_key'] ?? '');
+                if (isset($rowKeys[$oldKey])) {
+                    $diff['row_key'] = $rowKeys[$oldKey];
+                }
+            }
+            unset($diff);
+        }
+
         return [
-            'content' => json_encode($snapshot->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+            'content' => json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             'filename' => $snapshot->snapshotId() . '.json',
             'content_type' => 'application/json',
         ];
@@ -68,7 +115,7 @@ class ExportService {
             fputcsv($handle, [
                 $row->objectType(),
                 $row->appId(),
-                $row->objectName(),
+                $this->exportObjectName($snapshot, $row),
                 $row->permissionType(),
                 $this->accessRuleText($row),
                 $this->accessRuleSources($row),
@@ -147,7 +194,7 @@ class ExportService {
             '',
             '## Aenderungen gegenueber Baseline',
             '',
-            $this->diffMarkdown($snapshot->diffToBaseline()),
+            $this->diffMarkdown($snapshot, $snapshot->diffToBaseline()),
             '',
             '## Nicht unterstuetzte oder nicht eindeutig auslesbare Bereiche',
             '',
@@ -202,7 +249,7 @@ class ExportService {
             $lines[] = '| ' . implode(' | ', array_map([$this, 'mdCell'], [
                 $row->objectType(),
                 $row->appId(),
-                $row->objectName(),
+                $this->exportObjectName($snapshot, $row),
                 $row->permissionType(),
                 $this->accessRuleText($row),
                 $this->accessRuleSources($row),
@@ -225,13 +272,14 @@ class ExportService {
         return $lines === [] ? 'Keine Apps erkannt.' : implode("\n", $lines);
     }
 
-    private function diffMarkdown(array $diffs): string {
+    private function diffMarkdown(Snapshot $snapshot, array $diffs): string {
         if ($diffs === []) {
             return 'Keine Abweichungen.';
         }
 
-        return implode("\n", array_map(static function(array $diff): string {
-            return '- [' . ($diff['severity'] ?? 'info') . '] ' . ($diff['type'] ?? 'PERMISSION_CHANGED') . ': ' . ($diff['message'] ?? '');
+        return implode("\n", array_map(function(array $diff) use ($snapshot): string {
+            return '- [' . ($diff['severity'] ?? 'info') . '] ' . ($diff['type'] ?? 'PERMISSION_CHANGED') . ': '
+                . $this->redactText($snapshot, (string)($diff['message'] ?? ''));
         }, $diffs));
     }
 
@@ -255,7 +303,7 @@ class ExportService {
             $html .= '<tr><th scope="row">' . $this->esc($row->objectType()) . '</th>';
             foreach ([
                 $row->appId(),
-                $row->objectName(),
+                $this->exportObjectName($snapshot, $row),
                 $row->permissionType(),
                 $this->accessRuleText($row),
                 $this->accessRuleSources($row),
@@ -406,6 +454,91 @@ class ExportService {
         }
 
         return $html . '</ul>';
+    }
+
+    /**
+     * Zweck: Redigiert konkrete Datei-/Ordnerziele ohne sie durch reproduzierbare Pfad-Hashes zu ersetzen.
+     *
+     * Vertrag:
+     * - Gleiche Ziele erhalten innerhalb genau eines Exports denselben neutralen Platzhalter.
+     * - Der Platzhalter erlaubt keine Woerterbuchsuche nach dem Originalpfad.
+     */
+    private function exportObjectName(Snapshot $snapshot, MatrixRow $row): string {
+        if (!$this->config->redactPaths()) {
+            return $row->objectName();
+        }
+        $identity = $this->pathIdentity($row);
+        if ($identity === null) {
+            return $row->objectName();
+        }
+
+        return $this->pathAliases($snapshot)[$identity] ?? '[Pfad redigiert]';
+    }
+
+    /** @return array<string, string> */
+    private function pathAliases(Snapshot $snapshot): array {
+        $aliases = [];
+        foreach ($snapshot->matrix() as $row) {
+            $identity = $this->pathIdentity($row);
+            if ($identity === null || isset($aliases[$identity])) {
+                continue;
+            }
+            $aliases[$identity] = '[Pfad redigiert ' . (count($aliases) + 1) . ']';
+        }
+        foreach ($snapshot->diffToBaseline() as $diff) {
+            if (!is_array($diff)) {
+                continue;
+            }
+            $identity = $this->pathIdentityFromArray($diff);
+            if ($identity === null || isset($aliases[$identity])) {
+                continue;
+            }
+            $aliases[$identity] = '[Pfad redigiert ' . (count($aliases) + 1) . ']';
+        }
+
+        return $aliases;
+    }
+
+    private function pathIdentity(MatrixRow $row): ?string {
+        if (!in_array($row->objectType(), self::PATH_OBJECT_TYPES, true)) {
+            return null;
+        }
+
+        return implode("\0", [$row->objectType(), $row->appId(), $row->objectName()]);
+    }
+
+    private function pathIdentityFromArray(array $row): ?string {
+        $objectType = (string)($row['object_type'] ?? '');
+        if (!in_array($objectType, self::PATH_OBJECT_TYPES, true)) {
+            return null;
+        }
+
+        return implode("\0", [$objectType, (string)($row['app_id'] ?? ''), (string)($row['object'] ?? '')]);
+    }
+
+    private function redactText(Snapshot $snapshot, string $text): string {
+        if (!$this->config->redactPaths()) {
+            return $text;
+        }
+        $replace = [];
+        foreach ($snapshot->matrix() as $row) {
+            $identity = $this->pathIdentity($row);
+            if ($identity !== null && $row->objectName() !== '') {
+                $replace[$row->objectName()] = $this->pathAliases($snapshot)[$identity] ?? '[Pfad redigiert]';
+            }
+        }
+        foreach ($snapshot->diffToBaseline() as $diff) {
+            if (!is_array($diff)) {
+                continue;
+            }
+            $identity = $this->pathIdentityFromArray($diff);
+            $object = (string)($diff['object'] ?? '');
+            if ($identity !== null && $object !== '') {
+                $replace[$object] = $this->pathAliases($snapshot)[$identity] ?? '[Pfad redigiert]';
+            }
+        }
+
+        return strtr($text, $replace);
     }
 
     private function mdCell(string $value): string {

@@ -11,11 +11,15 @@ use OCA\BrPermissionMatrix\Service\ConfigService;
 use OCA\BrPermissionMatrix\Service\ExportService;
 
 class ExportTestConfig extends ConfigService {
-    public function __construct(private array $formats) {
+    public function __construct(private array $formats, private bool $redact = true) {
     }
 
     public function exportFormats(): array {
         return $this->formats;
+    }
+
+    public function redactPaths(): bool {
+        return $this->redact;
     }
 }
 
@@ -50,10 +54,28 @@ $snapshot = new Snapshot(
             'ad-ASN-Berta' => '?',
             'ad-EB-Ada' => 'S',
         ]),
+        new MatrixRow('SharedFolder', 'files_sharing', '/Personal/Akte', 'Gruppenfreigabe · Referenz test', 'Lesen', 'NEW', 'nextcloud:OCP\\Share\\IManager::getSharesBy', 'high', [
+            'Betriebsrat' => 'R',
+            'IKT-Ausschuss' => '-',
+            'ad-ASN-Ada' => '-',
+            'ad-ASN-Berta' => '-',
+            'ad-EB-Ada' => '-',
+        ]),
     ],
     [],
     [],
-    [],
+    [[
+        'type' => 'PERMISSION_REMOVED',
+        'severity' => 'info',
+        'row_key' => 'removed-path-key',
+        'group' => null,
+        'old' => 'present',
+        'new' => 'removed',
+        'object_type' => 'SharedFolder',
+        'app_id' => 'files_sharing',
+        'object' => '/Removed/Folder',
+        'message' => 'SharedFolder files_sharing / /Removed/Folder: PERMISSION_REMOVED',
+    ]],
     ['redacted' => true, 'organization_snapshot' => [
         'status' => 'VALID',
         'contract_version' => 1,
@@ -120,6 +142,17 @@ assertSameValue(false, str_contains($html['content'], '<td>test:files-policy</td
 assertContainsText('Hauptmatrix (Gruppenfamilien)', $html['content'], 'html should lead with the summarized group-family matrix.');
 assertContainsText('title="ad-ASN-Ada: X; ad-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
 assertContainsText('<h2>Rohmatrix</h2>', $html['content'], 'html should retain the complete auditable raw matrix.');
+foreach ([$json['content'], $csv['content'], $md['content'], $html['content']] as $content) {
+    assertSameValue(false, str_contains($content, '/Personal/Akte'), 'Default exports must redact concrete shared paths in every format.');
+    assertContainsText('[Pfad redigiert 1]', $content, 'Redacted exports should keep distinct auditable placeholders.');
+}
+assertSameValue(false, str_contains($json['content'], '/Removed/Folder'), 'JSON must also redact paths that occur only in a removed baseline diff.');
+assertSameValue(false, str_contains($md['content'], '/Removed/Folder'), 'Markdown must also redact paths that occur only in a removed baseline diff.');
+assertContainsText('[Pfad redigiert 2]', $json['content'], 'Removed path-only diffs should receive a neutral export-local alias.');
+
+$unredactedService = new ExportService(new ExportTestConfig(['json'], false));
+assertContainsText('/Personal/Akte', $unredactedService->export($snapshot, 'json')['content'], 'An explicit administrative opt-out should retain paths in the protected export.');
+assertContainsText('/Removed/Folder', $unredactedService->export($snapshot, 'json')['content'], 'An explicit opt-out should also retain path-only diff details.');
 
 $restrictedService = new ExportService(new ExportTestConfig(['md']));
 assertSameValue(['md'], $restrictedService->allowedFormats(), 'The UI/API contract should expose only configured export formats.');

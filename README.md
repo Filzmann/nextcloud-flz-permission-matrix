@@ -4,7 +4,7 @@ Nextcloud-App `br_permission_matrix` fuer eine read-only Berechtigungsmatrix als
 
 ## Zweck
 
-Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und erste globale Files-/Sharing-/Admin-Policies. Sie erzeugt Snapshots, vergleicht diese gegen eine Baseline und exportiert die Matrix als JSON, CSV, Markdown oder HTML.
+Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und globale Files-/Sharing-/Admin-Policies. Optional liest sie konkrete native Nextcloud-Gruppenfreigaben mit ihren Datei- und Ordnerrechten. Sie erzeugt Snapshots, vergleicht diese gegen eine Baseline und exportiert die Matrix als JSON, CSV, Markdown oder HTML.
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
 
@@ -75,6 +75,40 @@ Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
 Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
 Konfigurationsschlüssel geändert wird.
 
+### Native Nextcloud-Gruppenfreigaben
+
+Mit `include_share_metadata=true` liest die App Gruppenfreigaben ausschließlich
+über `OCP\Share\IManager`. Pro Freigabe werden Lesen, Ändern, Erstellen,
+Löschen und Teilen getrennt dargestellt. Nextcloud liefert für Shares kein
+Ausführen-Recht; die Matrix weist es deshalb ausdrücklich als `n/a` aus.
+Direkte Freigaben und Weiterfreigaben bleiben unterscheidbar.
+
+Zur vollständigen Abfrage werden Owner-IDs aktiver und deaktivierter Konten
+nur transient verwendet. Persistiert werden ausschließlich Zielgruppe,
+empfängerrelativer Zielpfad, Datei-/Ordnertyp, Permission-Maske, ein gehashter
+Share-Verweis und die Information direkte Freigabe/Weiterfreigabe. Dateiinhalte,
+Owner-IDs, Share-Tokens und Credentials werden weder gespeichert noch
+exportiert. Die Daten liegen nur in den eigenen Matrix-Snapshots und unterliegen
+deren konfigurierter `retention`.
+
+Konkrete Pfade sind in der geschützten Matrix sichtbar. Bei
+`redact_paths=true` ersetzt jeder Export sie und pfadbezogene Diffangaben durch
+exportlokale neutrale Platzhalter. Ohne `include_share_metadata` findet keine
+Einzelfreigaben-Abfrage statt.
+
+### App-eigene Berechtigungen
+
+App-eigene Detailrechte werden nur über einen öffentlichen, versionierten und
+read-only Providervertrag der zuständigen App übernommen. Interne Services,
+Tabellen oder private Konfiguration anderer Apps werden nicht gelesen und ihre
+Regeln werden nicht in der Matrix nachgebaut. Fehlt ein solcher Vertrag, bleibt
+die native Nextcloud-App-Gruppeneinschränkung sichtbar; die Detailabdeckung wird
+kontrolliert als `UNSUPPORTED` ausgewiesen.
+
+Die Berechtigungsmatrix selbst liest ihre Viewer- und Admin-Gruppen direkt aus
+derselben `ConfigService`-Konfiguration, die der serverseitige `AccessService`
+erzwingt. Verwaltung umfasst Lesen; reine Viewer erhalten kein Verwaltungsrecht.
+
 `occ`-Kommandos:
 
 ```bash
@@ -104,6 +138,8 @@ MVP:
 - App-Skeleton mit dynamischer Navigation.
 - Admin-Konfigurationsseite.
 - Read-only Scan von Gruppen, aktivierten Apps und App-Gruppenbeschraenkungen.
+- Native Sharing-Policies aus öffentlichen Nextcloud-APIs und optionale
+  konkrete Gruppenfreigaben mit getrennten R/W/C/D/S-Rechten.
 - Matrixansicht mit Filtern.
 - Semantische, per Pfeiltasten bedienbare Tabs und vollständiger Filter-Reset.
 - Versionierter LocalBase-Organisationssnapshot mit kontrolliertem

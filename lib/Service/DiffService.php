@@ -70,6 +70,9 @@ class DiffService {
                     'group' => $cellDiff['group'],
                     'old' => $cellDiff['old'],
                     'new' => $cellDiff['new'],
+                    'object_type' => $row->objectType(),
+                    'app_id' => $row->appId(),
+                    'object' => $row->objectName(),
                     'message' => $this->messageForCellDiff($row, $cellDiff, $expanded),
                 ];
             }
@@ -133,6 +136,9 @@ class DiffService {
             'group' => null,
             'old' => $old,
             'new' => $new,
+            'object_type' => $row->objectType(),
+            'app_id' => $row->appId(),
+            'object' => $row->objectName(),
             'message' => $row->objectType() . ' ' . $row->appId() . ' / ' . $row->objectName() . ': ' . $type,
         ];
     }
