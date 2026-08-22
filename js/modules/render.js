@@ -35,9 +35,12 @@
             return empty('Noch kein Snapshot vorhanden.');
         }
         const summary = snapshot.summary || {};
+        const organization = (snapshot.metadata || {}).organization_snapshot || {};
         const stats = [
             ['Nextcloud-Version', snapshot.nextcloud_version],
             ['Letzter Scan', snapshot.created_at],
+            ['Organisationsvertrag', `${organization.status || 'UNKNOWN'} · v${organization.contract_version || 0} / Definition ${organization.definition_version || 0}`],
+            ['Organisationsprüfsumme', organization.checksum || 'nicht verfügbar'],
             ['Gruppen', summary.group_count],
             ['Gruppenfamilien', summary.group_family_count],
             ['Aktivierte Apps', summary.app_count],
@@ -261,6 +264,7 @@
                             <h2>${esc(entry.label)}</h2>
                             <dl>
                                 <dt>Typ</dt><dd>${entry.type === 'family' ? 'Gruppenfamilie' : 'Einzelgruppe'}</dd>
+                                <dt>Bedeutung</dt><dd>${badge(entry.meaning_status || 'UNKNOWN')}</dd>
                                 <dt>Enthaltene Gruppen</dt><dd>${esc(entry.count)}</dd>
                                 <dt>Relevante Rechte</dt><dd>${esc(active.length)}</dd>
                                 <dt>Unklare Bereiche</dt><dd>${esc(unknown.length)}</dd>

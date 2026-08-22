@@ -67,7 +67,9 @@ class GenericAppAdapter implements PermissionAdapterInterface {
                 $rowWarnings[] = 'App-Gruppenbeschraenkung konnte nicht eindeutig gelesen werden.';
                 $warnings[] = $appId . ': App-Gruppenbeschraenkung unklar.';
             } elseif (!$hasAdapter) {
-                $coverageWarnings[] = 'Keine Detailrechte auswertbar; App muss fachlich geprueft werden.';
+                $coverageWarnings[] = ($app['source'] ?? '') === 'custom'
+                    ? 'Keine öffentliche versionierte read-only Schnittstelle für app-eigene Detailrechte verfügbar; App muss fachlich geprüft werden.'
+                    : 'Keine Detailrechte auswertbar; App muss fachlich geprueft werden.';
                 $warnings[] = $appId . ': kein Detailadapter vorhanden.';
                 $unsupported[] = $appId;
             }

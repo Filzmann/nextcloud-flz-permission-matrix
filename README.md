@@ -4,19 +4,35 @@ Nextcloud-App `br_permission_matrix` fuer eine read-only Berechtigungsmatrix als
 
 ## Zweck
 
-Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und erste globale Files-/Sharing-/Admin-Policies. Sie erzeugt Snapshots, vergleicht diese gegen eine Baseline und exportiert die Matrix als JSON, CSV, Markdown oder HTML.
+Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und globale Files-/Sharing-/Admin-Policies. Optional liest sie konkrete native Nextcloud-Gruppenfreigaben mit ihren Datei- und Ordnerrechten. Sie erzeugt Snapshots, vergleicht diese gegen eine Baseline und exportiert die Matrix als JSON, CSV, Markdown oder HTML.
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
 
 ## Gruppenfamilien
 
-Die Matrix kann bekannte, massenhaft auftretende technische Gruppen zu fachlichen Familien zusammenfassen. Fuer die AdPlaner-Schemata `ad-ASN-<Kuerzel>`, `ad-ASN-<Kuerzel>-Urlaub`, `ad-EB-*` und `ad-PFK-*` stehen Team-, Familien- und vollstaendige Rohgruppenansicht zur Verfuegung.
+Die Matrix deutet Rollen und Bereiche ausschließlich über den validierten,
+versionierten Organisationssnapshot von LocalBase. Dessen Vertragsversion,
+Definitionsversion und Prüfsumme werden mit jedem Matrixsnapshot festgehalten.
+Für die AdPlaner-Schemata `ad-ASN-<Kürzel>` und
+`ad-ASN-<Kürzel>-Urlaub` stehen bei gültigem Organisationsvertrag zusätzlich
+Team-, Familien- und vollständige Rohgruppenansichten zur Verfügung.
 
 Die Zusammenfassung ersetzt weder in den gescannten Daten noch in Baselines, Diffs oder Exporten die Rohgruppen. Abweichende Rechte innerhalb einer Familie werden als Teilbelegung oder `gemischt` markiert; die zugehoerigen Rohwerte bleiben in der Ansicht nachvollziehbar. Nicht ausdruecklich erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
 
 Die Standardansicht sortiert Berechtigungen streng nach App. App-Abschnitte lassen sich einzeln oder gemeinsam ein- und ausklappen; ein Klick auf eine Gruppenueberschrift fokussiert diese Spalte. Diese Interaktionen filtern nur die read-only Darstellung und veraendern keine Nextcloud-Rechte.
 
-Die Teamansicht ordnet bekannte technische Gruppen verstaendlich, zum Beispiel `Team A1 · Assistenz`, `Rolle EB · Koordination` oder `Rolle PFK · Pflege`. Die zugrunde liegenden `ad-ASN-*`, `ad-EB-*`, `ad-PFK-*` und Urlaubsgruppen bleiben getrennt. Eine N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team- und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu einem scheinbaren Einzelrecht verschmolzen.
+Die Teamansicht ordnet bekannte technische Gruppen verständlich, zum Beispiel
+`Team A1 · Assistenz`, während Rollen und Bereiche ihre fachlichen Labels aus
+LocalBase erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
+N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team-
+und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu
+einem scheinbaren Einzelrecht verschmolzen.
+
+Fehlt LocalBase, ist sein Vertrag ungültig oder inkompatibel oder enthält er
+mehrdeutige Gruppenzuordnungen, bleibt der Scan verfügbar. Die Matrix zeigt
+dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
+speichert den konkreten Providerstatus im historischen Snapshot. Spätere
+Konfigurationsänderungen deuten vorhandene Snapshots nicht neu.
 
 ## Installation lokal
 
@@ -54,6 +70,45 @@ Admin-Einstellungen:
 - `export_formats`: serverseitig erlaubte Exportformate aus `md,csv,json,html`.
 - `retention`: Anzahl aufzubewahrender Snapshots.
 
+Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
+Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
+Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
+Konfigurationsschlüssel geändert wird.
+
+### Native Nextcloud-Gruppenfreigaben
+
+Mit `include_share_metadata=true` liest die App Gruppenfreigaben ausschließlich
+über `OCP\Share\IManager`. Pro Freigabe werden Lesen, Ändern, Erstellen,
+Löschen und Teilen getrennt dargestellt. Nextcloud liefert für Shares kein
+Ausführen-Recht; die Matrix weist es deshalb ausdrücklich als `n/a` aus.
+Direkte Freigaben und Weiterfreigaben bleiben unterscheidbar.
+
+Zur vollständigen Abfrage werden Owner-IDs aktiver und deaktivierter Konten
+nur transient verwendet. Persistiert werden ausschließlich Zielgruppe,
+empfängerrelativer Zielpfad, Datei-/Ordnertyp, Permission-Maske, ein gehashter
+Share-Verweis und die Information direkte Freigabe/Weiterfreigabe. Dateiinhalte,
+Owner-IDs, Share-Tokens und Credentials werden weder gespeichert noch
+exportiert. Die Daten liegen nur in den eigenen Matrix-Snapshots und unterliegen
+deren konfigurierter `retention`.
+
+Konkrete Pfade sind in der geschützten Matrix sichtbar. Bei
+`redact_paths=true` ersetzt jeder Export sie und pfadbezogene Diffangaben durch
+exportlokale neutrale Platzhalter. Ohne `include_share_metadata` findet keine
+Einzelfreigaben-Abfrage statt.
+
+### App-eigene Berechtigungen
+
+App-eigene Detailrechte werden nur über einen öffentlichen, versionierten und
+read-only Providervertrag der zuständigen App übernommen. Interne Services,
+Tabellen oder private Konfiguration anderer Apps werden nicht gelesen und ihre
+Regeln werden nicht in der Matrix nachgebaut. Fehlt ein solcher Vertrag, bleibt
+die native Nextcloud-App-Gruppeneinschränkung sichtbar; die Detailabdeckung wird
+kontrolliert als `UNSUPPORTED` ausgewiesen.
+
+Die Berechtigungsmatrix selbst liest ihre Viewer- und Admin-Gruppen direkt aus
+derselben `ConfigService`-Konfiguration, die der serverseitige `AccessService`
+erzwingt. Verwaltung umfasst Lesen; reine Viewer erhalten kein Verwaltungsrecht.
+
 `occ`-Kommandos:
 
 ```bash
@@ -83,14 +138,19 @@ MVP:
 - App-Skeleton mit dynamischer Navigation.
 - Admin-Konfigurationsseite.
 - Read-only Scan von Gruppen, aktivierten Apps und App-Gruppenbeschraenkungen.
+- Native Sharing-Policies aus öffentlichen Nextcloud-APIs und optionale
+  konkrete Gruppenfreigaben mit getrennten R/W/C/D/S-Rechten.
 - Matrixansicht mit Filtern.
+- Semantische, per Pfeiltasten bedienbare Tabs und vollständiger Filter-Reset.
+- Versionierter LocalBase-Organisationssnapshot mit kontrolliertem
+  `UNKNOWN`-Fallback.
 - Snapshot-Speicherung, Baseline und Diff-Grundlagen.
 - Background Job.
 - `occ`-Kommandos.
 - JSON/CSV/Markdown/HTML-Export.
 
-Geplante Adapter, weitere Exportformate und die Prüfung des gemeinsamen
-AD-Gruppenvertrags stehen in der [Roadmap](ROADMAP.md).
+Geplante Adapter und weitere Exportformate stehen in der
+[Roadmap](ROADMAP.md).
 
 ## Tests
 
@@ -102,3 +162,8 @@ node tests/run-js.mjs
 ```
 
 Bei Controller-, DI-, Migration-, Background-Job- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
+
+Für die fachliche, visuelle und sicherheitsbezogene Staging-Prüfung steht ein
+ausfüllbares [manuelles Abnahmeformular](docs/manual-acceptance.md) bereit.
+Belege werden darin ausschließlich synthetisch beziehungsweise redigiert
+dokumentiert.

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/helpers.php';
-
 use OCA\BrPermissionMatrix\Model\MatrixRow;
 use OCA\BrPermissionMatrix\Model\Snapshot;
 use OCA\BrPermissionMatrix\Service\DiffService;
@@ -24,5 +22,8 @@ $current = new Snapshot('current', '2026-07-05T11:00:00+00:00', '34.0.0', ['Betr
 assertSameValue('NOT_APPROVED', $rows[0]->status(), 'expanded app availability should be not approved in strict mode');
 assertSameValue('APP_GROUP_EXPANDED', $diffs[0]['type'], 'diff type should classify app group expansion');
 assertSameValue('critical', $diffs[0]['severity'], 'expansion should be critical');
+assertSameValue('App', $diffs[0]['object_type'], 'Diffs should carry the object type so export redaction does not have to parse messages.');
+assertSameValue('deck', $diffs[0]['app_id'], 'Diffs should carry their app id as structured evidence.');
+assertSameValue('Deck', $diffs[0]['object'], 'Diffs should carry the affected object as structured evidence.');
 
 echo 'DiffService tests passed' . PHP_EOL;

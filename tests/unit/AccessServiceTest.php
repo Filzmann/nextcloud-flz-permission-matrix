@@ -18,8 +18,6 @@ namespace OCP {
 }
 
 namespace {
-    require_once __DIR__ . '/helpers.php';
-
     use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
     use OCA\BrPermissionMatrix\Service\AccessService;
     use OCA\BrPermissionMatrix\Service\ConfigService;

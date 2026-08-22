@@ -28,20 +28,20 @@ style('orgsuite', 'suite-navigation');
 
     <div id="pm-notice" class="pm-notice" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 
-    <nav class="pm-tabs" aria-label="Berechtigungsmatrix Ansichten">
-        <button type="button" id="pm-tab-overview" data-tab="overview" class="active" aria-controls="pm-view-overview" aria-pressed="true">Uebersicht</button>
-        <button type="button" id="pm-tab-matrix" data-tab="matrix" aria-controls="pm-view-matrix" aria-pressed="false">Matrix</button>
-        <button type="button" id="pm-tab-apps" data-tab="apps" aria-controls="pm-view-apps" aria-pressed="false">Apps</button>
-        <button type="button" id="pm-tab-groups" data-tab="groups" aria-controls="pm-view-groups" aria-pressed="false">Gruppen</button>
-        <button type="button" id="pm-tab-diffs" data-tab="diffs" aria-controls="pm-view-diffs" aria-pressed="false">Abweichungen</button>
-        <button type="button" id="pm-tab-snapshots" data-tab="snapshots" aria-controls="pm-view-snapshots" aria-pressed="false">Snapshots</button>
+    <nav class="pm-tabs" role="tablist" aria-label="Ansichten der Berechtigungsmatrix">
+        <button type="button" id="pm-tab-overview" data-tab="overview" role="tab" aria-selected="true" tabindex="0" aria-controls="pm-view-overview" class="active">Übersicht</button>
+        <button type="button" id="pm-tab-matrix" data-tab="matrix" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-matrix">Matrix</button>
+        <button type="button" id="pm-tab-apps" data-tab="apps" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-apps">Apps</button>
+        <button type="button" id="pm-tab-groups" data-tab="groups" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-groups">Gruppen</button>
+        <button type="button" id="pm-tab-diffs" data-tab="diffs" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-diffs">Abweichungen</button>
+        <button type="button" id="pm-tab-snapshots" data-tab="snapshots" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-snapshots">Snapshots</button>
     </nav>
 
-    <section id="pm-view-overview" class="pm-view active" aria-labelledby="pm-tab-overview">
+    <section id="pm-view-overview" class="pm-view active" role="tabpanel" aria-labelledby="pm-tab-overview">
         <div id="pm-overview"></div>
     </section>
 
-    <section id="pm-view-matrix" class="pm-view" aria-labelledby="pm-tab-matrix" hidden>
+    <section id="pm-view-matrix" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-matrix" hidden>
         <div class="pm-filters">
             <label>Gruppenansicht
                 <select id="pm-group-mode">
@@ -56,30 +56,31 @@ style('orgsuite', 'suite-navigation');
             <label>Detailabdeckung
                 <select id="pm-filter-coverage">
                     <option value="">Alle</option>
-                    <option value="IMPLEMENTED">Vollstaendig</option>
+                    <option value="IMPLEMENTED">Vollständig</option>
                     <option value="PARTIAL">Teilweise</option>
-                    <option value="UNSUPPORTED">Nicht unterstuetzt</option>
+                    <option value="UNSUPPORTED">Nicht unterstützt</option>
                     <option value="UNKNOWN">Unklar</option>
                 </select>
             </label>
             <label>Text <input id="pm-filter-text" type="search"></label>
+            <button type="button" id="pm-reset-filters">Filter zurücksetzen</button>
         </div>
         <div id="pm-matrix"></div>
     </section>
 
-    <section id="pm-view-apps" class="pm-view" aria-labelledby="pm-tab-apps" hidden>
+    <section id="pm-view-apps" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-apps" hidden>
         <div id="pm-apps"></div>
     </section>
 
-    <section id="pm-view-groups" class="pm-view" aria-labelledby="pm-tab-groups" hidden>
+    <section id="pm-view-groups" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-groups" hidden>
         <div id="pm-groups"></div>
     </section>
 
-    <section id="pm-view-diffs" class="pm-view" aria-labelledby="pm-tab-diffs" hidden>
+    <section id="pm-view-diffs" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-diffs" hidden>
         <div id="pm-diffs"></div>
     </section>
 
-    <section id="pm-view-snapshots" class="pm-view" aria-labelledby="pm-tab-snapshots" hidden>
+    <section id="pm-view-snapshots" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-snapshots" hidden>
         <div id="pm-snapshots"></div>
     </section>
 </div>

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace OCA\BrPermissionMatrix\Service;
 
 use OCA\BrPermissionMatrix\Adapter\AdapterResult;
-use OCA\BrPermissionMatrix\Adapter\AdPlanerAdapter;
 use OCA\BrPermissionMatrix\Adapter\CoreAdapter;
 use OCA\BrPermissionMatrix\Adapter\FilesAccessControlAdapter;
 use OCA\BrPermissionMatrix\Adapter\FilesAdapter;
 use OCA\BrPermissionMatrix\Adapter\GenericAppAdapter;
 use OCA\BrPermissionMatrix\Adapter\GroupFoldersAdapter;
+use OCA\BrPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
 use OCA\BrPermissionMatrix\Adapter\SharingAdapter;
 
 /**
@@ -30,8 +30,9 @@ class MatrixBuilder {
         private SharingAdapter $sharing,
         private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
-        private AdPlanerAdapter $adPlaner,
-        private GroupCatalogService $groupCatalog
+        private PermissionMatrixAccessAdapter $permissionMatrixAccess,
+        private GroupCatalogService $groupCatalog,
+        private OrganizationSnapshotService $organization
     ) {
     }
 
@@ -42,19 +43,25 @@ class MatrixBuilder {
             ->merge($this->files->collect())
             ->merge($this->sharing->collect())
             ->merge($this->groupFolders->collect())
-            ->merge($this->filesAccessControl->collect())
-            ->merge($this->adPlaner->collect());
+            ->merge($this->filesAccessControl->collect());
+        $result = $result->merge($this->permissionMatrixAccess->collect());
 
         $groups = $this->inventory->groups();
+        $organization = $this->organization->snapshot();
+        $warnings = $result->warnings();
+        if (is_string($organization['warning'] ?? null) && $organization['warning'] !== '') {
+            $warnings[] = $organization['warning'];
+        }
 
         return [
             'groups' => $groups,
-            'group_catalog' => $this->groupCatalog->catalog($groups),
+            'group_catalog' => $this->groupCatalog->catalog($groups, $organization),
             'apps' => $this->inventory->enabledApps(),
             'rows' => $result->rows(),
-            'warnings' => $result->warnings(),
+            'warnings' => array_values(array_unique($warnings)),
             'unsupported_apps' => $result->unsupportedApps(),
             'adapter_status' => $result->adapterStatus(),
+            'organization_snapshot' => $organization,
         ];
     }
 }

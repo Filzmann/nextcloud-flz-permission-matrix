@@ -1,13 +1,9 @@
 (function() {
     const api = window.PermissionMatrix.api;
     const render = window.PermissionMatrix.render;
-    const state = {
-        snapshot: null,
-        snapshots: [],
-        baseline: '',
-        canManage: false,
-        exportFormats: ['md', 'csv', 'json', 'html'],
-        filters: {
+
+    function emptyFilters() {
+        return {
             app: '',
             group: '',
             groupMode: 'teams',
@@ -15,7 +11,25 @@
             coverage: '',
             text: '',
             collapsedApps: []
-        }
+        };
+    }
+
+    function nextTabIndex(current, key, count) {
+        if (count < 1) return null;
+        if (key === 'Home') return 0;
+        if (key === 'End') return count - 1;
+        if (key === 'ArrowRight' || key === 'ArrowDown') return (current + 1) % count;
+        if (key === 'ArrowLeft' || key === 'ArrowUp') return (current - 1 + count) % count;
+        return null;
+    }
+
+    const state = {
+        snapshot: null,
+        snapshots: [],
+        baseline: '',
+        canManage: false,
+        exportFormats: ['md', 'csv', 'json', 'html'],
+        filters: emptyFilters()
     };
 
     function notice(message, type = 'info') {
@@ -34,7 +48,9 @@
     }
 
     function bindEvents() {
-        document.querySelectorAll('.pm-tabs button').forEach((button) => {
+        const tabs = document.querySelector('.pm-tabs');
+        tabs.addEventListener('keydown', handleTabKeydown);
+        document.querySelectorAll('.pm-tabs [role="tab"]').forEach((button) => {
             button.addEventListener('click', () => activateTab(button.dataset.tab));
         });
         document.querySelectorAll('[data-export]').forEach((button) => {
@@ -61,6 +77,7 @@
             render.fillFilters(state.snapshot, state.filters.groupMode);
             updateFilters();
         });
+        render.byId('pm-reset-filters').addEventListener('click', resetFilters);
         render.byId('pm-matrix').addEventListener('click', handleMatrixClick);
         render.byId('pm-snapshots').addEventListener('click', async (event) => {
             const button = event.target.closest('[data-baseline-id]');
@@ -69,6 +86,18 @@
             }
             await setBaseline(button.dataset.baselineId);
         });
+    }
+
+    function handleTabKeydown(event) {
+        const buttons = Array.from(document.querySelectorAll('.pm-tabs [role="tab"]'));
+        const current = buttons.indexOf(event.target);
+        if (current < 0) return;
+        const targetIndex = nextTabIndex(current, event.key, buttons.length);
+        if (targetIndex === null) return;
+        event.preventDefault();
+        const target = buttons[targetIndex];
+        activateTab(target.dataset.tab);
+        target.focus();
     }
 
     async function loadState() {
@@ -134,6 +163,18 @@
         render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);
     }
 
+    function resetFilters() {
+        state.filters = emptyFilters();
+        render.byId('pm-group-mode').value = 'teams';
+        render.byId('pm-filter-app').value = '';
+        render.byId('pm-filter-group').value = '';
+        render.byId('pm-filter-status').value = '';
+        render.byId('pm-filter-coverage').value = '';
+        render.byId('pm-filter-text').value = '';
+        render.fillFilters(state.snapshot, 'teams');
+        updateFilters();
+    }
+
     function handleMatrixClick(event) {
         const appToggle = event.target.closest('[data-app-toggle]');
         if (appToggle) {
@@ -180,17 +221,19 @@
     }
 
     function activateTab(tab) {
-        document.querySelectorAll('.pm-tabs button').forEach((button) => {
+        document.querySelectorAll('.pm-tabs [role="tab"]').forEach((button) => {
             const active = button.dataset.tab === tab;
             button.classList.toggle('active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            button.setAttribute('aria-selected', active ? 'true' : 'false');
+            button.setAttribute('tabindex', active ? '0' : '-1');
         });
-        document.querySelectorAll('.pm-view').forEach((view) => {
+        document.querySelectorAll('.pm-view[role="tabpanel"]').forEach((view) => {
             const active = view.id === `pm-view-${tab}`;
             view.classList.toggle('active', active);
             view.hidden = !active;
         });
     }
 
+    window.PermissionMatrix.navigation = { nextTabIndex, emptyFilters };
     document.addEventListener('DOMContentLoaded', init);
 })();

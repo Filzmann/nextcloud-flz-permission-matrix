@@ -12,6 +12,10 @@ const info = readFileSync(join(root, 'appinfo', 'info.xml'), 'utf8');
 
 assert(template.includes('aria-controls="pm-view-matrix"'));
 assert(template.includes('aria-labelledby="pm-tab-matrix" hidden'));
+assert(template.includes('class="pm-tabs" role="tablist"'));
+assert(template.includes('role="tab" aria-selected="true" tabindex="0"'));
+assert(template.includes('role="tabpanel"'));
+assert(template.includes('id="pm-reset-filters"'));
 assert(template.includes('<option value="teams">Teams</option>'));
 assert(template.includes('id="pm-notice" class="pm-notice" role="status" aria-live="polite"'));
 assert(template.includes("script('orgsuite', 'suite-navigation')"));
@@ -20,13 +24,18 @@ assert(template.includes('data-orgsuite data-suite="br" data-current-app="br_per
 assert(info.includes('<app>orgsuite</app>'));
 assert(!info.includes('<navigations>'));
 assert(adminTemplate.includes('id="pm-admin-notice" class="pm-notice" role="status" aria-live="polite"'));
-assert(main.includes("button.setAttribute('aria-pressed', active ? 'true' : 'false')"));
+assert(main.includes("button.setAttribute('aria-selected', active ? 'true' : 'false')"));
+assert(main.includes("button.setAttribute('tabindex', active ? '0' : '-1')"));
+assert(main.includes("tabs.addEventListener('keydown'"));
+assert(main.includes("render.byId('pm-reset-filters').addEventListener('click', resetFilters)"));
 assert(main.includes('view.hidden = !active'));
 assert(main.includes("event.target.closest('[data-app-toggle]')"));
 assert(main.includes("event.target.closest('[data-group-focus]')"));
 assert(main.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("type === 'error' ? 'alert' : 'status'"));
-assert(style.includes('overflow-y: auto !important'));
+assert(!style.includes('#content'));
+assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
+assert(/\.pm-admin\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none/s.test(style));
 assert(style.includes('max-height: calc(100vh - 300px)'));
 
 console.log('Permission Matrix accessibility contract test passed.');

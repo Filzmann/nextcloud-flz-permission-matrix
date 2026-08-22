@@ -22,6 +22,13 @@ contract, smoke, or end-to-end level when the lower level cannot exercise the
 relevant boundary truthfully. For a bug fix, make the smallest proof a
 regression test.
 
+When the change touches a domain or security boundary, select at least one
+meaningful denied, invalid, manipulated, foreign-object, legacy-state, or
+failure case and assert that forbidden state and side effects remain absent.
+Do not create a negative test when no meaningful negative state exists. If a
+relevant negative path cannot be automated truthfully, identify the missing
+proof and the suitable integration or manual check.
+
 ## Red
 
 1. Write the smallest meaningful test before changing production code.
@@ -64,9 +71,15 @@ For database or migration changes, verify at least:
 
 - fresh installation on an empty schema;
 - upgrade from at least the immediately relevant prior version;
-- preservation or correct migration of existing data;
+- preservation or correct migration of realistic existing data, including
+  relevant `NULL`, special, invalid, contradictory, and partially migrated
+  states;
 - required constraints and indexes exist and preserve integrity;
-- no incomplete state after failure.
+- compatible code behavior during every deployed schema phase;
+- safe retry or continuation after failure, without an incomplete or
+  duplicated state;
+- backfill completion before an old structure is removed when an
+  Expand–Migrate–Contract sequence is required.
 
 For shared libraries or contracts, verify:
 

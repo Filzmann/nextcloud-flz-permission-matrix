@@ -6,6 +6,7 @@ namespace OCA\BrPermissionMatrix\Controller;
 
 use OCA\BrPermissionMatrix\AppInfo\Application;
 use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
+use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
 use OCA\BrPermissionMatrix\Service\AccessService;
 use OCA\BrPermissionMatrix\Service\AuditLogService;
 use OCA\BrPermissionMatrix\Service\ConfigService;
@@ -73,6 +74,9 @@ class ConfigController extends Controller {
         } catch (AccessDeniedException $e) {
             $this->auditLog->record($action . '.denied');
             return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+        } catch (ConfigValidationException $e) {
+            $this->auditLog->record($action . '.rejected');
+            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $e) {
             $this->auditLog->record($action . '.failed');
             $this->logger->error('Permission matrix config API failed', ['app' => Application::APP_ID, 'exception' => $e]);

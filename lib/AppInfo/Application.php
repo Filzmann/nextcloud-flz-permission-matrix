@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OCA\BrPermissionMatrix\AppInfo;
 
+use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
+use OCA\BrPermissionMatrix\Service\NextcloudSharingSource;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -17,6 +19,7 @@ class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
+        $context->registerServiceAlias(NativeSharingSourceInterface::class, NextcloudSharingSource::class);
     }
 
     public function boot(IBootContext $context): void {

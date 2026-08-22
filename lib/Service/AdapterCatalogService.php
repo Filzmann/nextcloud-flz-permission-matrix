@@ -20,7 +20,7 @@ class AdapterCatalogService {
         'files_accesscontrol',
         'groupfolders',
         'files_groupfolders',
-        'adplaner',
+        'br_permission_matrix',
     ];
 
     private const MINIMUM_TARGET_APP_IDS = [
