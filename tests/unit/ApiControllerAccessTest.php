@@ -79,8 +79,6 @@ namespace Psr\Log {
 }
 
 namespace {
-    require_once __DIR__ . '/helpers.php';
-
     use OCA\BrPermissionMatrix\Controller\ApiController;
     use OCA\BrPermissionMatrix\Db\ExportMapper;
     use OCA\BrPermissionMatrix\Db\SnapshotMapper;

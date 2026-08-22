@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/helpers.php';
-
 use OCA\BrPermissionMatrix\Adapter\AdPlanerAdapter;
 use OCA\BrPermissionMatrix\Service\InventoryService;
 

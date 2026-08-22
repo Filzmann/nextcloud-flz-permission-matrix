@@ -19,8 +19,6 @@ namespace {
 }
 
 namespace {
-    require_once __DIR__ . '/helpers.php';
-
     use OCA\BrPermissionMatrix\Db\SnapshotMapper;
     use OCA\BrPermissionMatrix\Model\MatrixRow;
     use OCA\BrPermissionMatrix\Service\BaselineService;

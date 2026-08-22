@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/helpers.php';
-require_once __DIR__ . '/../../lib/Service/GroupCatalogService.php';
-
 use OCA\BrPermissionMatrix\Service\GroupCatalogService;
 
 $catalog = (new GroupCatalogService())->catalog([
