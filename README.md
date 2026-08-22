@@ -10,13 +10,29 @@ Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodell
 
 ## Gruppenfamilien
 
-Die Matrix kann bekannte, massenhaft auftretende technische Gruppen zu fachlichen Familien zusammenfassen. Fuer die AdPlaner-Schemata `ad-ASN-<Kuerzel>`, `ad-ASN-<Kuerzel>-Urlaub`, `ad-EB-*` und `ad-PFK-*` stehen Team-, Familien- und vollstaendige Rohgruppenansicht zur Verfuegung.
+Die Matrix deutet Rollen und Bereiche ausschließlich über den validierten,
+versionierten Organisationssnapshot von LocalBase. Dessen Vertragsversion,
+Definitionsversion und Prüfsumme werden mit jedem Matrixsnapshot festgehalten.
+Für die AdPlaner-Schemata `ad-ASN-<Kürzel>` und
+`ad-ASN-<Kürzel>-Urlaub` stehen bei gültigem Organisationsvertrag zusätzlich
+Team-, Familien- und vollständige Rohgruppenansichten zur Verfügung.
 
 Die Zusammenfassung ersetzt weder in den gescannten Daten noch in Baselines, Diffs oder Exporten die Rohgruppen. Abweichende Rechte innerhalb einer Familie werden als Teilbelegung oder `gemischt` markiert; die zugehoerigen Rohwerte bleiben in der Ansicht nachvollziehbar. Nicht ausdruecklich erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
 
 Die Standardansicht sortiert Berechtigungen streng nach App. App-Abschnitte lassen sich einzeln oder gemeinsam ein- und ausklappen; ein Klick auf eine Gruppenueberschrift fokussiert diese Spalte. Diese Interaktionen filtern nur die read-only Darstellung und veraendern keine Nextcloud-Rechte.
 
-Die Teamansicht ordnet bekannte technische Gruppen verstaendlich, zum Beispiel `Team A1 · Assistenz`, `Rolle EB · Koordination` oder `Rolle PFK · Pflege`. Die zugrunde liegenden `ad-ASN-*`, `ad-EB-*`, `ad-PFK-*` und Urlaubsgruppen bleiben getrennt. Eine N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team- und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu einem scheinbaren Einzelrecht verschmolzen.
+Die Teamansicht ordnet bekannte technische Gruppen verständlich, zum Beispiel
+`Team A1 · Assistenz`, während Rollen und Bereiche ihre fachlichen Labels aus
+LocalBase erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
+N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team-
+und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu
+einem scheinbaren Einzelrecht verschmolzen.
+
+Fehlt LocalBase, ist sein Vertrag ungültig oder inkompatibel oder enthält er
+mehrdeutige Gruppenzuordnungen, bleibt der Scan verfügbar. Die Matrix zeigt
+dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
+speichert den konkreten Providerstatus im historischen Snapshot. Spätere
+Konfigurationsänderungen deuten vorhandene Snapshots nicht neu.
 
 ## Installation lokal
 
@@ -54,6 +70,11 @@ Admin-Einstellungen:
 - `export_formats`: serverseitig erlaubte Exportformate aus `md,csv,json,html`.
 - `retention`: Anzahl aufzubewahrender Snapshots.
 
+Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
+Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
+Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
+Konfigurationsschlüssel geändert wird.
+
 `occ`-Kommandos:
 
 ```bash
@@ -84,13 +105,16 @@ MVP:
 - Admin-Konfigurationsseite.
 - Read-only Scan von Gruppen, aktivierten Apps und App-Gruppenbeschraenkungen.
 - Matrixansicht mit Filtern.
+- Semantische, per Pfeiltasten bedienbare Tabs und vollständiger Filter-Reset.
+- Versionierter LocalBase-Organisationssnapshot mit kontrolliertem
+  `UNKNOWN`-Fallback.
 - Snapshot-Speicherung, Baseline und Diff-Grundlagen.
 - Background Job.
 - `occ`-Kommandos.
 - JSON/CSV/Markdown/HTML-Export.
 
-Geplante Adapter, weitere Exportformate und die Prüfung des gemeinsamen
-AD-Gruppenvertrags stehen in der [Roadmap](ROADMAP.md).
+Geplante Adapter und weitere Exportformate stehen in der
+[Roadmap](ROADMAP.md).
 
 ## Tests
 

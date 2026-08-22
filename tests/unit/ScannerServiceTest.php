@@ -45,6 +45,12 @@ namespace {
                 'warnings' => ['deck: kein Detailadapter vorhanden.'],
                 'unsupported_apps' => ['deck'],
                 'adapter_status' => [],
+                'organization_snapshot' => [
+                    'status' => 'VALID',
+                    'contract_version' => 1,
+                    'definition_version' => 4,
+                    'checksum' => str_repeat('a', 64),
+                ],
             ];
         }
     }
@@ -118,6 +124,11 @@ namespace {
     assertSameValue('red', $snapshot->summary()['compliance_status'], 'missing baseline should be red');
     assertSameValue('UNSUPPORTED', $snapshot->matrix()[0]->status(), 'scanner should not approve unsupported rows');
     assertSameValue('Betriebsrat', $snapshot->groupCatalog()[0]['key'], 'scanner should preserve the presentation catalog without changing raw groups');
+    assertSameValue(
+        str_repeat('a', 64),
+        $snapshot->metadata()['organization_snapshot']['checksum'],
+        'Every persisted snapshot should retain the organization checksum used for interpretation.'
+    );
 
     echo 'ScannerService tests passed' . PHP_EOL;
 }

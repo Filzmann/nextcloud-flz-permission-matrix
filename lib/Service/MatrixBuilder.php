@@ -31,7 +31,8 @@ class MatrixBuilder {
         private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
         private AdPlanerAdapter $adPlaner,
-        private GroupCatalogService $groupCatalog
+        private GroupCatalogService $groupCatalog,
+        private OrganizationSnapshotService $organization
     ) {
     }
 
@@ -46,15 +47,21 @@ class MatrixBuilder {
             ->merge($this->adPlaner->collect());
 
         $groups = $this->inventory->groups();
+        $organization = $this->organization->snapshot();
+        $warnings = $result->warnings();
+        if (is_string($organization['warning'] ?? null) && $organization['warning'] !== '') {
+            $warnings[] = $organization['warning'];
+        }
 
         return [
             'groups' => $groups,
-            'group_catalog' => $this->groupCatalog->catalog($groups),
+            'group_catalog' => $this->groupCatalog->catalog($groups, $organization),
             'apps' => $this->inventory->enabledApps(),
             'rows' => $result->rows(),
-            'warnings' => $result->warnings(),
+            'warnings' => array_values(array_unique($warnings)),
             'unsupported_apps' => $result->unsupportedApps(),
             'adapter_status' => $result->adapterStatus(),
+            'organization_snapshot' => $organization,
         ];
     }
 }

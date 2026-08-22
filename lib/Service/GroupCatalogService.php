@@ -5,25 +5,13 @@ declare(strict_types=1);
 namespace OCA\BrPermissionMatrix\Service;
 
 /**
- * Zweck: Fasst bekannte technische Massengruppen fuer die Darstellung zu fachlichen Familien zusammen.
+ * Erzeugt eine historische, verlustfreie Präsentationssicht auf rohe Nextcloud-Gruppen.
  *
- * Zusammenspiel:
- * - MatrixBuilder speichert den Katalog zusaetzlich zu den Rohgruppen im Snapshot; UI und
- *   ExportService aggregieren nur die Darstellung anhand der enthaltenen Gruppen.
- *
- * Vertrag:
- * - Keine Rohgruppe oder Matrixzelle wird ersetzt.
- * - Nicht exakt erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
+ * Semantische Rollen und Bereiche stammen ausschließlich aus dem validierten
+ * LocalBase-Organisationssnapshot. App-spezifische AdPlaner-Teamfamilien werden nur dann
+ * ergänzt, wenn diese kanonische Organisationsquelle im selben Scan gültig war.
  */
 class GroupCatalogService {
-    /**
-     * Bedeutung: Explizit bestaetigte Namensvertraege der Quell-Apps; die Reihenfolge bestimmt
-     * zugleich die stabile Reihenfolge der Familien in UI und Export.
-     *
-     * Zusammenspiel:
-     * - Die Muster folgen AdPlaner TeamAccessService::teamsForCurrentUser(),
-     *   TeamAccessService::currentUserIsEbForTeam() und den dort erzeugten Urlaubsgruppen.
-     */
     private const FAMILIES = [
         'adplaner_vacation_visibility' => [
             'label' => 'AdPlaner · Urlaubssichtbarkeit',
@@ -35,26 +23,66 @@ class GroupCatalogService {
             'source_app' => 'adplaner',
             'pattern' => '/^ad-ASN-[\p{L}\p{N}]{1,16}$/u',
         ],
-        'adplaner_eb_roles' => [
-            'label' => 'AdPlaner · Einsatzbegleitung',
-            'source_app' => 'adplaner',
-            'pattern' => '/^ad-EB-.+$/u',
-        ],
-        'adplaner_pfk_roles' => [
-            'label' => 'AdPlaner · Pflegefachkraefte',
-            'source_app' => 'adplaner',
-            'pattern' => '/^ad-PFK-.+$/u',
-        ],
     ];
 
-    public function catalog(array $groups): array {
+    public function catalog(array $groups, array $organizationSnapshot = []): array {
+        $groups = array_values(array_unique(array_map('strval', $groups)));
+        $validOrganization = ($organizationSnapshot['status'] ?? '') === 'VALID';
+        if (!$validOrganization) {
+            $individual = array_map(
+                fn(string $group): array => $this->entry(
+                    $group,
+                    $group,
+                    'group',
+                    null,
+                    null,
+                    [$group],
+                    'UNKNOWN'
+                ),
+                $groups
+            );
+            usort($individual, static fn(array $a, array $b): int => strnatcasecmp($a['label'], $b['label']));
+
+            return $individual;
+        }
+
+        $semanticGroups = $this->semanticGroups($organizationSnapshot);
         $families = [];
         $individual = [];
+        foreach ($groups as $group) {
+            if (isset($semanticGroups[$group])) {
+                $semantic = $semanticGroups[$group];
+                $individual[] = $this->entry(
+                    $group,
+                    $semantic['prefix'] . ' · ' . $semantic['label'],
+                    'group',
+                    'localbase',
+                    null,
+                    [$group],
+                    'KNOWN',
+                    $semantic['type'],
+                    $semantic['key'],
+                    [[
+                        'group' => $group,
+                        'label' => $semantic['prefix'] . ' · ' . $semantic['label'],
+                        'team' => null,
+                        'role' => $semantic['type'] === 'role' ? $semantic['key'] : null,
+                    ]]
+                );
+                continue;
+            }
 
-        foreach (array_values(array_unique(array_map('strval', $groups))) as $group) {
             $familyKey = $this->familyKey($group);
             if ($familyKey === null) {
-                $individual[] = $this->entry($group, $group, 'group', null, null, [$group]);
+                $individual[] = $this->entry(
+                    $group,
+                    $group,
+                    'group',
+                    null,
+                    null,
+                    [$group],
+                    'UNKNOWN'
+                );
                 continue;
             }
 
@@ -74,12 +102,42 @@ class GroupCatalogService {
                 'family',
                 $definition['source_app'],
                 $key,
-                $members
+                $members,
+                'KNOWN',
+                'family',
+                $key
             );
         }
 
         usort($individual, static fn(array $a, array $b): int => strnatcasecmp($a['label'], $b['label']));
+
         return [...$catalog, ...$individual];
+    }
+
+    private function semanticGroups(array $snapshot): array {
+        $semantic = [];
+        foreach ([
+            'roles' => ['type' => 'role', 'prefix' => 'Rolle'],
+            'areas' => ['type' => 'area', 'prefix' => 'Bereich'],
+        ] as $collection => $definition) {
+            foreach (is_array($snapshot[$collection] ?? null) ? $snapshot[$collection] : [] as $key => $mapping) {
+                if (!is_array($mapping)) {
+                    continue;
+                }
+                $groupId = (string)($mapping['groupId'] ?? '');
+                if ($groupId === '') {
+                    continue;
+                }
+                $semantic[$groupId] = [
+                    'type' => $definition['type'],
+                    'prefix' => $definition['prefix'],
+                    'key' => (string)$key,
+                    'label' => (string)($mapping['label'] ?? $key),
+                ];
+            }
+        }
+
+        return $semantic;
     }
 
     private function familyKey(string $group): ?string {
@@ -88,6 +146,7 @@ class GroupCatalogService {
                 return $key;
             }
         }
+
         return null;
     }
 
@@ -97,7 +156,11 @@ class GroupCatalogService {
         string $type,
         ?string $sourceApp,
         ?string $family,
-        array $groups
+        array $groups,
+        string $meaningStatus,
+        ?string $semanticType = null,
+        ?string $semanticKey = null,
+        ?array $members = null
     ): array {
         return [
             'key' => $key,
@@ -107,19 +170,13 @@ class GroupCatalogService {
             'family' => $family,
             'groups' => array_values($groups),
             'count' => count($groups),
-            'members' => array_map(fn(string $group): array => $this->member($group), $groups),
+            'meaning_status' => $meaningStatus,
+            'semantic_type' => $semanticType,
+            'semantic_key' => $semanticKey,
+            'members' => $members ?? array_map(fn(string $group): array => $this->member($group), $groups),
         ];
     }
 
-    /**
-     * Zweck: Liefert eine verstaendliche Beschriftung fuer technische Teamgruppen.
-     *
-     * Vertrag:
-     * - Die Rohgruppen-ID bleibt der Schluessel; Team und Rolle sind reine Anzeige-Metadaten.
-     * - Unbekannte Gruppen werden unveraendert und ohne erfundene Teamzuordnung geliefert.
-     *
-     * @return array{group: string, label: string, team: ?string, role: ?string}
-     */
     private function member(string $group): array {
         $team = null;
         $role = null;
@@ -129,14 +186,11 @@ class GroupCatalogService {
             $team = $matches[1];
             $role = ($matches[2] ?? '') === '-Urlaub' ? 'vacation' : 'assistant';
             $roleLabel = $role === 'vacation' ? 'Urlaub' : 'Assistenz';
-        } elseif (preg_match('/^ad-(EB|PFK)-(.+)$/u', $group, $matches) === 1) {
-            $role = strtolower($matches[1]);
-            $roleLabel = $matches[1] . ' · ' . $matches[2];
         }
 
         return [
             'group' => $group,
-            'label' => $role === null ? $group : ($team === null ? 'Rolle ' . $roleLabel : 'Team ' . $team . ' · ' . $roleLabel),
+            'label' => $role === null ? $group : 'Team ' . $team . ' · ' . $roleLabel,
             'team' => $team,
             'role' => $role,
         ];

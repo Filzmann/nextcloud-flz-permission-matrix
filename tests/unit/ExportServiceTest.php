@@ -54,7 +54,12 @@ $snapshot = new Snapshot(
     [],
     [],
     [],
-    ['redacted' => true],
+    ['redacted' => true, 'organization_snapshot' => [
+        'status' => 'VALID',
+        'contract_version' => 1,
+        'definition_version' => 4,
+        'checksum' => str_repeat('a', 64),
+    ]],
     ['compliance_status' => 'green', 'baseline_snapshot' => 'base'],
     [],
     [[
@@ -89,12 +94,16 @@ $md = $service->export($snapshot, 'md');
 $html = $service->export($snapshot, 'html');
 
 assertContainsText('"snapshot_id": "pm-test"', $json['content'], 'json export should contain snapshot id');
+assertContainsText('"checksum": "' . str_repeat('a', 64) . '"', $json['content'], 'json should record the organization source checksum.');
 assertContainsText('Objekttyp,App-ID', $csv['content'], 'csv export should contain header');
+assertContainsText(str_repeat('a', 64), $csv['content'], 'csv should record the organization source checksum.');
 assertContainsText('Bedingung,"Technische Quelle",Aussagesicherheit', $csv['content'], 'csv should expose the evidence columns separately from status.');
 assertContainsText('"(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)",test:files-policy,high', $csv['content'], 'csv should preserve composite access conditions and their source.');
 assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown export should contain title');
+assertContainsText('Organisationsvertrag: VALID · Vertrag 1 · Definition 4 · Prüfsumme ' . str_repeat('a', 64), $md['content'], 'markdown should identify its canonical organization source.');
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
 assertContainsText('AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein', $md['content'], 'markdown should explain composite group cells.');
+assertSameValue(1, substr_count($md['content'], 'AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein'), 'The export legend must not duplicate the same contract line.');
 assertContainsText('Technische Quelle', $md['content'], 'markdown should expose the evidence source.');
 assertContainsText('(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)', $md['content'], 'markdown should preserve composite access conditions.');
 assertContainsText('## Hauptmatrix (Gruppenfamilien)', $md['content'], 'markdown should lead with the summarized group-family matrix.');
@@ -105,7 +114,9 @@ assertContainsText('gemischt (2/2)', $md['content'], 'markdown should expose con
 assertContainsText('## Rohmatrix', $md['content'], 'markdown should retain the complete auditable raw matrix.');
 assertContainsText('ad-ASN-Ada', $md['content'], 'markdown should name raw family members.');
 assertContainsText('<table>', $html['content'], 'html export should contain table');
+assertContainsText('Organisationsvertrag: VALID', $html['content'], 'html should identify its canonical organization source.');
 assertContainsText('<th scope="col">Bedingung</th>', $html['content'], 'html should expose access conditions as their own column.');
+assertSameValue(false, str_contains($html['content'], '<td>test:files-policy</td><td>test:files-policy</td>'), 'HTML rows must align one-to-one with their declared evidence columns.');
 assertContainsText('Hauptmatrix (Gruppenfamilien)', $html['content'], 'html should lead with the summarized group-family matrix.');
 assertContainsText('title="ad-ASN-Ada: X; ad-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
 assertContainsText('<h2>Rohmatrix</h2>', $html['content'], 'html should retain the complete auditable raw matrix.');

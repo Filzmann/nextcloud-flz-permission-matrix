@@ -22,10 +22,11 @@ const snapshot = {
         { key: 'family:adplaner_eb_roles', label: 'AdPlaner · Einsatzbegleitung', type: 'family', groups: ['ad-EB-Ada'], count: 1, members: [
             { group: 'ad-EB-Ada', label: 'Rolle EB · Ada', team: null, role: 'eb' }
         ] },
-        { key: 'Betriebsrat', label: 'Betriebsrat', type: 'group', groups: ['Betriebsrat'], count: 1 },
-        { key: 'IKT-Ausschuss', label: 'IKT-Ausschuss', type: 'group', groups: ['IKT-Ausschuss'], count: 1 }
+        { key: 'Betriebsrat', label: 'Betriebsrat', type: 'group', groups: ['Betriebsrat'], count: 1, meaning_status: 'UNKNOWN' },
+        { key: 'IKT-Ausschuss', label: 'IKT-Ausschuss', type: 'group', groups: ['IKT-Ausschuss'], count: 1, meaning_status: 'KNOWN' }
     ],
     summary: { compliance_status: 'yellow', group_count: 4, group_family_count: 1, app_count: 1, object_count: 1, warning_count: 1, unsupported_count: 1 },
+    metadata: { organization_snapshot: { status: 'VALID', contract_version: 1, definition_version: 4, checksum: 'abc123' } },
     warnings: ['Deck <unklar>'],
     unsupported_apps: ['deck'],
     adapter_status: [
@@ -62,6 +63,8 @@ const groups = render.renderGroups(snapshot);
 const diffs = render.renderDiffs(snapshot);
 
 assert(overview.includes('Nicht unterstuetzte Apps'));
+assert(overview.includes('Organisationsvertrag'));
+assert(overview.includes('VALID · v1 / Definition 4'));
 assert(overview.includes('Deck &lt;unklar&gt;'));
 assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
@@ -88,6 +91,7 @@ assert(apps.includes('Deck &lt;Test&gt;'));
 assert(apps.includes('<dt>Detailabdeckung</dt><dd><span class="pm-badge pm-badge-unsupported">UNSUPPORTED</span></dd>'));
 assert(groups.includes('<summary>Rohgruppen anzeigen</summary>'));
 assert(groups.includes('<li>ad-ASN-Ada</li>'));
+assert(groups.includes('<dt>Bedeutung</dt><dd><span class="pm-badge pm-badge-unknown">UNKNOWN</span></dd>'));
 assert(diffs.includes('APP_GROUP_EXPANDED'));
 
 const mixed = render.aggregateCell(

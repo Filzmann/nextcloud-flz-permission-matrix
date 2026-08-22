@@ -40,6 +40,16 @@ class ScannerService {
             $warnings[] = 'Kein Baseline-Snapshot gesetzt.';
         }
 
+        $metadata = $this->config->metadata();
+        $metadata['organization_snapshot'] = $build['organization_snapshot'] ?? [
+            'status' => 'MISSING',
+            'contract_version' => 0,
+            'definition_version' => 0,
+            'checksum' => '',
+            'roles' => [],
+            'areas' => [],
+        ];
+
         $snapshot = new Snapshot(
             Snapshot::freshId(),
             Snapshot::now(),
@@ -50,7 +60,7 @@ class ScannerService {
             $warnings,
             $build['unsupported_apps'],
             [],
-            $this->config->metadata(),
+            $metadata,
             [],
             $build['adapter_status'],
             $build['group_catalog'] ?? []

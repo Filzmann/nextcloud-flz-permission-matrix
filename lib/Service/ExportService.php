@@ -56,7 +56,12 @@ class ExportService {
 
     private function csv(Snapshot $snapshot): array {
         $handle = fopen('php://temp', 'w+');
-        $header = ['Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Bedingung', 'Technische Quelle', 'Aussagesicherheit', 'Status', ...$snapshot->groups()];
+        $organization = $this->organizationMetadata($snapshot);
+        $header = [
+            'Objekttyp', 'App-ID', 'Objekt/Funktion', 'Berechtigungsart', 'Bedingung',
+            'Technische Quelle', 'Aussagesicherheit', 'Status', ...$snapshot->groups(),
+            'Organisationsstatus', 'Organisationsvertrag', 'Organisationsdefinition', 'Organisationsprüfsumme',
+        ];
         fputcsv($handle, $header);
 
         foreach ($snapshot->matrix() as $row) {
@@ -70,6 +75,10 @@ class ExportService {
                 $this->accessRuleConfidence($row),
                 $row->status(),
                 ...array_map(fn(string $group): string => (string)($row->cells()[$group] ?? '-'), $snapshot->groups()),
+                $organization['status'],
+                $organization['contract_version'],
+                $organization['definition_version'],
+                $organization['checksum'],
             ]);
         }
 
@@ -95,6 +104,7 @@ class ExportService {
             'Erstellt durch: br_permission_matrix',
             'Baseline: ' . (string)($summary['baseline_snapshot'] ?? 'nicht gesetzt'),
             'Scan-ID: ' . $snapshot->snapshotId(),
+            $this->organizationLabel($snapshot),
             '',
             '## Zweck',
             '',
@@ -164,6 +174,7 @@ class ExportService {
         $title = 'Berechtigungsmatrix Nextcloud';
         $body = '<h1>' . $this->esc($title) . '</h1>'
             . '<p>Stand: ' . $this->esc($snapshot->createdAt()) . '<br>Scan-ID: ' . $this->esc($snapshot->snapshotId()) . '</p>'
+            . '<p>' . $this->esc($this->organizationLabel($snapshot)) . '</p>'
             . '<h2>Compliance-Status</h2><p>' . $this->esc(strtoupper((string)($snapshot->summary()['compliance_status'] ?? 'UNKNOWN'))) . '</p>'
             . '<h2>' . ($this->hasGroupFamilies($snapshot) ? 'Hauptmatrix (Gruppenfamilien)' : 'Hauptmatrix') . '</h2>'
             . $this->htmlTable($snapshot, $this->groupColumns($snapshot))
@@ -399,6 +410,26 @@ class ExportService {
 
     private function mdCell(string $value): string {
         return str_replace(["\n", '|'], [' ', '\\|'], $value);
+    }
+
+    private function organizationMetadata(Snapshot $snapshot): array {
+        $organization = $snapshot->metadata()['organization_snapshot'] ?? [];
+
+        return [
+            'status' => (string)($organization['status'] ?? 'UNKNOWN'),
+            'contract_version' => (string)($organization['contract_version'] ?? '0'),
+            'definition_version' => (string)($organization['definition_version'] ?? '0'),
+            'checksum' => (string)($organization['checksum'] ?? ''),
+        ];
+    }
+
+    private function organizationLabel(Snapshot $snapshot): string {
+        $organization = $this->organizationMetadata($snapshot);
+
+        return 'Organisationsvertrag: ' . $organization['status']
+            . ' · Vertrag ' . $organization['contract_version']
+            . ' · Definition ' . $organization['definition_version']
+            . ' · Prüfsumme ' . ($organization['checksum'] !== '' ? $organization['checksum'] : 'nicht verfügbar');
     }
 
     private function esc(string $value): string {

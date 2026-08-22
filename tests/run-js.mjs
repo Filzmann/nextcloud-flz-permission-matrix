@@ -10,6 +10,7 @@ const checks = [
     ['node', ['--check', 'js/admin.js']],
     ['node', ['tests/js/render-smoke.js']],
     ['node', ['tests/js/accessibility-contract.js']],
+    ['node', ['tests/js/navigation-smoke.js']],
 ];
 
 for (const [command, args] of checks) {
