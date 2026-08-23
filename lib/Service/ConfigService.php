@@ -17,7 +17,7 @@ use OCP\IGroupManager;
  *   die serverseitig erzwungene Format-Allowlist.
  */
 class ConfigService {
-    private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutz', 'IT-Administration'];
+    private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutzbeauftragte', 'IT-Administration'];
     private const DEFAULT_ADMIN_GROUPS = ['IT-Administration'];
     private const DEFAULT_EXPORT_FORMATS = ['md', 'csv', 'json', 'html'];
 

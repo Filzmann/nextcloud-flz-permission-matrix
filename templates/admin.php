@@ -9,13 +9,22 @@ $config = $_['config'];
     <h2>Berechtigungsmatrix</h2>
     <form id="pm-admin-form">
         <label>
-            Viewer-Gruppen
-            <textarea name="viewer_groups" rows="4"><?php p(implode("\n", $config['viewer_groups'])); ?></textarea>
+            Leseberechtigte Gruppen
+            <textarea name="viewer_groups" rows="4" aria-describedby="pm-viewer-groups-help"><?php p(implode("\n", $config['viewer_groups'])); ?></textarea>
         </label>
+        <p id="pm-viewer-groups-help">
+            Üblich ist der lesende Zugriff für den Betriebsrat oder Personalrat.
+            IKT-Ausschuss und Datenschutzbeauftragte können für Prüfung und Beratung ergänzt werden.
+            Die Gruppennamen sind vollständig an die eigene Organisation anpassbar.
+        </p>
         <label>
             Admin-Gruppen
-            <textarea name="admin_groups" rows="3"><?php p(implode("\n", $config['admin_groups'])); ?></textarea>
+            <textarea name="admin_groups" rows="3" aria-describedby="pm-admin-groups-help"><?php p(implode("\n", $config['admin_groups'])); ?></textarea>
         </label>
+        <p id="pm-admin-groups-help">
+            Beispielsweise IT-Administration. Verwaltungsrechte umfassen Konfiguration,
+            Scans und Baseline-Freigaben und sollten restriktiv vergeben werden.
+        </p>
         <label>
             Scan-Intervall
             <select name="scan_interval">

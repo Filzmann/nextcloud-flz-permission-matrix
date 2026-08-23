@@ -59,8 +59,11 @@ Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-B
 
 Admin-Einstellungen:
 
-- `viewer_groups`: Gruppen mit Matrix-/Export-Zugriff.
-- `admin_groups`: Gruppen mit Konfigurations-, Scan- und Baseline-Rechten.
+- `viewer_groups`: frei anpassbare Gruppen mit Matrix-/Export-Zugriff. Als
+  Ausgangsbeispiele dienen `Betriebsrat`, `IKT-Ausschuss`,
+  `Datenschutzbeauftragte` und `IT-Administration`.
+- `admin_groups`: frei anpassbare Gruppen mit Konfigurations-, Scan- und
+  Baseline-Rechten; Ausgangsbeispiel ist `IT-Administration`.
 - `scan_interval`: `hourly`, `daily` oder `weekly`.
 - `baseline_snapshot`: aktuell genehmigter Positivlistenstand.
 - `strict_mode`: neue/erweiterte Rechte werden strenger als nicht freigegeben bewertet.
@@ -74,6 +77,16 @@ Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
 Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
 Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
 Konfigurationsschlüssel geändert wird.
+
+Im Normalfall sollte die zuständige Beschäftigtenvertretung die Matrix lesen
+können. In Betrieben ist dies häufig der Betriebsrat, in Dienststellen der
+Personalrat; die Beispielgruppe `Betriebsrat` kann vollständig durch die real
+vorhandene Gruppe, etwa `Personalrat`, ersetzt werden. Ein IKT-Ausschuss und
+Datenschutzbeauftragte benötigen typischerweise Leserechte für technische
+Prüfung beziehungsweise datenschutzrechtliche Beratung, aber keine
+Konfigurations-, Scan- oder Baseline-Rechte. Diese administrativen Rechte
+sollten auf eine kleine zuständige Gruppe wie `IT-Administration` und native
+Nextcloud-Administratoren begrenzt bleiben.
 
 ### Native Nextcloud-Gruppenfreigaben
 

@@ -63,6 +63,10 @@ Wichtige Pruefungen:
 ## Zugriff und Sicherheit
 
 - Matrix, Snapshots und Exporte sind nur fuer konfigurierte Viewer-Gruppen, konfigurierte Admin-Gruppen oder Nextcloud-Admins sichtbar.
+- `Betriebsrat`, `IKT-Ausschuss`, `Datenschutzbeauftragte` und
+  `IT-Administration` sind anpassbare Ausgangsbeispiele, keine fest
+  vorausgesetzten Organisationsrollen. Ein Personalrat kann die
+  Betriebsratsgruppe vollständig ersetzen.
 - App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer Nextcloud-Admins oder konfigurierte Admin-Gruppen erlaubt.
 - Alle App-Zugriffe werden mit Zeitpunkt, Benutzer-ID, Aktion, Export-Flag und optionaler Snapshot-ID in eigenen Audit-Tabellen protokolliert.
 - API-Aktionen mit Zustandsaenderung behalten CSRF-Schutz.

@@ -82,6 +82,24 @@ namespace {
         }
     }
 
+    $defaultService = new ConfigService(new ConfigTestAppConfig(), new ConfigTestGroups([]));
+    assertSameValue(
+        ['Betriebsrat', 'Datenschutzbeauftragte', 'IKT-Ausschuss', 'IT-Administration'],
+        $defaultService->viewerGroups(),
+        'The configurable viewer examples should cover employee representation, privacy and IKT governance.'
+    );
+
+    $personalratStore = new ConfigTestAppConfig();
+    $personalratService = new ConfigService($personalratStore, new ConfigTestGroups(['Personalrat', 'IT-Administration']));
+    $personalratConfig = $personalratService->save([
+        'viewer_groups' => ['Personalrat'],
+        'admin_groups' => ['IT-Administration'],
+        'scan_interval' => 'daily',
+        'export_formats' => 'md',
+        'retention' => '50',
+    ]);
+    assertSameValue(['Personalrat'], $personalratConfig['viewer_groups'], 'A Personalrat must be configurable instead of a Betriebsrat.');
+
     $store = new ConfigTestAppConfig();
     $service = new ConfigService($store, new ConfigTestGroups(['Matrix-Viewer', 'Matrix-Admin']));
     $saved = $service->save([
