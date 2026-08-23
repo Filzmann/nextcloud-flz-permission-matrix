@@ -35,9 +35,9 @@ namespace OCP\AppFramework\Http\Attribute {
     #[\Attribute(\Attribute::TARGET_METHOD)] class NoCSRFRequired {}
 }
 
-namespace OCA\BrPermissionMatrix\AppInfo {
+namespace OCA\FilzmannPermissionMatrix\AppInfo {
     final class Application {
-        public const APP_ID = 'br_permission_matrix';
+        public const APP_ID = 'filzmann_permission_matrix';
     }
 }
 
@@ -56,12 +56,12 @@ namespace Psr\Log {
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Controller\ConfigController;
-    use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
-    use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
-    use OCA\BrPermissionMatrix\Service\AccessService;
-    use OCA\BrPermissionMatrix\Service\AuditLogService;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
+    use OCA\FilzmannPermissionMatrix\Controller\ConfigController;
+    use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
+    use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
+    use OCA\FilzmannPermissionMatrix\Service\AccessService;
+    use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
+    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
     use OCP\IRequest;
     use Psr\Log\LoggerInterface;
 

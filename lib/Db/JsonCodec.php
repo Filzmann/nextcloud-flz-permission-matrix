@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FilzmannPermissionMatrix\Db;
 
 class JsonCodec {
     public function encode(array $payload): string {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Adapter;
+namespace OCA\FilzmannPermissionMatrix\Adapter;
 
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
+use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
+use OCA\FilzmannPermissionMatrix\Model\AccessRule;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\Service\InventoryService;
 
 /**
  * Zweck: Liest die gruppenbezogenen View-/Manage-Rechte der Berechtigungsmatrix aus ihrer kanonischen Konfiguration.
@@ -26,11 +26,11 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
     }
 
     public function supports(string $appId): bool {
-        return $appId === 'br_permission_matrix';
+        return $appId === 'filzmann_permission_matrix';
     }
 
     public function collect(): AdapterResult {
-        if (!$this->inventory->isAppEnabled('br_permission_matrix')) {
+        if (!$this->inventory->isAppEnabled('filzmann_permission_matrix')) {
             return AdapterResult::empty();
         }
 
@@ -65,29 +65,29 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $viewRules = $viewGroups === [] ? [] : [new AccessRule(
             'matrix.view',
             'allow',
-            'app:br_permission_matrix',
+            'app:filzmann_permission_matrix',
             AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $viewGroups)),
-            'br_permission_matrix:AccessService::canViewUserId',
+            'filzmann_permission_matrix:AccessService::canViewUserId',
             $missingView === [] ? 'high' : 'low'
         )];
         $manageRules = $manageGroups === [] ? [] : [new AccessRule(
             'matrix.manage',
             'allow',
-            'app:br_permission_matrix',
+            'app:filzmann_permission_matrix',
             AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $manageGroups)),
-            'br_permission_matrix:AccessService::canManageUserId',
+            'filzmann_permission_matrix:AccessService::canManageUserId',
             $missingManage === [] ? 'high' : 'low'
         )];
 
         return new AdapterResult([
             new MatrixRow(
                 'AppPermission',
-                'br_permission_matrix',
+                'filzmann_permission_matrix',
                 'Matrix ansehen',
                 'Konfigurierte Viewer- und Admin-Gruppen; Nextcloud-Admins',
                 'Lesen',
                 $missingView === [] ? 'NEW' : 'UNKNOWN',
-                'br_permission_matrix:AccessService::canViewUserId',
+                'filzmann_permission_matrix:AccessService::canViewUserId',
                 $missingView === [] ? 'high' : 'low',
                 $viewCells,
                 $missingView === [] ? [] : [$warnings[0]],
@@ -95,19 +95,19 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             ),
             new MatrixRow(
                 'AppPermission',
-                'br_permission_matrix',
+                'filzmann_permission_matrix',
                 'Matrix verwalten',
                 'Konfigurierte Admin-Gruppen; Nextcloud-Admins',
                 'Administrieren',
                 $missingManage === [] ? 'NEW' : 'UNKNOWN',
-                'br_permission_matrix:AccessService::canManageUserId',
+                'filzmann_permission_matrix:AccessService::canManageUserId',
                 $missingManage === [] ? 'high' : 'low',
                 $manageCells,
                 $missingManage === [] ? [] : ['Mindestens eine konfigurierte Admin-Gruppe fehlt.'],
                 $manageRules
             ),
         ], $warnings, [], [[
-            'app_id' => 'br_permission_matrix',
+            'app_id' => 'filzmann_permission_matrix',
             'adapter' => self::class,
             'status' => $warnings === [] ? 'IMPLEMENTED' : 'PARTIAL',
             'confidence' => $warnings === [] ? 'high' : 'low',

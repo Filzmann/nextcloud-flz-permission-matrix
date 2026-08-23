@@ -1,6 +1,6 @@
 # Berechtigungsmatrix
 
-Nextcloud-App `br_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
+Nextcloud-App `filzmann_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
 
 ## Zweck
 
@@ -39,8 +39,8 @@ Konfigurationsänderungen deuten vorhandene Snapshots nicht neu.
 Die App wird in der gemeinsamen DDEV-Nextcloud per Mount eingebunden:
 
 ```text
-<WORKSPACE-ROOT>/br_permission_matrix
--> /var/www/html/html/custom_apps/br_permission_matrix
+<WORKSPACE-ROOT>/filzmann_permission_matrix
+-> /var/www/html/html/custom_apps/filzmann_permission_matrix
 ```
 
 Aktivieren:
@@ -48,9 +48,9 @@ Aktivieren:
 Aus dem dokumentierten `nextcloud-dev`-Root:
 
 ```bash
-ddev exec -d /var/www/html/html php occ app:enable br_permission_matrix
+ddev exec -d /var/www/html/html php occ app:enable filzmann_permission_matrix
 ddev exec -d /var/www/html/html php occ status
-ddev exec -d /var/www/html/html php occ app:list | grep -i br_permission_matrix
+ddev exec -d /var/www/html/html php occ app:list | grep -i filzmann_permission_matrix
 ```
 
 Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-Befehl. Migrationen laufen beim Aktivieren der App oder ueber `occ upgrade`, falls `occ status` einen DB-Upgrade-Bedarf meldet.

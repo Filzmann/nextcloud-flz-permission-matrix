@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\Snapshot;
-use OCA\BrPermissionMatrix\Service\DiffService;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Service\DiffService;
 
 $baselineRow = new MatrixRow('App', 'deck', 'Deck', 'App-Nutzung', 'App-Verfuegbarkeit', 'APPROVED', 'core-app-config', 'high', [
     'Betriebsrat' => '-',

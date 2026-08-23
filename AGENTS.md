@@ -1,20 +1,22 @@
-# AGENTS.md - BR Permission Matrix
+# AGENTS.md - Filzmann Permission Matrix
 
 ## Projekt
 
-Nextcloud-App `br_permission_matrix` fuer eine dauerhaft einsehbare, exportierbare Berechtigungsmatrix der lokalen bzw. betrieblichen Nextcloud.
+Nextcloud-App `filzmann_permission_matrix` fuer eine dauerhaft einsehbare, exportierbare Berechtigungsmatrix der lokalen bzw. betrieblichen Nextcloud.
 
 Lokale App-URL in der gemeinsamen DDEV-Umgebung:
 
-    https://nextcloud-dev.ddev.site/apps/br_permission_matrix/
+    https://nextcloud-dev.ddev.site/apps/filzmann_permission_matrix/
 
 Nextcloud-App-ID:
 
-    br_permission_matrix
+    filzmann_permission_matrix
 
 ## Zielsetzung
 
-Die App stellt Betriebsrat, IKT-Ausschuss, Datenschutz und IT-Administration eine read-only Positivliste aller gruppenbezogenen Nextcloud-Berechtigungen bereit.
+Die App stellt IKT, Datenschutz, Revision und berechtigten betrieblichen
+Interessenvertretungen eine read-only Positivliste gruppenbezogener
+Nextcloud-Berechtigungen bereit. Sie ist keine Gremien-Arbeits-App.
 
 Kernprinzipien:
 
@@ -26,7 +28,7 @@ Kernprinzipien:
 
 ## Repository und gemeinsamer Arbeitsablauf
 
-- Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `br_permission_matrix`.
+- Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `filzmann_permission_matrix`.
 - Andere Apps und der Parent-Workspace werden nicht aus diesem Repo heraus gestaged oder committed.
 - Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.
 - Fuer Git-, Sandbox-, DDEV-/`occ`-Sicherheit, Verifikation und Learning Candidates gilt der lokal mitgefuehrte Skill `work-in-nextcloud-app`; die folgenden Matrix-Regeln und Pruefungen ergaenzen ihn.
@@ -41,8 +43,8 @@ ermitteln.
 Wichtige Pruefungen:
 
     ddev exec -d /var/www/html/html php occ status
-    ddev exec -d /var/www/html/html php occ app:list | grep -i br_permission_matrix
-    ddev exec -d /var/www/html/html php occ app:enable br_permission_matrix
+    ddev exec -d /var/www/html/html php occ app:list | grep -i filzmann_permission_matrix
+    ddev exec -d /var/www/html/html php occ app:enable filzmann_permission_matrix
     ddev exec -d /var/www/html/html php occ permission-matrix:status
     ddev exec -d /var/www/html/html php occ permission-matrix:scan
 
@@ -75,8 +77,11 @@ Schnelle lokale Einstiegspunkte:
 
 Neue oder refaktorierte Fachlogik bekommt passende Tests fuer Scanner, Matrixaufbau, Diff und Exporte. Bei Controller-, DI-, Migrations-, Background-Job- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
 
-## Verbindliche Suite-Navigation
+## Verbindliche Standalone-Navigation
 
-- Die Berechtigungsmatrix registriert keinen eigenen Nextcloud-Hauptnavigationseintrag. `orgsuite` stellt den gemeinsamen Einstieg `BR` bereit.
-- Das Template bindet das zentrale OrgSuite-Menue mit `data-suite="br"` und `data-current-app="br_permission_matrix"` ein.
+- Die Berechtigungsmatrix registriert einen eigenen neutralen
+  Nextcloud-Hauptnavigationseintrag und bleibt ohne OrgSuite erreichbar.
+- Der Navigationslistener verwendet für die Sichtbarkeit denselben
+  serverseitigen `AccessService` wie die geschützten App-Pfade.
+- OrgSuite-Assets, BR-Suite-Menüs oder fremde Linklisten werden nicht geladen.
 - Die bestehende serverseitige View-/Manage-Pruefung bleibt alleinige Autoritaet; Menuesichtbarkeit ist keine Berechtigung.

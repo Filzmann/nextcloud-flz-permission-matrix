@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Adapter\SharingAdapter;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
-use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
+use OCA\FilzmannPermissionMatrix\Adapter\SharingAdapter;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
 
 class SharingAdapterFakeInventory extends InventoryService {
     public function __construct(private bool $enabled = true) {

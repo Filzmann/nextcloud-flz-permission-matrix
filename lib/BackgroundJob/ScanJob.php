@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\BackgroundJob;
+namespace OCA\FilzmannPermissionMatrix\BackgroundJob;
 
 use DateTimeImmutable;
-use OCA\BrPermissionMatrix\Db\SnapshotMapper;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\ScannerService;
+use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\Service\ScannerService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
@@ -32,7 +32,7 @@ class ScanJob extends TimedJob {
             $this->scanner->scan(null);
         } catch (\Throwable $e) {
             $this->logger->error('Permission matrix background scan failed', [
-                'app' => 'br_permission_matrix',
+                'app' => 'filzmann_permission_matrix',
                 'exception' => $e,
             ]);
         }

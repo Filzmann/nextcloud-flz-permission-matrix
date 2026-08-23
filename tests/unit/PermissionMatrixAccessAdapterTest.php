@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
+use OCA\FilzmannPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\Service\InventoryService;
 
 class MatrixAccessFakeInventory extends InventoryService {
     public function __construct() {
     }
 
     public function isAppEnabled(string $appId): bool {
-        return $appId === 'br_permission_matrix';
+        return $appId === 'filzmann_permission_matrix';
     }
 
     public function groups(): array {

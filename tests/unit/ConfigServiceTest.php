@@ -19,15 +19,15 @@ namespace OCP {
     }
 }
 
-namespace OCA\BrPermissionMatrix\AppInfo {
+namespace OCA\FilzmannPermissionMatrix\AppInfo {
     final class Application {
-        public const APP_ID = 'br_permission_matrix';
+        public const APP_ID = 'filzmann_permission_matrix';
     }
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
+    use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
+    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
     use OCP\IAppConfig;
     use OCP\IGroupManager;
 

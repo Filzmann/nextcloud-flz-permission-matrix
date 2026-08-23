@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Model;
+namespace OCA\FilzmannPermissionMatrix\Model;
 
 use InvalidArgumentException;
 

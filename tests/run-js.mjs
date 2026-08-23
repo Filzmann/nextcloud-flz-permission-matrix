@@ -22,4 +22,4 @@ for (const [command, args] of checks) {
     }
 }
 
-console.log('BR Permission Matrix JavaScript tests passed');
+console.log('Filzmann Permission Matrix JavaScript tests passed');

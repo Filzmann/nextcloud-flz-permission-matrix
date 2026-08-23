@@ -1,5 +1,5 @@
 (function() {
-    const base = '/apps/br_permission_matrix';
+    const base = '/apps/filzmann_permission_matrix';
 
     function url(path) {
         if (window.OC && typeof window.OC.generateUrl === 'function') {

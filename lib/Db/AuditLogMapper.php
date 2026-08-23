@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FilzmannPermissionMatrix\Db;
 
 use DateTimeImmutable;
 use OCP\DB\QueryBuilder\IQueryBuilder;

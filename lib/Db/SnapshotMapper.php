@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FilzmannPermissionMatrix\Db;
 
 use DateTimeImmutable;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 

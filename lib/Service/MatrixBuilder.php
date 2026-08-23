@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\Adapter\AdapterResult;
-use OCA\BrPermissionMatrix\Adapter\CoreAdapter;
-use OCA\BrPermissionMatrix\Adapter\FilesAccessControlAdapter;
-use OCA\BrPermissionMatrix\Adapter\FilesAdapter;
-use OCA\BrPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\BrPermissionMatrix\Adapter\GroupFoldersAdapter;
-use OCA\BrPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
-use OCA\BrPermissionMatrix\Adapter\SharingAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\AdapterResult;
+use OCA\FilzmannPermissionMatrix\Adapter\CoreAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\FilesAccessControlAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\FilesAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\GroupFoldersAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\SharingAdapter;
 
 /**
  * Zweck: Orchestriert alle Berechtigungsadapter zu einem noch unbewerteten Matrix-Rohbau.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Service\GroupCatalogService;
+use OCA\FilzmannPermissionMatrix\Service\GroupCatalogService;
 
 $groups = [
     'Betriebsrat',

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FilzmannPermissionMatrix\Db;
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
 use OCP\IDBConnection;
 
 class CellMapper {

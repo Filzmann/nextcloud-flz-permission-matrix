@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Command;
+namespace OCA\FilzmannPermissionMatrix\Command;
 
-use OCA\BrPermissionMatrix\Db\SnapshotMapper;
-use OCA\BrPermissionMatrix\Service\DiffService;
+use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
+use OCA\FilzmannPermissionMatrix\Service\DiffService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
+use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
 

@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Controller;
+namespace OCA\FilzmannPermissionMatrix\Controller;
 
 use DomainException;
 use InvalidArgumentException;
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Db\ExportMapper;
-use OCA\BrPermissionMatrix\Db\SnapshotMapper;
-use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
-use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
-use OCA\BrPermissionMatrix\Service\AccessService;
-use OCA\BrPermissionMatrix\Service\AuditLogService;
-use OCA\BrPermissionMatrix\Service\BaselineService;
-use OCA\BrPermissionMatrix\Service\DiffService;
-use OCA\BrPermissionMatrix\Service\ExportService;
-use OCA\BrPermissionMatrix\Service\ScannerService;
+use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+use OCA\FilzmannPermissionMatrix\Db\ExportMapper;
+use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
+use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
+use OCA\FilzmannPermissionMatrix\Exception\ExportFormatNotAllowedException;
+use OCA\FilzmannPermissionMatrix\Service\AccessService;
+use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
+use OCA\FilzmannPermissionMatrix\Service\BaselineService;
+use OCA\FilzmannPermissionMatrix\Service\DiffService;
+use OCA\FilzmannPermissionMatrix\Service\ExportService;
+use OCA\FilzmannPermissionMatrix\Service\ScannerService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

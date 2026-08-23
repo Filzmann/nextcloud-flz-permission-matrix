@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
 
 $row = static fn(string $appId, string $object): MatrixRow => new MatrixRow(
     'Permission',

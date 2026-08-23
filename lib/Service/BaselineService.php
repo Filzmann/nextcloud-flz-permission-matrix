@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
 use DomainException;
-use OCA\BrPermissionMatrix\Db\SnapshotMapper;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
 
 class BaselineService {
     public function __construct(

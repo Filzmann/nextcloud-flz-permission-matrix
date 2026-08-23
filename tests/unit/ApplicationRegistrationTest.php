@@ -10,20 +10,26 @@ namespace OCP\AppFramework\Bootstrap {
     interface IBootContext {}
     interface IRegistrationContext {
         public function registerServiceAlias(string $alias, string $target): void;
+        public function registerEventListener(string $event, string $listener): void;
     }
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\AppInfo\Application;
-    use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
-    use OCA\BrPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+    use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
+    use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
     use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
     $context = new class implements IRegistrationContext {
         public array $aliases = [];
+        public array $listeners = [];
 
         public function registerServiceAlias(string $alias, string $target): void {
             $this->aliases[$alias] = $target;
+        }
+
+        public function registerEventListener(string $event, string $listener): void {
+            $this->listeners[$event] = $listener;
         }
     };
 
@@ -33,6 +39,11 @@ namespace {
         NextcloudSharingSource::class,
         $context->aliases[NativeSharingSourceInterface::class] ?? null,
         'The narrow read-only source contract must resolve to the native Nextcloud implementation.'
+    );
+    assertSameValue(
+        \OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener::class,
+        $context->listeners[\OCP\Navigation\Events\LoadAdditionalEntriesEvent::class] ?? null,
+        'The standalone app must register its own native navigation entry.'
     );
 
     echo 'Application registration tests passed' . PHP_EOL;

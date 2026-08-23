@@ -1,7 +1,7 @@
 <?php
-script('br_permission_matrix', 'modules/api');
-script('br_permission_matrix', 'admin');
-style('br_permission_matrix', 'style');
+script('filzmann_permission_matrix', 'modules/api');
+script('filzmann_permission_matrix', 'admin');
+style('filzmann_permission_matrix', 'style');
 $config = $_['config'];
 ?>
 

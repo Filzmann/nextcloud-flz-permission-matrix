@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
+use OCA\FilzmannPermissionMatrix\Model\AccessRule;
 
 $row = MatrixRow::get([
     'object_type' => 'App',

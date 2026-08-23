@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\BrPermissionMatrix\Service\AdapterCatalogService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
+use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
+use OCA\FilzmannPermissionMatrix\Service\AdapterCatalogService;
+use OCA\FilzmannPermissionMatrix\Service\InventoryService;
 
 class GenericAdapterFakeInventory extends InventoryService {
     public function __construct() {
