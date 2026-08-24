@@ -1,32 +1,31 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>br_permission_matrix</id>
+    <id>filzmann_permission_matrix</id>
     <name>Berechtigungsmatrix</name>
     <summary>Read-only Berechtigungsmatrix und Positivlisten-Audit fuer Nextcloud-Gruppenrechte.</summary>
     <description>Dokumentiert gruppenbezogene App-Verfuegbarkeit, bekannte Berechtigungsquellen, Snapshots, Baselines, Diffs und Exporte ohne Nextcloud-Berechtigungen zu veraendern.</description>
-    <version>0.1.4</version>
+    <version>0.2.1</version>
     <licence>agpl</licence>
-    <author>Simon</author>
-    <namespace>BrPermissionMatrix</namespace>
+    <author>Simon Filzmann</author>
+    <namespace>FilzmannPermissionMatrix</namespace>
     <category>organization</category>
     <dependencies>
         <nextcloud min-version="29" max-version="35"/>
-        <app>orgsuite</app>
     </dependencies>
     <settings>
-        <admin>OCA\BrPermissionMatrix\Settings\Admin</admin>
-        <admin-section>OCA\BrPermissionMatrix\Settings\AdminSection</admin-section>
+        <admin>OCA\FilzmannPermissionMatrix\Settings\Admin</admin>
+        <admin-section>OCA\FilzmannPermissionMatrix\Settings\AdminSection</admin-section>
     </settings>
     <background-jobs>
-        <job>OCA\BrPermissionMatrix\BackgroundJob\ScanJob</job>
+        <job>OCA\FilzmannPermissionMatrix\BackgroundJob\ScanJob</job>
     </background-jobs>
     <commands>
-        <command>OCA\BrPermissionMatrix\Command\ScanCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\ExportCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\BaselineSetCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\BaselineShowCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\DiffCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\StatusCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\ScanCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\ExportCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\BaselineSetCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\BaselineShowCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\DiffCommand</command>
+        <command>OCA\FilzmannPermissionMatrix\Command\StatusCommand</command>
     </commands>
 </info>

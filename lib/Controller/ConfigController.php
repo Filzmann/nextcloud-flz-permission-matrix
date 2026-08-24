@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Controller;
+namespace OCA\FilzmannPermissionMatrix\Controller;
 
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
-use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
-use OCA\BrPermissionMatrix\Service\AccessService;
-use OCA\BrPermissionMatrix\Service\AuditLogService;
-use OCA\BrPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
+use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
+use OCA\FilzmannPermissionMatrix\Service\AccessService;
+use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -55,6 +55,8 @@ class ConfigController extends Controller {
                 'include_share_metadata',
                 'export_formats',
                 'retention',
+                'export_metadata_retention_days',
+                'audit_retention_days',
             ]));
             $config = $this->config->save($payload);
             $this->auditLog->record('api.config.save');

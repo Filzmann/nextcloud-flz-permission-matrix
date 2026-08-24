@@ -2,23 +2,32 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\AppInfo;
+namespace OCA\FilzmannPermissionMatrix\AppInfo;
 
-use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
-use OCA\BrPermissionMatrix\Service\NextcloudSharingSource;
+use OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener;
+use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
+use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
+use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
+use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
+use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 
 class Application extends App implements IBootstrap {
-    public const APP_ID = 'br_permission_matrix';
+    public const APP_ID = AppId::VALUE;
 
     public function __construct(array $urlParams = []) {
         parent::__construct(self::APP_ID, $urlParams);
     }
 
     public function register(IRegistrationContext $context): void {
+        $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
+        $context->registerEventListener(RegisterPersonalDataProvidersEvent::class, PermissionMatrixPersonalDataProviderListener::class);
+        $context->registerEventListener(RegisterRetentionProvidersEvent::class, PermissionMatrixRetentionProviderListener::class);
         $context->registerServiceAlias(NativeSharingSourceInterface::class, NextcloudSharingSource::class);
     }
 

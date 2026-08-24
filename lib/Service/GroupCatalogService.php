@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
 /**
  * Erzeugt eine historische, verlustfreie Präsentationssicht auf rohe Nextcloud-Gruppen.

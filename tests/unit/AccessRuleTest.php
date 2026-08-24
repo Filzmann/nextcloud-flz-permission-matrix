@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
+use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
+use OCA\FilzmannPermissionMatrix\Model\AccessRule;
 
 $rule = new AccessRule(
     'team.coordinate',

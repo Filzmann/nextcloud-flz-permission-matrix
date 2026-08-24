@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
-use OCA\BrPermissionMatrix\Model\Snapshot;
-use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\ExportService;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
+use OCA\FilzmannPermissionMatrix\Model\AccessRule;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Exception\ExportFormatNotAllowedException;
+use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FilzmannPermissionMatrix\Service\ExportService;
 
 class ExportTestConfig extends ConfigService {
     public function __construct(private array $formats, private bool $redact = true) {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\Db\AuditLogMapper;
+use OCA\FilzmannPermissionMatrix\Db\AuditLogMapper;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -34,7 +34,7 @@ class AuditLogService {
             $this->mapper->insert($uid, $action, $exportGenerated, $snapshotId, $safeDetails);
         } catch (\Throwable $e) {
             $this->logger->warning('Permission matrix audit log write failed', [
-                'app' => 'br_permission_matrix',
+                'app' => 'filzmann_permission_matrix',
                 'action' => $action,
                 'exception' => $e,
             ]);

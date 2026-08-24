@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
 /**
  * Zweck: Trennt tatsaechlich implementierte Detailadapter vom fachlich geforderten Mindestumfang.
@@ -20,7 +20,7 @@ class AdapterCatalogService {
         'files_accesscontrol',
         'groupfolders',
         'files_groupfolders',
-        'br_permission_matrix',
+        'filzmann_permission_matrix',
     ];
 
     private const MINIMUM_TARGET_APP_IDS = [

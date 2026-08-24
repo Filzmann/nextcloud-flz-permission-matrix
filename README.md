@@ -1,12 +1,38 @@
 # Berechtigungsmatrix
 
-Nextcloud-App `br_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
+Nextcloud-App `filzmann_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
 
 ## Zweck
 
 Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und globale Files-/Sharing-/Admin-Policies. Optional liest sie konkrete native Nextcloud-Gruppenfreigaben mit ihren Datei- und Ordnerrechten. Sie erzeugt Snapshots, vergleicht diese gegen eine Baseline und exportiert die Matrix als JSON, CSV, Markdown oder HTML.
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
+
+## Art.-15-Selbstauskunft
+
+Ist die eigenständige App `filzmann_data_protection` kompatibel aktiviert,
+registriert die Permission-Matrix lazy einen öffentlichen V1-Provider. Die
+Auskunft ist serverseitig an die angemeldete Nextcloud-UID gebunden und
+enthält ausschließlich eigene:
+
+- Snapshot-Erstellungsbezüge mit neutralen Kennzahlen;
+- Exportmetadaten ohne freien Dateinamen oder Exportinhalt;
+- Auditaktionen ohne freie Auditdetails.
+
+Snapshotinhalte, Benutzerlisten und Angaben anderer Personen werden nicht
+übergeben. Die drei app-eigenen Tabellen werden read-only mit gebundenen
+QueryBuilder-Parametern abgefragt. Opaque, providergebundene Cursor begrenzen
+große Antworten. Fehlt oder ist das Datenschutz-Center deaktiviert, startet
+die Permission-Matrix weiterhin ohne Auskunftsintegration.
+
+Für Exportmetadaten und Auditprotokolle gelten getrennt konfigurierbare
+Prüffristen von standardmäßig jeweils 180 Tagen. Die Art.-15-Auskunft weist
+nach Fristablauf `REVIEW erforderlich` aus. Das ist bewusst nur ein
+Prüfhinweis: Der aktuelle Stand löscht keine Datensätze automatisch.
+Zusätzlich registriert die App lazy einen öffentlichen V1-Preview-Provider
+beim Datenschutz-Center. Er meldet fällige technische Referenzen ohne UIDs,
+freie Dateinamen, Auditdetails oder Inhalte. Der Vertrag besitzt keinen
+Ausführungspfad.
 
 ## Gruppenfamilien
 
@@ -39,8 +65,8 @@ Konfigurationsänderungen deuten vorhandene Snapshots nicht neu.
 Die App wird in der gemeinsamen DDEV-Nextcloud per Mount eingebunden:
 
 ```text
-<WORKSPACE-ROOT>/br_permission_matrix
--> /var/www/html/html/custom_apps/br_permission_matrix
+<WORKSPACE-ROOT>/filzmann_permission_matrix
+-> /var/www/html/html/custom_apps/filzmann_permission_matrix
 ```
 
 Aktivieren:
@@ -48,9 +74,9 @@ Aktivieren:
 Aus dem dokumentierten `nextcloud-dev`-Root:
 
 ```bash
-ddev exec -d /var/www/html/html php occ app:enable br_permission_matrix
+ddev exec -d /var/www/html/html php occ app:enable filzmann_permission_matrix
 ddev exec -d /var/www/html/html php occ status
-ddev exec -d /var/www/html/html php occ app:list | grep -i br_permission_matrix
+ddev exec -d /var/www/html/html php occ app:list | grep -i filzmann_permission_matrix
 ```
 
 Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-Befehl. Migrationen laufen beim Aktivieren der App oder ueber `occ upgrade`, falls `occ status` einen DB-Upgrade-Bedarf meldet.
@@ -59,8 +85,11 @@ Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-B
 
 Admin-Einstellungen:
 
-- `viewer_groups`: Gruppen mit Matrix-/Export-Zugriff.
-- `admin_groups`: Gruppen mit Konfigurations-, Scan- und Baseline-Rechten.
+- `viewer_groups`: frei anpassbare Gruppen mit Matrix-/Export-Zugriff. Als
+  Ausgangsbeispiele dienen `Betriebsrat`, `IKT-Ausschuss`,
+  `Datenschutzbeauftragte` und `IT-Administration`.
+- `admin_groups`: frei anpassbare Gruppen mit Konfigurations-, Scan- und
+  Baseline-Rechten; Ausgangsbeispiel ist `IT-Administration`.
 - `scan_interval`: `hourly`, `daily` oder `weekly`.
 - `baseline_snapshot`: aktuell genehmigter Positivlistenstand.
 - `strict_mode`: neue/erweiterte Rechte werden strenger als nicht freigegeben bewertet.
@@ -69,11 +98,25 @@ Admin-Einstellungen:
 - `include_share_metadata`: Standard `false`.
 - `export_formats`: serverseitig erlaubte Exportformate aus `md,csv,json,html`.
 - `retention`: Anzahl aufzubewahrender Snapshots.
+- `export_metadata_retention_days`: Prüffrist für Exportmetadaten in Tagen,
+  Standard `180`, zulässig `1` bis `3650`.
+- `audit_retention_days`: Prüffrist für Auditprotokolle in Tagen, Standard
+  `180`, zulässig `1` bis `3650`.
 
 Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
 Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
 Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
 Konfigurationsschlüssel geändert wird.
+
+Im Normalfall sollte die zuständige Beschäftigtenvertretung die Matrix lesen
+können. In Betrieben ist dies häufig der Betriebsrat, in Dienststellen der
+Personalrat; die Beispielgruppe `Betriebsrat` kann vollständig durch die real
+vorhandene Gruppe, etwa `Personalrat`, ersetzt werden. Ein IKT-Ausschuss und
+Datenschutzbeauftragte benötigen typischerweise Leserechte für technische
+Prüfung beziehungsweise datenschutzrechtliche Beratung, aber keine
+Konfigurations-, Scan- oder Baseline-Rechte. Diese administrativen Rechte
+sollten auf eine kleine zuständige Gruppe wie `IT-Administration` und native
+Nextcloud-Administratoren begrenzt bleiben.
 
 ### Native Nextcloud-Gruppenfreigaben
 

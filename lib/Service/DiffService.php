@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FilzmannPermissionMatrix\Model\Snapshot;
 
 /**
  * Zweck: Vergleicht Matrixzeilen mit einer freigegebenen Baseline und leitet Status sowie Diffs ab.

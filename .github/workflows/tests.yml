@@ -36,7 +36,7 @@ jobs:
           else
             echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
-      - name: LocalBase-Testhilfe auschecken
+      - name: Coverage-Tooling auschecken
         uses: actions/checkout@v7
         with:
           repository: Filzmann/nextcloud-localbase
@@ -63,7 +63,7 @@ jobs:
           PHP_COVERAGE_COMMAND="$GITHUB_WORKSPACE/localbase/tests/coverage/vendor/bin/phpcov" \
           PHP_COVERAGE_OUTPUT_DIR="$RUNNER_TEMP/php-coverage" \
           php tests/run.php
-          php "$GITHUB_WORKSPACE/localbase/tests/coverage/merge-clover.php" br_permission_matrix "$RUNNER_TEMP/php-coverage" 47.13
+          php "$GITHUB_WORKSPACE/localbase/tests/coverage/merge-clover.php" filzmann_permission_matrix "$RUNNER_TEMP/php-coverage" 47.13
 
   javascript:
     name: JavaScript
@@ -84,7 +84,7 @@ jobs:
           else
             echo "ref=main" >> "$GITHUB_OUTPUT"
           fi
-      - name: LocalBase-Testhilfe auschecken
+      - name: Coverage-Tooling auschecken
         uses: actions/checkout@v7
         with:
           repository: Filzmann/nextcloud-localbase
@@ -113,5 +113,5 @@ jobs:
     needs: [php, javascript]
     uses: Filzmann/br-nextcloud-apps/.github/workflows/deploy-staging.yml@main
     with:
-      app-id: br_permission_matrix
+      app-id: filzmann_permission_matrix
     secrets: inherit

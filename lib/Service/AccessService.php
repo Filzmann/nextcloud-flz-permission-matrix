@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
+use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 

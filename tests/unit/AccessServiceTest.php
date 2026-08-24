@@ -18,9 +18,9 @@ namespace OCP {
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
-    use OCA\BrPermissionMatrix\Service\AccessService;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
+    use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
+    use OCA\FilzmannPermissionMatrix\Service\AccessService;
+    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
     use OCP\IGroupManager;
     use OCP\IUser;
     use OCP\IUserSession;

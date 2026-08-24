@@ -19,15 +19,15 @@ namespace OCP {
     }
 }
 
-namespace OCA\BrPermissionMatrix\AppInfo {
+namespace OCA\FilzmannPermissionMatrix\AppInfo {
     final class Application {
-        public const APP_ID = 'br_permission_matrix';
+        public const APP_ID = 'filzmann_permission_matrix';
     }
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
+    use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
+    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
     use OCP\IAppConfig;
     use OCP\IGroupManager;
 
@@ -82,6 +82,26 @@ namespace {
         }
     }
 
+    $defaultService = new ConfigService(new ConfigTestAppConfig(), new ConfigTestGroups([]));
+    assertSameValue(
+        ['Betriebsrat', 'Datenschutzbeauftragte', 'IKT-Ausschuss', 'IT-Administration'],
+        $defaultService->viewerGroups(),
+        'The configurable viewer examples should cover employee representation, privacy and IKT governance.'
+    );
+    assertSameValue(180, $defaultService->exportMetadataRetentionDays(), 'Export metadata should default to a 180-day review period.');
+    assertSameValue(180, $defaultService->auditRetentionDays(), 'Audit records should default to a 180-day review period.');
+
+    $personalratStore = new ConfigTestAppConfig();
+    $personalratService = new ConfigService($personalratStore, new ConfigTestGroups(['Personalrat', 'IT-Administration']));
+    $personalratConfig = $personalratService->save([
+        'viewer_groups' => ['Personalrat'],
+        'admin_groups' => ['IT-Administration'],
+        'scan_interval' => 'daily',
+        'export_formats' => 'md',
+        'retention' => '50',
+    ]);
+    assertSameValue(['Personalrat'], $personalratConfig['viewer_groups'], 'A Personalrat must be configurable instead of a Betriebsrat.');
+
     $store = new ConfigTestAppConfig();
     $service = new ConfigService($store, new ConfigTestGroups(['Matrix-Viewer', 'Matrix-Admin']));
     $saved = $service->save([
@@ -94,11 +114,15 @@ namespace {
         'include_share_metadata' => '0',
         'export_formats' => 'HTML,md',
         'retention' => '75',
+        'export_metadata_retention_days' => '120',
+        'audit_retention_days' => '240',
     ]);
 
     assertSameValue(['Matrix-Viewer'], $saved['viewer_groups'], 'Known viewer groups should be normalized and saved.');
     assertSameValue(['html', 'md'], $saved['export_formats'], 'Valid export formats should be normalized.');
     assertSameValue(75, $saved['retention'], 'Valid retention should be persisted as an integer.');
+    assertSameValue(120, $saved['export_metadata_retention_days'], 'The export review period should be independently configurable.');
+    assertSameValue(240, $saved['audit_retention_days'], 'The audit review period should be independently configurable.');
 
     $store->writes = [];
     try {
@@ -120,6 +144,10 @@ namespace {
         ['export_formats' => 'md,pdf'],
         ['retention' => '501'],
         ['retention' => '7.5'],
+        ['export_metadata_retention_days' => '0'],
+        ['export_metadata_retention_days' => '3651'],
+        ['audit_retention_days' => '7.5'],
+        ['audit_retention_days' => '3651'],
     ] as $invalid) {
         try {
             $service->save(array_merge([
@@ -128,6 +156,8 @@ namespace {
                 'scan_interval' => 'daily',
                 'export_formats' => 'md',
                 'retention' => '50',
+                'export_metadata_retention_days' => '180',
+                'audit_retention_days' => '180',
             ], $invalid));
             throw new RuntimeException('Each invalid configuration boundary must be rejected.');
         } catch (ConfigValidationException) {

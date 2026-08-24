@@ -19,14 +19,14 @@ namespace {
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Db\SnapshotMapper;
-    use OCA\BrPermissionMatrix\Model\MatrixRow;
-    use OCA\BrPermissionMatrix\Service\BaselineService;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
-    use OCA\BrPermissionMatrix\Service\DiffService;
-    use OCA\BrPermissionMatrix\Service\InventoryService;
-    use OCA\BrPermissionMatrix\Service\MatrixBuilder;
-    use OCA\BrPermissionMatrix\Service\ScannerService;
+    use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
+    use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+    use OCA\FilzmannPermissionMatrix\Service\BaselineService;
+    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+    use OCA\FilzmannPermissionMatrix\Service\DiffService;
+    use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+    use OCA\FilzmannPermissionMatrix\Service\MatrixBuilder;
+    use OCA\FilzmannPermissionMatrix\Service\ScannerService;
     use Psr\Log\LoggerInterface;
 
     class ScannerFakeMatrixBuilder extends MatrixBuilder {
@@ -85,7 +85,7 @@ namespace {
         public function __construct() {
         }
 
-        public function currentBaseline(): ?\OCA\BrPermissionMatrix\Model\Snapshot {
+        public function currentBaseline(): ?\OCA\FilzmannPermissionMatrix\Model\Snapshot {
             return null;
         }
     }

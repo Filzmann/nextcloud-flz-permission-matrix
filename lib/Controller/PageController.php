@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Controller;
+namespace OCA\FilzmannPermissionMatrix\Controller;
 
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Service\AccessService;
-use OCA\BrPermissionMatrix\Service\AuditLogService;
+use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+use OCA\FilzmannPermissionMatrix\Service\AccessService;
+use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

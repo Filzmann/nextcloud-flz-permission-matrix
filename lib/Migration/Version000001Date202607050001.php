@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Migration;
+namespace OCA\FilzmannPermissionMatrix\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;

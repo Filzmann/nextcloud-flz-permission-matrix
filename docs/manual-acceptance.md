@@ -36,7 +36,7 @@ Begründung verpflichtend.
 | A3 | Nextcloud-Admin | Dieselben Verwaltungswege mit einem Nextcloud-Admin prüfen. | Der Admin kann die vorgesehenen Funktionen nutzen, ohne einer zusätzlichen Viewer-Gruppe anzugehören. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A4 | Nicht berechtigtes Konto | App, Snapshot, Export und Scan mit einem Konto außerhalb aller erlaubten Gruppen direkt aufrufen. | Alle Wege werden serverseitig verweigert; keine Matrixdaten werden offengelegt und kein Scan gestartet. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A5 | Keine Rechteänderung | Vor und nach Scan, Filterung, Baseline und Export eine vorbereitete Nextcloud-Berechtigung vergleichen. | Die Quellberechtigung bleibt unverändert; die App schreibt ausschließlich ihre eigenen Matrixdaten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A6 | BR-Suite-Navigation | App über den gemeinsamen BR-Einstieg öffnen. | Die Berechtigungsmatrix ist korrekt markiert und besitzt keinen doppelten Haupteinstieg; Menüstatus ersetzt keine Zugriffsprüfung. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A6 | Eigenständige Navigation | App über ihren eigenen Nextcloud-Haupteinstieg öffnen und denselben Pfad mit einem nicht berechtigten Konto direkt aufrufen. | Der Einstieg erscheint nur für berechtigte Konten; der direkte Aufruf bleibt zusätzlich serverseitig geschützt und es gibt keinen OrgSuite-/BR-Einstieg. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## B. Scan und Matrixdarstellung
 
@@ -80,6 +80,7 @@ Begründung verpflichtend.
 | E4 | Tastatur und Fokus | Tabs, Filter, Klappsteuerung, Matrix, Snapshotliste und Adminformular nur mit Tastatur bedienen. | Alle Funktionen sind erreichbar, Fokus ist sichtbar und Status wird nicht ausschließlich farblich vermittelt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E5 | Große Matrix | Viele Apps und Gruppen bei kleinem Fenster anzeigen und in beide Richtungen scrollen. | Matrix und Snapshotliste bleiben innerhalb ihrer Wrapper bedienbar; Kopf- und Kontextinformationen bleiben verständlich. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E6 | Datensparsame Abnahme | Formular, Screenshots, Exporte und Auditbelege prüfen. | Es wurden nur synthetische beziehungsweise redigierte Daten dokumentiert; keine Secrets oder Dateiinhalte sind enthalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| E7 | Datenschutz-REVIEW-Fristen | Für Exportmetadaten und Auditprotokolle unterschiedliche Fristen speichern und die Art.-15-Auskunft mit synthetischen alten Datensätzen öffnen. | Beide Werte bleiben unabhängig erhalten; fällige Datensätze erscheinen als `REVIEW erforderlich`, ohne dass ein Datensatz gelöscht wird. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## Abschlussentscheidung
 

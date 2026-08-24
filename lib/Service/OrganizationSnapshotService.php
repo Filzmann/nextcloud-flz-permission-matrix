@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FilzmannPermissionMatrix\Service;
 
 use OCA\LocalBase\Organization\AdOrganizationSnapshotService;
 use OCP\App\IAppManager;
@@ -43,7 +43,7 @@ class OrganizationSnapshotService {
             );
         } catch (\Throwable $e) {
             $this->logger->warning('Permission matrix organization snapshot unavailable', [
-                'app' => 'br_permission_matrix',
+                'app' => 'filzmann_permission_matrix',
                 'provider' => self::PROVIDER_APP_ID,
                 'exception' => $e,
             ]);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Adapter;
+namespace OCA\FilzmannPermissionMatrix\Adapter;
 
 /**
  * Zweck: Gemeinsamer read-only Vertrag fuer auslesbare Berechtigungsquellen.
