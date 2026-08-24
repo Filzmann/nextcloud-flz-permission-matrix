@@ -139,6 +139,24 @@ Konkrete Pfade sind in der geschützten Matrix sichtbar. Bei
 exportlokale neutrale Platzhalter. Ohne `include_share_metadata` findet keine
 Einzelfreigaben-Abfrage statt.
 
+### Team Folders / Groupfolders
+
+Aktive Team Folders werden über einen eigenen read-only Adapter analysiert.
+Der freigegebene Vertrag gilt derzeit ausschließlich für die offizielle
+Groupfolders-Version 22.x auf Nextcloud 34. Er verwendet
+`FolderManager::getAllFolders()` und übernimmt nur pseudonyme Ordnerreferenzen,
+Nextcloud-Gruppen-IDs, Root-Permission-Masken und das Vorhandensein erweiterter
+ACLs. Mount-Pfade, Datei- und Ordnernamen sowie Dateiinhalte werden weder in
+die Matrix noch in Snapshots oder Exporte übernommen.
+
+Root-Rechte werden getrennt als R/W/C/D/S dargestellt; Ausführen ist `n/a`.
+Sind erweiterte ACLs aktiv, existieren Team-/Circle-Zuordnungen, ist die App-
+Version nicht freigegeben oder weicht der fremde Quellvertrag ab, bleiben die
+beobachtbaren Root-Werte sichtbar, die betroffenen Zeilen und der Adapterstatus
+werden aber fail-closed als `UNKNOWN` beziehungsweise `PARTIAL` markiert. Die
+historische App-ID `files_groupfolders` wird sichtbar erkannt, ohne eine
+Kompatibilität mit der heutigen Runtime-API zu unterstellen.
+
 ### App-eigene Berechtigungen
 
 App-eigene Detailrechte werden nur über einen öffentlichen, versionierten und
@@ -147,6 +165,9 @@ Tabellen oder private Konfiguration anderer Apps werden nicht gelesen und ihre
 Regeln werden nicht in der Matrix nachgebaut. Fehlt ein solcher Vertrag, bleibt
 die native Nextcloud-App-Gruppeneinschränkung sichtbar; die Detailabdeckung wird
 kontrolliert als `UNSUPPORTED` ausgewiesen.
+
+Die oben dokumentierte, versions- und releasegebundene Groupfolders-Quelle ist
+die einzige eng begrenzte Ausnahme von diesem öffentlichen Providerprinzip.
 
 Die Berechtigungsmatrix selbst liest ihre Viewer- und Admin-Gruppen direkt aus
 derselben `ConfigService`-Konfiguration, die der serverseitige `AccessService`
@@ -203,6 +224,18 @@ Schnelle lokale Checks:
 php tests/run.php
 node tests/run-js.mjs
 ```
+
+Vor jedem Release, der den Groupfolders-Adapter enthält, muss zusätzlich ein
+frischer offizieller `stable34`-Checkout geprüft werden:
+
+```bash
+scripts/check-groupfolders-source-compatibility /path/to/nextcloud-groupfolders
+```
+
+Der Check blockiert bei einem anderen Groupfolders-Major, einer anderen
+Nextcloud-Zielversion oder Änderungen an den verwendeten DTOs und Methoden.
+Eine Anpassung des Gates ohne gleichzeitige fachliche Prüfung und Tests des
+Adapters ist unzulässig.
 
 Bei Controller-, DI-, Migration-, Background-Job- oder Nextcloud-Container-Aenderungen zusaetzlich gezielte DDEV-/`occ`-Checks ausfuehren.
 

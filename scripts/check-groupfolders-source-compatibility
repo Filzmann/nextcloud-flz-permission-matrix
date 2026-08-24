@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 /path/to/official/nextcloud-groupfolders-checkout" >&2
+    exit 2
+fi
+
+checkout=$1
+info_file="$checkout/appinfo/info.xml"
+manager_file="$checkout/lib/Folder/FolderManager.php"
+definition_file="$checkout/lib/Folder/FolderDefinition.php"
+folder_dir="$checkout/lib/Folder"
+
+for required_file in "$info_file" "$manager_file" "$definition_file"; do
+    if [[ ! -f "$required_file" ]]; then
+        echo "Groupfolders compatibility check failed: missing ${required_file#"$checkout"/}." >&2
+        exit 1
+    fi
+done
+
+require_pattern() {
+    local file=$1
+    local pattern=$2
+    local label=$3
+    if ! rg --quiet --pcre2 "$pattern" "$file"; then
+        echo "Groupfolders compatibility check failed: $label" >&2
+        exit 1
+    fi
+}
+
+require_pattern "$info_file" '<id>\s*groupfolders\s*</id>' 'unexpected app id.'
+require_pattern "$info_file" '<version>\s*22\.[0-9]+\.[0-9]+(?:[-+][^<]*)?\s*</version>' 'only the reviewed Groupfolders 22.x contract is accepted.'
+require_pattern "$info_file" '<nextcloud\s+min-version="34"\s+max-version="34"\s*/>' 'the reviewed contract must target Nextcloud 34.'
+require_pattern "$manager_file" 'public\s+function\s+getAllFolders\s*\(\s*\)\s*:\s*array' 'FolderManager::getAllFolders() changed or is missing.'
+require_pattern "$manager_file" 'FolderDefinitionWithMappings::fromFolder\s*\(' 'FolderManager no longer builds the reviewed mapping DTO.'
+require_pattern "$definition_file" 'public\s+readonly\s+int\s+\$id\b' 'FolderDefinition::$id is no longer a public readonly int.'
+require_pattern "$definition_file" 'public\s+readonly\s+string\s+\$mountPoint\b' 'FolderDefinition::$mountPoint changed; path exclusion must be re-reviewed.'
+require_pattern "$definition_file" 'public\s+readonly\s+bool\s+\$acl\b' 'FolderDefinition::$acl changed; advanced-permission handling must be re-reviewed.'
+
+mapfile -t mapping_files < <(rg --files-with-matches 'class\s+FolderDefinitionWithMappings\b' "$folder_dir" --glob '*.php')
+if [[ ${#mapping_files[@]} -ne 1 ]]; then
+    echo 'Groupfolders compatibility check failed: the mapping DTO is missing or ambiguous.' >&2
+    exit 1
+fi
+mapping_file=${mapping_files[0]}
+require_pattern "$mapping_file" 'public\s+readonly\s+array\s+\$groups\b' 'FolderDefinitionWithMappings::$groups changed or is no longer directly readable.'
+require_pattern "$mapping_file" 'static\s+function\s+fromFolder\s*\(' 'FolderDefinitionWithMappings::fromFolder() changed or is missing.'
+
+echo 'Groupfolders 22.x / Nextcloud 34 source contract verified.'

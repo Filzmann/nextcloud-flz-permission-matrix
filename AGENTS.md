@@ -59,6 +59,17 @@ Wichtige Pruefungen:
 - Fehlende Tabellen, deaktivierte Apps oder nicht eindeutige Rechtequellen fuehren zu `UNKNOWN` oder `UNSUPPORTED`, nicht zu stillschweigender Freigabe.
 - Fehler werden zentral protokolliert; Logs enthalten keine Secrets, Dateiinhalte oder unnoetigen personenbezogenen Details.
 - Keine Architekturabstraktion wird vorsorglich gebaut. Adapter wachsen anhand konkret auslesbarer Berechtigungsmodelle.
+- Der Groupfolders-Adapter ist eine kontrollierte app-lokale Ausnahme für die
+  fremde OCA-Runtime-API. Freigegeben ist ausschließlich die durch
+  `scripts/check-groupfolders-source-compatibility` belegte 22.x-Struktur auf
+  Nextcloud 34. Vor jedem Release mit diesem Adapter wird ein frischer
+  offizieller Groupfolders-Checkout geprüft. Jede Versions-, DTO- oder
+  Methodenabweichung blockiert die Freigabe und bleibt zur Laufzeit
+  `UNKNOWN`, bis Adapter, Negativtests und Gate bewusst gemeinsam aktualisiert
+  wurden.
+- Der Groupfolders-Adapter übernimmt keine Mount-Pfade, Datei-/Ordnernamen
+  oder Dateiinhalte. Erweiterte ACLs und nicht als Nextcloud-Gruppe
+  abbildbare Team-/Circle-Zuordnungen verhindern eine Vollständigkeitsbehauptung.
 
 ## Zugriff und Sicherheit
 

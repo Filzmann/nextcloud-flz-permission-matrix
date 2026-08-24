@@ -37,7 +37,7 @@ Status: installierte Apps geprüft; öffentliche Providerverträge und appüberg
 
 ### BPM-FOLDER-RIGHTS – Konkrete Ordnerrechte ausweisen
 
-Status: native Nextcloud-Gruppenfreigaben umgesetzt; weitere Adapter offen
+Status: native Nextcloud-Gruppenfreigaben und Groupfolders 22.x umgesetzt; weitere Adapter offen
 
 - Für jeden belastbar auslesbaren konkreten Ordner und jede erfasste Gruppe
   getrennt Lesen, Schreiben beziehungsweise Ändern, Ausführen und Löschen
@@ -64,7 +64,21 @@ Umgesetzt für native Nextcloud-Gruppenfreigaben:
 - Standardmäßig deaktivierte Einzelfreigaben-Erfassung und pfadredigierte
   JSON-/CSV-/Markdown-/HTML-Exporte einschließlich Diffangaben.
 
-Offen bleiben Group Folders, Files Access Control und externe Speicher. Sie
+Umgesetzt für Groupfolders 22.x auf Nextcloud 34:
+
+- Versionsgebundene read-only Projektion der Root-Rechte aus dem offiziellen
+  `FolderManager`, ohne fremde Tabellen, Reflection oder Schreibzugriff.
+- Ausschluss von Mount-Pfaden, Datei-/Ordnernamen und Dateiinhalten;
+  persistiert werden nur pseudonyme Ordnerreferenzen, Gruppen-IDs,
+  Permission-Masken und der kontrollierte Vollständigkeitsstatus.
+- Sichtbarer `UNKNOWN`-Fallback für abweichende Versionen, die historische
+  App-ID, Team-/Circle-Zuordnungen, erweiterte ACLs und Vertragsfehler.
+- Verbindlicher Release-Check gegen einen frischen offiziellen
+  Groupfolders-Checkout, damit Änderungen der fremden Vorgehensweise nicht
+  stillschweigend übernommen werden.
+
+Offen bleiben die vollständige Abbildung erweiterter Groupfolders-ACLs,
+Files Access Control und externe Speicher. Sie
 werden nicht aus internen App-Klassen oder fremden Tabellen gelesen.
 
 ## Zukunftsplanung – nicht freigegeben
@@ -97,7 +111,7 @@ Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
 
 ## Geplante Erweiterungen
 
-- Konkrete Team- und Group-Folder-Rechte sowie externe Speicherrechte.
+- Erweiterte Team-Folder-ACLs sowie externe Speicherrechte.
 - Files-Access-Control-Regelgruppen.
 - App-spezifische Detailadapter für Deck, Collectives, Tables, Talk,
   Calendar, Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und
