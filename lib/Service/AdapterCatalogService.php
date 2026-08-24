@@ -12,6 +12,8 @@ namespace OCA\FilzmannPermissionMatrix\Service;
  *   sichtbar als UNSUPPORTED statt versehentlich als freigegeben zu markieren.
  */
 class AdapterCatalogService {
+    public function __construct(private PermissionProviderSourceInterface $providers) {}
+
     private const IMPLEMENTED_APP_IDS = [
         'core',
         'files',
@@ -49,7 +51,7 @@ class AdapterCatalogService {
     ];
 
     public function hasImplementedAdapter(string $appId): bool {
-        return in_array($appId, self::IMPLEMENTED_APP_IDS, true);
+        return in_array($appId, self::IMPLEMENTED_APP_IDS, true) || $this->providers->hasProvider($appId);
     }
 
     public function isMinimumTarget(string $appId): bool {
@@ -57,7 +59,7 @@ class AdapterCatalogService {
     }
 
     public function implementedAppIds(): array {
-        return self::IMPLEMENTED_APP_IDS;
+        return array_values(array_unique([...self::IMPLEMENTED_APP_IDS, ...array_keys($this->providers->providers())]));
     }
 
     public function minimumTargetAppIds(): array {

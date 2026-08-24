@@ -11,6 +11,7 @@ use OCA\FilzmannPermissionMatrix\Adapter\FilesAdapter;
 use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
 use OCA\FilzmannPermissionMatrix\Adapter\GroupFoldersAdapter;
 use OCA\FilzmannPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
+use OCA\FilzmannPermissionMatrix\Adapter\PermissionProviderAdapter;
 use OCA\FilzmannPermissionMatrix\Adapter\SharingAdapter;
 
 /**
@@ -31,6 +32,7 @@ class MatrixBuilder {
         private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
         private PermissionMatrixAccessAdapter $permissionMatrixAccess,
+        private PermissionProviderAdapter $permissionProviders,
         private GroupCatalogService $groupCatalog,
         private OrganizationSnapshotService $organization
     ) {
@@ -43,7 +45,8 @@ class MatrixBuilder {
             ->merge($this->files->collect())
             ->merge($this->sharing->collect())
             ->merge($this->groupFolders->collect())
-            ->merge($this->filesAccessControl->collect());
+            ->merge($this->filesAccessControl->collect())
+            ->merge($this->permissionProviders->collect());
         $result = $result->merge($this->permissionMatrixAccess->collect());
 
         $groups = $this->inventory->groups();

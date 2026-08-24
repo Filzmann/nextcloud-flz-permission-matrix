@@ -12,7 +12,7 @@ ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
 
 ### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
 
-Status: installierte Apps geprüft; öffentliche Providerverträge und appübergreifende Umsetzung noch ausstehend
+Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; Provider der AD-/BR-Apps im Rollout
 
 - Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
   Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
@@ -31,9 +31,11 @@ Status: installierte Apps geprüft; öffentliche Providerverträge und appüberg
   verfügbar; ohne Einschränkung steht die App vollständig allen
   Nextcloud-Benutzern zur Verfügung und wird für alle erfassten Gruppen als
   nutzbar ausgewiesen.
-- Provider-/Consumer-Vertrag, Versionierung, Fehlerfälle sowie positive und
-  negative Berechtigungsfälle werden vor der ersten appübergreifenden
-  Umsetzung gemeinsam festgelegt und getestet.
+- Der V1-Vertrag unterscheidet Gruppen-, kombinierte Gruppen-, Selbst-,
+  Anmelde- und Nextcloud-Admin-Bedingungen. Fehlerhafte, inkompatible,
+  mehrdeutige oder unvollständige Provider werden fail-closed als `UNKNOWN`
+  beziehungsweise `UNSUPPORTED` sichtbar; der Consumervertrag ist positiv und
+  negativ getestet.
 
 ### BPM-FOLDER-RIGHTS – Konkrete Ordnerrechte ausweisen
 

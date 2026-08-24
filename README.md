@@ -166,6 +166,17 @@ Regeln werden nicht in der Matrix nachgebaut. Fehlt ein solcher Vertrag, bleibt
 die native Nextcloud-App-Gruppeneinschränkung sichtbar; die Detailabdeckung wird
 kontrolliert als `UNSUPPORTED` ausgewiesen.
 
+Der öffentliche Vertrag liegt unter
+`OCA\FilzmannPermissionMatrix\PublicApi\V1`. Provider registrieren sich lazy am
+`RegisterPermissionProvidersEvent` und liefern ausschließlich Regeln aus ihrer
+eigenen kanonischen Berechtigungslogik. V1 unterscheidet Gruppenbedingungen
+(`group`, `all`, `any`) ausdrücklich von `self`, `authenticated` und
+`nextcloud-admin`. Nicht gruppenbezogene Bedingungen werden in Gruppenzellen als
+`n/a`, aber in der maschinenlesbaren Zugriffsregel vollständig ausgewiesen.
+Gekoppelte Gruppenbedingungen erscheinen als `AND`, nicht als mehrere
+unabhängige Freigaben. Details und ein Integrationsbeispiel stehen in
+[`docs/permission-provider-v1.md`](docs/permission-provider-v1.md).
+
 Die oben dokumentierte, versions- und releasegebundene Groupfolders-Quelle ist
 die einzige eng begrenzte Ausnahme von diesem öffentlichen Providerprinzip.
 

@@ -22,6 +22,8 @@ namespace {
     use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
     use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
     use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FilzmannPermissionMatrix\Service\NextcloudPermissionProviderSource;
+    use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
     use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
     $context = new class implements IRegistrationContext {
@@ -53,6 +55,11 @@ namespace {
         NextcloudGroupFoldersManagerProvider::class,
         $context->aliases[GroupFoldersManagerProviderInterface::class] ?? null,
         'The optional foreign runtime service must be resolved lazily behind an app-local boundary.'
+    );
+    assertSameValue(
+        NextcloudPermissionProviderSource::class,
+        $context->aliases[PermissionProviderSourceInterface::class] ?? null,
+        'The optional V1 permission provider event must be discovered through one cached source.'
     );
     assertSameValue(
         \OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener::class,

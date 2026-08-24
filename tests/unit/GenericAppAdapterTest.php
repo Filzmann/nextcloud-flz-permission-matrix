@@ -5,6 +5,7 @@ declare(strict_types=1);
 use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
 use OCA\FilzmannPermissionMatrix\Service\AdapterCatalogService;
 use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
 
 class GenericAdapterFakeInventory extends InventoryService {
     public function __construct() {
@@ -56,7 +57,12 @@ class GenericAdapterFakeInventory extends InventoryService {
     }
 }
 
-$result = (new GenericAppAdapter(new GenericAdapterFakeInventory(), new AdapterCatalogService()))->collect();
+$emptyProviders = new class implements PermissionProviderSourceInterface {
+    public function providers(): array { return []; }
+    public function registrationFailures(): array { return []; }
+    public function hasProvider(string $appId): bool { return false; }
+};
+$result = (new GenericAppAdapter(new GenericAdapterFakeInventory(), new AdapterCatalogService($emptyProviders)))->collect();
 $rows = $result->rows();
 
 assertSameValue(4, count($rows), 'generic adapter should create one app availability row per app');

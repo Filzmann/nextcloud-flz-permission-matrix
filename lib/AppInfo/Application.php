@@ -13,6 +13,8 @@ use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
 use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
 use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
 use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
+use OCA\FilzmannPermissionMatrix\Service\NextcloudPermissionProviderSource;
+use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
 use OCP\AppFramework\App;
@@ -35,6 +37,7 @@ class Application extends App implements IBootstrap {
         $context->registerServiceAlias(NativeSharingSourceInterface::class, NextcloudSharingSource::class);
         $context->registerServiceAlias(GroupFoldersSourceInterface::class, NextcloudGroupFoldersSource::class);
         $context->registerServiceAlias(GroupFoldersManagerProviderInterface::class, NextcloudGroupFoldersManagerProvider::class);
+        $context->registerServiceAlias(PermissionProviderSourceInterface::class, NextcloudPermissionProviderSource::class);
     }
 
     public function boot(IBootContext $context): void {
