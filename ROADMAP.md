@@ -51,6 +51,43 @@ gegen die echten V1-Klassen geprüft
   Nichtanwendbarkeit aus ihrem Zweck begründet und bei Scopeänderungen neu
   geprüft.
 
+### BPM-NEXTCLOUD-NATIVE-PERMISSIONS – Files, Calendar und App-Verfügbarkeit
+
+Status: App-Verfügbarkeit sowie native Gruppenfreigaben und Groupfolders-
+Rootrechte umgesetzt; weitere Files-Quellen und Calendar-Details offen
+
+- Für jede aktivierte App bleibt die native App-Verfügbarkeit eine eigene
+  Rechtequelle, getrennt von ihrer Detailabdeckung. Eine leere Gruppenbeschränkung
+  bedeutet nach `OCP\App\IAppManager::getAppRestriction()`, dass die App nicht
+  auf Gruppen begrenzt ist und deshalb für jede erfasste Gruppe als aktiviert
+  ausgewiesen wird. Bei einer ausdrücklichen
+  Beschränkung erhalten nur die genannten Gruppen `X`; eine nicht belastbar
+  lesbare Beschränkung bleibt `UNKNOWN`.
+- `UNSUPPORTED` oder `PARTIAL` bei App-Details dürfen eine bekannte globale
+  App-Verfügbarkeit nicht verdecken. Umgekehrt darf bloße App-Verfügbarkeit
+  keine anwendungsspezifischen Lese-, Schreib-, Verwaltungs- oder
+  Freigaberechte vortäuschen.
+- Files wird als Zusammenspiel getrennter Quellen bewertet: native
+  Gruppenfreigaben, Groupfolders, Files Access Control, externe Speicher und
+  weitere offizielle öffentliche Files-Verträge. Dateiinhalte bleiben ausgeschlossen.
+  Pfade, Personenbezüge und Share-Metadaten folgen weiterhin
+  den dokumentierten Opt-in- und Redaktionsgrenzen.
+- Calendar wird nach der App-Verfügbarkeit als vorrangige native
+  Detailquelle untersucht. `OCP\Calendar\IManager` und die öffentlichen
+  `OCP\Calendar\ICalendar`-Verträge dürfen effektive Rechte eines konkret
+  bestimmten Principals liefern. Sie belegen ohne zusätzliche öffentliche
+  Quelle jedoch keine vollständige globale Zuordnung aller Calendar-Shares
+  zu Nextcloud-Gruppen.
+- Vor dem Calendar-Adapter werden deshalb Scan-Scope, Principal-Auswahl,
+  Eigentümer-, Share- und Public-Link-Semantik sowie die Vollständigkeitsgrenze
+  ausdrücklich festgelegt. Kalender- und Termininhalte bleiben ausgeschlossen.
+  Bis dahin sind Calendar-Details sichtbar `UNSUPPORTED`; private
+  `OCA\DAV`-Backends, DAV-Tabellen oder Reflection sind kein Ersatz.
+- Native Nextcloud-Apps, insbesondere Files und Calendar, werden vor
+  beliebigen weiteren Fremd-App-Detailadaptern priorisiert. Jede konkrete
+  Umsetzung bleibt an öffentliche APIs, Negativtests und eine ehrliche
+  Coverage-Angabe gebunden.
+
 ### BPM-THIRD-PARTY-COVERAGE – Fremd-App-Coverage getrennt bewerten
 
 Status: read-only Analyse als nächste Etappe vorgemerkt; Adapter und
@@ -161,9 +198,10 @@ Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
 
 - Erweiterte Team-Folder-ACLs sowie externe Speicherrechte.
 - Files-Access-Control-Regelgruppen.
-- App-spezifische Detailadapter für Deck, Collectives, Tables, Talk,
-  Calendar, Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und
-  Two-Factor.
+- Calendar-Detailadapter nach Klärung der gruppenbezogenen öffentlichen
+  Coverage-Grenze.
+- Danach app-spezifische Detailadapter für Deck, Collectives, Tables, Talk,
+  Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und Two-Factor.
 - XLSX- und PDF-Export nach geklärtem Datenschutz- und
   Dokumenterzeugungsvertrag.
 

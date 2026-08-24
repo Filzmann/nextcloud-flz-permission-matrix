@@ -8,6 +8,13 @@ Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und globale 
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
 
+Die App-Verfügbarkeit ist davon getrennt: Liefert Nextcloud für eine
+aktivierte App keine Gruppenbeschränkung, zeigt die Matrix diese App für jede
+erfasste Gruppe als aktiviert an. Eine vorhandene Beschränkung aktiviert sie
+nur für die darin genannten Gruppen. Dieser Befund beschreibt ausschließlich
+den Zugang zur App; fehlende Detailadapter bleiben unabhängig davon
+`UNSUPPORTED` und werden nicht zu vermuteten Fachrechten aufgewertet.
+
 ## Art.-15-Selbstauskunft
 
 Ist die eigenständige App `filzmann_data_protection` kompatibel aktiviert,
@@ -156,6 +163,23 @@ beobachtbaren Root-Werte sichtbar, die betroffenen Zeilen und der Adapterstatus
 werden aber fail-closed als `UNKNOWN` beziehungsweise `PARTIAL` markiert. Die
 historische App-ID `files_groupfolders` wird sichtbar erkannt, ohne eine
 Kompatibilität mit der heutigen Runtime-API zu unterstellen.
+
+### Native Files- und Calendar-Berechtigungen
+
+Files wird aus mehreren getrennten Quellen zusammengesetzt. Native
+Gruppenfreigaben und die freigegebene Groupfolders-Projektion sind bereits
+auslesbar. Files Access Control und externe Speicher bleiben unvollständig und
+werden nicht aus internen Tabellen oder Klassen rekonstruiert. Dateiinhalte
+bleiben ausgeschlossen; für Pfade und Share-Metadaten gelten weiterhin die
+Opt-in- und Redaktionsregeln.
+
+Für Calendar ist die App-Verfügbarkeit bereits sichtbar. Die öffentlichen
+`OCP\Calendar\IManager`- und `OCP\Calendar\ICalendar`-Schnittstellen können
+effektive Rechte für einen bestimmten Principal liefern, stellen aber allein
+keine vollständige globale Gruppenfreigaben-Inventur bereit. Bis Scan-Scope
+und Vollständigkeitsgrenze festgelegt sind, bleiben Calendar-Details deshalb
+`UNSUPPORTED`. Kalender- und Termininhalte werden nicht gelesen; private
+DAV-Backends und DAV-Tabellen dienen nicht als Fallback.
 
 ### App-eigene Berechtigungen
 

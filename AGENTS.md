@@ -57,6 +57,16 @@ Wichtige Pruefungen:
 - Services arbeiten bevorzugt mit kleinen DTOs/Value Objects statt unstrukturierten Arrays, sobald Daten mehrere Schichten durchlaufen.
 - Modelle/DTOs verwenden `get(...)` fuer Einzelobjekte, `get_all([...])` fuer Listen, `toArray()` fuer Serialisierung und kein `save()`, sofern sie nicht selbst persistieren.
 - Fehlende Tabellen, deaktivierte Apps oder nicht eindeutige Rechtequellen fuehren zu `UNKNOWN` oder `UNSUPPORTED`, nicht zu stillschweigender Freigabe.
+- Die native App-Verfügbarkeit und die fachliche Detailabdeckung bleiben
+  getrennt. Eine aktivierte App ohne Gruppenbeschränkung aus dem öffentlichen
+  `OCP\App\IAppManager` gilt für jede erfasste Gruppe als verfügbar; eine
+  Einschränkung gilt nur für die ausdrücklich genannten Gruppen. Fehlende
+  Detailadapter verändern diesen Befund nicht und bleiben separat
+  `UNSUPPORTED`.
+- Nextcloud-eigene Apps, insbesondere Files und Calendar, werden als eigene
+  priorisierte Rechtequellen behandelt. Adapter verwenden ausschließlich
+  öffentliche OCP-Verträge und weisen deren Coverage-Grenzen aus; private
+  DAV-Backends, DAV-Tabellen oder vermutete Defaults sind unzulässig.
 - Fehler werden zentral protokolliert; Logs enthalten keine Secrets, Dateiinhalte oder unnoetigen personenbezogenen Details.
 - Keine Architekturabstraktion wird vorsorglich gebaut. Adapter wachsen anhand konkret auslesbarer Berechtigungsmodelle.
 - Der Groupfolders-Adapter ist eine kontrollierte app-lokale Ausnahme für die
