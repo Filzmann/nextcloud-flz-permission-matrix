@@ -45,6 +45,20 @@ $config = $_['config'];
             Snapshot-Retention
             <input type="number" min="1" max="500" name="retention" value="<?php p((string)$config['retention']); ?>">
         </label>
+        <fieldset>
+            <legend>Datenschutz-REVIEW</legend>
+            <label>
+                Aufbewahrungsfrist für Exportmetadaten in Tagen
+                <input type="number" min="1" max="3650" name="export_metadata_retention_days" value="<?php p((string)$config['export_metadata_retention_days']); ?>" aria-describedby="pm-retention-review-help">
+            </label>
+            <label>
+                Aufbewahrungsfrist für Auditprotokolle in Tagen
+                <input type="number" min="1" max="3650" name="audit_retention_days" value="<?php p((string)$config['audit_retention_days']); ?>" aria-describedby="pm-retention-review-help">
+            </label>
+            <p id="pm-retention-review-help">
+                Standard sind jeweils 180 Tage. Nach Fristablauf wird ein REVIEW erforderlich. Keine automatische Löschung.
+            </p>
+        </fieldset>
         <button type="submit">Speichern</button>
     </form>
     <div id="pm-admin-notice" class="pm-notice" role="status" aria-live="polite" aria-atomic="true" hidden></div>

@@ -45,6 +45,16 @@ namespace {
         $context->listeners[\OCP\Navigation\Events\LoadAdditionalEntriesEvent::class] ?? null,
         'The standalone app must register its own native navigation entry.'
     );
+    assertSameValue(
+        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener::class,
+        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class] ?? null,
+        'The app must register its optional V1 privacy provider lazily.'
+    );
+    assertSameValue(
+        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener::class,
+        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class] ?? null,
+        'The app must register its optional V1 retention preview provider lazily.'
+    );
 
     echo 'Application registration tests passed' . PHP_EOL;
 }

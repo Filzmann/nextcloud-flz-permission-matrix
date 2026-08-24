@@ -55,6 +55,8 @@ class ConfigController extends Controller {
                 'include_share_metadata',
                 'export_formats',
                 'retention',
+                'export_metadata_retention_days',
+                'audit_retention_days',
             ]));
             $config = $this->config->save($payload);
             $this->auditLog->record('api.config.save');

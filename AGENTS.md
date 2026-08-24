@@ -69,8 +69,18 @@ Wichtige Pruefungen:
   Betriebsratsgruppe vollständig ersetzen.
 - App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer Nextcloud-Admins oder konfigurierte Admin-Gruppen erlaubt.
 - Alle App-Zugriffe werden mit Zeitpunkt, Benutzer-ID, Aktion, Export-Flag und optionaler Snapshot-ID in eigenen Audit-Tabellen protokolliert.
+- Exportmetadaten und Auditprotokolle besitzen getrennt konfigurierbare
+  REVIEW-Fristen mit jeweils 180 Tagen als Standard. Ein Fristablauf darf
+  ohne gesondert freigegebenes Löschkonzept keine automatische Löschung
+  auslösen.
 - API-Aktionen mit Zustandsaenderung behalten CSRF-Schutz.
 - Exporte enthalten standardmaessig keine Benutzerlisten, keine Share-Metadaten und nur redigierte Pfadangaben.
+- Art.-15-Selbstauskunft wird optional und lazy über den öffentlichen
+  V1-Vertrag von `filzmann_data_protection` registriert. Sie liest nur
+  app-eigene Snapshot-Ersteller-, Export- und Auditbezüge der betroffenen UID.
+  Snapshot-/Exportinhalte, freie Dateinamen, freie Auditdetails und Angaben
+  anderer Personen bleiben ausgeschlossen. Fehlt oder ist die Privacy-App
+  deaktiviert, muss die Permission-Matrix unverändert starten.
 
 ## Tests
 

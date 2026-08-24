@@ -24,7 +24,9 @@
             redact_paths: data.has('redact_paths') ? '1' : '0',
             include_share_metadata: data.has('include_share_metadata') ? '1' : '0',
             export_formats: data.get('export_formats') || 'md,csv,json,html',
-            retention: data.get('retention') || '50'
+            retention: data.get('retention') || '50',
+            export_metadata_retention_days: data.get('export_metadata_retention_days') || '180',
+            audit_retention_days: data.get('audit_retention_days') || '180'
         });
     }
 

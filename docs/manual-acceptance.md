@@ -80,6 +80,7 @@ Begründung verpflichtend.
 | E4 | Tastatur und Fokus | Tabs, Filter, Klappsteuerung, Matrix, Snapshotliste und Adminformular nur mit Tastatur bedienen. | Alle Funktionen sind erreichbar, Fokus ist sichtbar und Status wird nicht ausschließlich farblich vermittelt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E5 | Große Matrix | Viele Apps und Gruppen bei kleinem Fenster anzeigen und in beide Richtungen scrollen. | Matrix und Snapshotliste bleiben innerhalb ihrer Wrapper bedienbar; Kopf- und Kontextinformationen bleiben verständlich. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E6 | Datensparsame Abnahme | Formular, Screenshots, Exporte und Auditbelege prüfen. | Es wurden nur synthetische beziehungsweise redigierte Daten dokumentiert; keine Secrets oder Dateiinhalte sind enthalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| E7 | Datenschutz-REVIEW-Fristen | Für Exportmetadaten und Auditprotokolle unterschiedliche Fristen speichern und die Art.-15-Auskunft mit synthetischen alten Datensätzen öffnen. | Beide Werte bleiben unabhängig erhalten; fällige Datensätze erscheinen als `REVIEW erforderlich`, ohne dass ein Datensatz gelöscht wird. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## Abschlussentscheidung
 

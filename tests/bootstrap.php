@@ -9,6 +9,7 @@ spl_autoload_register(static function(string $class) use ($appRoot, $workspaceRo
     $prefixes = [
         'OCA\\FilzmannPermissionMatrix\\Tests\\' => $appRoot . '/tests/',
         'OCA\\FilzmannPermissionMatrix\\' => $appRoot . '/lib/',
+        'OCA\\FilzmannDataProtection\\' => $appRoot . '/tests/stubs/FilzmannDataProtection/',
         'OCA\\LocalBase\\' => $workspaceRoot . '/localbase/lib/',
     ];
     foreach ($prefixes as $prefix => $directory) {

@@ -8,6 +8,32 @@ Die App scannt aktivierte Apps, Gruppen, App-Gruppenbeschraenkungen und globale 
 
 Nicht eindeutig auslesbare oder noch nicht adaptergestuetzte Berechtigungsmodelle werden als `UNKNOWN` oder `UNSUPPORTED` markiert und gelten nicht als freigegeben.
 
+## Art.-15-Selbstauskunft
+
+Ist die eigenständige App `filzmann_data_protection` kompatibel aktiviert,
+registriert die Permission-Matrix lazy einen öffentlichen V1-Provider. Die
+Auskunft ist serverseitig an die angemeldete Nextcloud-UID gebunden und
+enthält ausschließlich eigene:
+
+- Snapshot-Erstellungsbezüge mit neutralen Kennzahlen;
+- Exportmetadaten ohne freien Dateinamen oder Exportinhalt;
+- Auditaktionen ohne freie Auditdetails.
+
+Snapshotinhalte, Benutzerlisten und Angaben anderer Personen werden nicht
+übergeben. Die drei app-eigenen Tabellen werden read-only mit gebundenen
+QueryBuilder-Parametern abgefragt. Opaque, providergebundene Cursor begrenzen
+große Antworten. Fehlt oder ist das Datenschutz-Center deaktiviert, startet
+die Permission-Matrix weiterhin ohne Auskunftsintegration.
+
+Für Exportmetadaten und Auditprotokolle gelten getrennt konfigurierbare
+Prüffristen von standardmäßig jeweils 180 Tagen. Die Art.-15-Auskunft weist
+nach Fristablauf `REVIEW erforderlich` aus. Das ist bewusst nur ein
+Prüfhinweis: Der aktuelle Stand löscht keine Datensätze automatisch.
+Zusätzlich registriert die App lazy einen öffentlichen V1-Preview-Provider
+beim Datenschutz-Center. Er meldet fällige technische Referenzen ohne UIDs,
+freie Dateinamen, Auditdetails oder Inhalte. Der Vertrag besitzt keinen
+Ausführungspfad.
+
 ## Gruppenfamilien
 
 Die Matrix deutet Rollen und Bereiche ausschließlich über den validierten,
@@ -72,6 +98,10 @@ Admin-Einstellungen:
 - `include_share_metadata`: Standard `false`.
 - `export_formats`: serverseitig erlaubte Exportformate aus `md,csv,json,html`.
 - `retention`: Anzahl aufzubewahrender Snapshots.
+- `export_metadata_retention_days`: Prüffrist für Exportmetadaten in Tagen,
+  Standard `180`, zulässig `1` bis `3650`.
+- `audit_retention_days`: Prüffrist für Auditprotokolle in Tagen, Standard
+  `180`, zulässig `1` bis `3650`.
 
 Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
 Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder

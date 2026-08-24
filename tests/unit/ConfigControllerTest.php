@@ -79,11 +79,13 @@ namespace {
 
     final class ConfigControllerTestConfig extends ConfigService {
         public int $saveCalls = 0;
+        public array $lastPayload = [];
         public function __construct(private bool $valid) {}
         public function save(array $payload): array {
             $this->saveCalls++;
+            $this->lastPayload = $payload;
             if (!$this->valid) throw new ConfigValidationException('Retention muss zwischen 1 und 500 liegen.');
-            return ['retention' => 50];
+            return ['retention' => 50, 'export_metadata_retention_days' => 180, 'audit_retention_days' => 180];
         }
     }
 
@@ -111,7 +113,12 @@ namespace {
     $deniedConfig = new ConfigControllerTestConfig(true);
     $deniedAudit = new ConfigControllerTestAudit();
     $denied = new ConfigController(
-        new ConfigControllerTestRequest(['retention' => '50']),
+        new ConfigControllerTestRequest([
+            'retention' => '50',
+            'export_metadata_retention_days' => '120',
+            'audit_retention_days' => '240',
+            'ignored' => 'must-not-pass',
+        ]),
         new ConfigControllerTestAccess(false),
         $deniedConfig,
         $deniedAudit,
@@ -140,7 +147,12 @@ namespace {
     $allowedConfig = new ConfigControllerTestConfig(true);
     $allowedAudit = new ConfigControllerTestAudit();
     $allowed = new ConfigController(
-        new ConfigControllerTestRequest(['retention' => '50']),
+        new ConfigControllerTestRequest([
+            'retention' => '50',
+            'export_metadata_retention_days' => '120',
+            'audit_retention_days' => '240',
+            'ignored' => 'must-not-pass',
+        ]),
         new ConfigControllerTestAccess(true),
         $allowedConfig,
         $allowedAudit,
@@ -148,6 +160,11 @@ namespace {
     );
     assertSameValue(200, $allowed->save()->getStatus(), 'Authorized valid configuration writes should succeed.');
     assertSameValue(1, $allowedConfig->saveCalls, 'The authorized path should persist exactly once.');
+    assertSameValue([
+        'retention' => '50',
+        'export_metadata_retention_days' => '120',
+        'audit_retention_days' => '240',
+    ], $allowedConfig->lastPayload, 'Only allowlisted retention settings should reach persistence.');
     assertSameValue(['api.config.save'], $allowedAudit->actions, 'Successful writes must be audited.');
 
     echo 'ConfigController tests passed' . PHP_EOL;
