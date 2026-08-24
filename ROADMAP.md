@@ -12,7 +12,9 @@ ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
 
 ### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
 
-Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; Provider der AD-/BR-Apps im Rollout
+Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; Provider aller
+sechs AD-Fachapps und beider BR-Apps implementiert und im Parent gemeinsam
+gegen die echten V1-Klassen geprüft
 
 - Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
   Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
@@ -36,6 +38,39 @@ Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; Provider der AD-/B
   mehrdeutige oder unvollständige Provider werden fail-closed als `UNKNOWN`
   beziehungsweise `UNSUPPORTED` sichtbar; der Consumervertrag ist positiv und
   negativ getestet.
+- Jede eigene App hält ihre Projektion bei jeder relevanten Weiterentwicklung
+  gemeinsam mit der kanonischen Berechtigungslogik aktuell. Neue oder
+  geänderte Rollen, Gruppen, Scopes, Objektgrenzen, Adminausnahmen oder
+  bewusst nicht abbildbare Bedingungen werden im selben Feature im Provider
+  und in dessen Provider-/Consumer-/Negativtests mitgepflegt. Bekannte
+  Vertragsgrenzen bleiben `UNKNOWN` oder `UNSUPPORTED` und werden nie als
+  Freigabe ergänzt.
+- Eine neue eigene App mit Fachberechtigungen liefert den Provider spätestens
+  mit dem ersten betroffenen Feature. Hat sie ausschließlich native
+  Nextcloud-Verfügbarkeit oder keine eigenen Fachrechte, wird die
+  Nichtanwendbarkeit aus ihrem Zweck begründet und bei Scopeänderungen neu
+  geprüft.
+
+### BPM-THIRD-PARTY-COVERAGE – Fremd-App-Coverage getrennt bewerten
+
+Status: read-only Analyse als nächste Etappe vorgemerkt; Adapter und
+Änderungen an fremden Apps nicht freigegeben
+
+- Erst nach der Eigen-App-Abdeckung die tatsächlich aktivierten fremden Apps
+  nach Zweck, Berechtigungsmodell und offizieller öffentlicher Schnittstelle
+  inventarisieren.
+- Öffentliche OCP-, Provider-, Capability- oder dokumentierte Exportverträge
+  bevorzugen und eine Providerunterstützung möglichst beim Upstream-Projekt
+  anregen.
+- Fehlende, inkompatible oder unvollständige Verträge sichtbar als
+  `UNKNOWN` oder `UNSUPPORTED` ausweisen; keine Rechte aus Navigation,
+  UI-Sichtbarkeit, Klassennamen oder vermuteten Defaults ableiten.
+- Einen versionsgebundenen read-only Adapter nur für eine konkret benannte
+  App und Version nach separater Risiko-, Datenschutz-, Update- und
+  Releaseentscheidung umsetzen. Keine fremden Tabellen, Reflection,
+  AppConfig-, Datei-, Volltext- oder Migrator-Fallbacks verwenden.
+- Die eng begrenzte Groupfolders-Ausnahme bleibt releasegebunden und ist kein
+  allgemeiner Präzedenzfall für andere Fremd-Apps.
 
 ### BPM-FOLDER-RIGHTS – Konkrete Ordnerrechte ausweisen
 
@@ -102,6 +137,17 @@ Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
 
 ## Aktueller Fokus
 
+- Als nächste Eigen-App-Lücke den `PermissionProvider` von
+  `filzmann_data_protection` aus dessen kanonischen Reviewer-Gruppen,
+  optionalem Nextcloud-Adminzugang und reinem Admin-Konfigurationsrecht
+  implementieren. Self-Service erteilt darüber hinaus kein fremdes
+  Auskunftsrecht.
+- Für `filzmann_permission_matrix` bleibt der eigene
+  `PermissionMatrixAccessAdapter` die direkte Projektion derselben
+  `ConfigService`, die der serverseitige `AccessService` nutzt; ein
+  Event-Rücklauf der App zu sich selbst ist nicht erforderlich. LocalBase und
+  OrgSuite besitzen im aktuellen Zweck keine eigenen Fachrechte, müssen diese
+  Nichtanwendbarkeit aber bei Scopeänderungen neu bewerten.
 - Die manuellen Prüfungen werden im ausfüllbaren
   [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
 - Den versionierten AD-Organisationsvertrag und seinen kontrollierten
