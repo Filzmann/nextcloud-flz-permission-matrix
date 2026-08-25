@@ -99,6 +99,7 @@ final class PermissionProviderAdapter implements PermissionAdapterInterface {
             'self' => AccessCondition::self(),
             'authenticated' => AccessCondition::authenticated(),
             'nextcloud-admin' => AccessCondition::nextcloudAdmin(),
+            'app-admin-grant' => AccessCondition::temporaryAppAdminGrant(),
         };
     }
 

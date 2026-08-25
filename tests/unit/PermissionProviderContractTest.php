@@ -34,6 +34,11 @@ namespace {
         $condition->toArray(),
         'The public contract must preserve group and non-group actor semantics losslessly.'
     );
+    assertSameValue(
+        ['operator' => 'app-admin-grant'],
+        PermissionCondition::temporaryAppAdminGrant()->toArray(),
+        'A provider must describe the app-local temporary admin grant separately from native Nextcloud administration.',
+    );
 
     $rule = new PermissionRule(
         'Schedule',

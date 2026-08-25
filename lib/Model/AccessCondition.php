@@ -16,7 +16,7 @@ use InvalidArgumentException;
  * Vertrag:
  * - group referenziert genau eine rohe Nextcloud-Gruppen-ID.
  * - all und any enthalten mindestens eine gueltige Kindbedingung; leere Bedingungen sind verboten.
- * - self, authenticated und nextcloud-admin bleiben ausdrueckliche Akteursbedingungen und
+ * - self, authenticated, nextcloud-admin und app-admin-grant bleiben ausdrueckliche Akteursbedingungen und
  *   duerfen von der Gruppenmatrix nicht als Gruppenfreigabe interpretiert werden.
  */
 class AccessCondition {
@@ -25,7 +25,7 @@ class AccessCondition {
         private ?string $groupId,
         private array $children
     ) {
-        if (!in_array($operator, ['group', 'all', 'any', 'self', 'authenticated', 'nextcloud-admin'], true)) {
+        if (!in_array($operator, ['group', 'all', 'any', 'self', 'authenticated', 'nextcloud-admin', 'app-admin-grant'], true)) {
             throw new InvalidArgumentException('Unbekannter Bedingungsoperator.');
         }
         if ($operator === 'group' && ($groupId === null || trim($groupId) === '')) {
@@ -54,6 +54,8 @@ class AccessCondition {
 
     public static function nextcloudAdmin(): self { return new self('nextcloud-admin', null, []); }
 
+    public static function temporaryAppAdminGrant(): self { return new self('app-admin-grant', null, []); }
+
     public static function get(?array $payload): ?self {
         if ($payload === null) {
             return null;
@@ -63,7 +65,7 @@ class AccessCondition {
         if ($operator === 'group') {
             return self::group((string)($payload['group_id'] ?? ''));
         }
-        if (in_array($operator, ['self', 'authenticated', 'nextcloud-admin'], true)) {
+        if (in_array($operator, ['self', 'authenticated', 'nextcloud-admin', 'app-admin-grant'], true)) {
             return new self($operator, null, []);
         }
         return new self($operator, null, self::get_all(is_array($payload['children'] ?? null) ? $payload['children'] : []));
@@ -97,6 +99,9 @@ class AccessCondition {
         if ($this->operator === 'nextcloud-admin') {
             return 'Nextcloud-Administration';
         }
+        if ($this->operator === 'app-admin-grant') {
+            return 'Aktive zeitlich begrenzte App-Adminfreigabe';
+        }
         $separator = $this->operator === 'all' ? ' UND ' : ' ODER ';
 
         return '(' . implode($separator, array_map(static fn(self $child): string => $child->describe(), $this->children)) . ')';
@@ -107,7 +112,7 @@ class AccessCondition {
             return ['operator' => 'group', 'group_id' => $this->groupId];
         }
 
-        if (in_array($this->operator, ['self', 'authenticated', 'nextcloud-admin'], true)) {
+        if (in_array($this->operator, ['self', 'authenticated', 'nextcloud-admin', 'app-admin-grant'], true)) {
             return ['operator' => $this->operator];
         }
 

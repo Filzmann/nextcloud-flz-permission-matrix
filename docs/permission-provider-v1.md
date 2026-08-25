@@ -47,6 +47,10 @@ Zulässige Bedingungen:
 - `self()` für eigene Datensätze oder die eigene Person;
 - `authenticated()` für jede angemeldete Person;
 - `nextcloudAdmin()` für native Nextcloud-Administration.
+- `temporaryAppAdminGrant()` für eine aktuell aktive, app-lokal persistierte
+  und zeitlich begrenzte Admin-Vollzugriffsfreigabe. Fachapps kombinieren sie
+  mit `nextcloudAdmin()` über `all([...])`; sie enthält keine UID oder
+  Freigabehistorie.
 
 Nur ausschließlich gruppenbezogene Bedingungen werden auf Gruppenfelder
 projiziert. `all` wird dabei als `AND` markiert. Sobald eine Bedingung einen

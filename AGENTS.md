@@ -67,6 +67,11 @@ Wichtige Pruefungen:
   priorisierte Rechtequellen behandelt. Adapter verwenden ausschließlich
   öffentliche OCP-Verträge und weisen deren Coverage-Grenzen aus; private
   DAV-Backends, DAV-Tabellen oder vermutete Defaults sind unzulässig.
+- Ein nativer Nextcloud-Adminstatus ist keine automatische Fachfreigabe.
+  Zeitlich begrenzter app-lokaler Vollzugriff wird im öffentlichen
+  Permission-V1-Vertrag als UND aus `nextcloud-admin` und
+  `app-admin-grant` beschrieben und niemals aus einer der beiden Bedingungen
+  allein abgeleitet.
 - Fehler werden zentral protokolliert; Logs enthalten keine Secrets, Dateiinhalte oder unnoetigen personenbezogenen Details.
 - Keine Architekturabstraktion wird vorsorglich gebaut. Adapter wachsen anhand konkret auslesbarer Berechtigungsmodelle.
 - Der Groupfolders-Adapter ist eine kontrollierte app-lokale Ausnahme für die

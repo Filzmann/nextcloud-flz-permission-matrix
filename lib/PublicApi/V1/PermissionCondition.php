@@ -12,7 +12,7 @@ final class PermissionCondition {
         private ?string $groupId = null,
         private array $children = [],
     ) {
-        if (!in_array($operator, ['group', 'all', 'any', 'self', 'authenticated', 'nextcloud-admin'], true)) {
+        if (!in_array($operator, ['group', 'all', 'any', 'self', 'authenticated', 'nextcloud-admin', 'app-admin-grant'], true)) {
             throw new InvalidArgumentException('Invalid permission condition operator.');
         }
         if ($operator === 'group' && ($groupId === null || trim($groupId) === '')) {
@@ -34,6 +34,7 @@ final class PermissionCondition {
     public static function self(): self { return new self('self'); }
     public static function authenticated(): self { return new self('authenticated'); }
     public static function nextcloudAdmin(): self { return new self('nextcloud-admin'); }
+    public static function temporaryAppAdminGrant(): self { return new self('app-admin-grant'); }
 
     public function operator(): string { return $this->operator; }
     public function groupId(): ?string { return $this->groupId; }

@@ -29,6 +29,10 @@ $provider = new class implements PermissionProvider {
             ]), 'adplaner:policy', 'high'),
             new PermissionRule('Schedule', 'Duty schedule', 'Own entry', 'schedule.own.read', 'Read own', 'allow', 'own-entry', PermissionCondition::self(), 'adplaner:policy', 'high'),
             new PermissionRule('Schedule', 'Duty schedule', 'Signed in', 'schedule.read', 'Read', 'allow', 'app', PermissionCondition::authenticated(), 'adplaner:policy', 'high'),
+            new PermissionRule('Schedule', 'Duty schedule', 'Temporary administration', 'schedule.admin', 'Administer', 'allow', 'app', PermissionCondition::all([
+                PermissionCondition::nextcloudAdmin(),
+                PermissionCondition::temporaryAppAdminGrant(),
+            ]), 'adplaner:policy', 'high'),
         ]);
     }
 };
@@ -48,13 +52,15 @@ $source = new class($provider, $failing) implements PermissionProviderSourceInte
 $result = (new PermissionProviderAdapter(new PermissionProviderInventory(), $source))->collect();
 $rows = $result->rows();
 
-assertSameValue(4, count($rows), 'Every provider rule plus a visible provider failure row must be returned.');
+assertSameValue(5, count($rows), 'Every provider rule plus a visible provider failure row must be returned.');
 assertSameValue(['AND', 'AND', '-'], array_values($rows[0]->cells()), 'AND policies must not be presented as independent group grants.');
 assertSameValue(['n/a', 'n/a', 'n/a'], array_values($rows[1]->cells()), 'Self policies must not be translated into group grants.');
 assertSameValue('self', $rows[1]->accessRules()[0]->toArray()['condition']['operator'], 'Self semantics must remain machine-readable.');
 assertSameValue(['n/a', 'n/a', 'n/a'], array_values($rows[2]->cells()), 'Authenticated policies must not be translated into group grants.');
-assertSameValue('UNKNOWN', $rows[3]->status(), 'A failing provider must produce visible unknown coverage.');
-assertSameValue(['?', '?', '?'], array_values($rows[3]->cells()), 'A failing provider must not synthesize denies or grants.');
-assertSameValue(false, str_contains(implode(' ', $rows[3]->warnings()), 'private failure detail'), 'Provider exceptions must not leak internal details.');
+assertSameValue(['n/a', 'n/a', 'n/a'], array_values($rows[3]->cells()), 'Temporary admin grants must not be translated into group grants.');
+assertContainsText('Nextcloud-Administration UND Aktive zeitlich begrenzte App-Adminfreigabe', $rows[3]->accessRules()[0]->conditionText(), 'The combined temporary admin condition must remain explicit.');
+assertSameValue('UNKNOWN', $rows[4]->status(), 'A failing provider must produce visible unknown coverage.');
+assertSameValue(['?', '?', '?'], array_values($rows[4]->cells()), 'A failing provider must not synthesize denies or grants.');
+assertSameValue(false, str_contains(implode(' ', $rows[4]->warnings()), 'private failure detail'), 'Provider exceptions must not leak internal details.');
 
 echo 'Permission provider adapter tests passed' . PHP_EOL;
