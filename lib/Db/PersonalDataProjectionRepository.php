@@ -31,6 +31,7 @@ class PersonalDataProjectionRepository {
             ...$this->snapshots($uid, $limit, $upperBound),
             ...$this->exports($uid, $limit, $upperBound),
             ...$this->auditRecords($uid, $limit, $upperBound),
+            ...$this->adminAccessRecords($uid, $limit, $upperBound),
         ];
     }
 
@@ -107,6 +108,47 @@ class PersonalDataProjectionRepository {
             'action' => (string)$row['action'],
             'exportGenerated' => (bool)$row['export_generated'],
         ], $qb->executeQuery()->fetchAll());
+    }
+
+    private function adminAccessRecords(string $uid, int $limit, DateTimeImmutable $upperBound): array {
+        $qb = $this->db->getQueryBuilder();
+        $rows = $qb->select(
+            'id',
+            'target_uid',
+            'granted_by',
+            'starts_at',
+            'ends_at',
+            'revoked_at',
+            'revoked_by',
+            'created_at',
+        )
+            ->from('pm_admin_access')
+            ->where($qb->expr()->orX(
+                $qb->expr()->eq('target_uid', $qb->createNamedParameter($uid, IQueryBuilder::PARAM_STR)),
+                $qb->expr()->eq('granted_by', $qb->createNamedParameter($uid, IQueryBuilder::PARAM_STR)),
+                $qb->expr()->eq('revoked_by', $qb->createNamedParameter($uid, IQueryBuilder::PARAM_STR)),
+            ))
+            ->andWhere($qb->expr()->lte(
+                'created_at',
+                $qb->createNamedParameter($upperBound, IQueryBuilder::PARAM_DATETIME_IMMUTABLE),
+            ))
+            ->orderBy('created_at', 'DESC')
+            ->addOrderBy('id', 'DESC')
+            ->setMaxResults($limit)
+            ->executeQuery()
+            ->fetchAll();
+
+        return array_map(fn(array $row): array => [
+            'source' => 'admin_access',
+            'id' => (string)$row['id'],
+            'createdAt' => $this->dateValue($row['created_at']),
+            'targetUid' => (string)$row['target_uid'],
+            'grantedBy' => (string)$row['granted_by'],
+            'startsAt' => $this->dateValue($row['starts_at']),
+            'endsAt' => $this->dateValue($row['ends_at']),
+            'revokedAt' => $row['revoked_at'] === null ? null : $this->dateValue($row['revoked_at']),
+            'revokedBy' => $row['revoked_by'] === null ? null : (string)$row['revoked_by'],
+        ], $rows);
     }
 
     private function subjectQuery(

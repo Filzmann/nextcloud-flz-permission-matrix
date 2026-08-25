@@ -17,13 +17,15 @@ use OCP\IUserSession;
  *
  * Vertrag:
  * - Deny by default: anonyme und nicht zugeordnete Nutzer*innen erhalten keinen Zugriff.
- * - Nextcloud-Admins und konfigurierte App-Admins duerfen verwalten; Verwaltung umfasst Lesen.
+ * - Konfigurierte App-Admins duerfen verwalten; Verwaltung umfasst Lesen.
+ * - Native Nextcloud-Admins benoetigen zusaetzlich eine aktive app-lokale Freigabe.
  */
 class AccessService {
     public function __construct(
         private IUserSession $userSession,
         private IGroupManager $groups,
-        private ConfigService $config
+        private ConfigService $config,
+        private TemporaryAdminAccessChecker $temporaryAdminAccess,
     ) {
     }
 
@@ -50,7 +52,7 @@ class AccessService {
     }
 
     public function canManageUserId(string $uid): bool {
-        return $this->groups->isAdmin($uid) || $this->isInAnyGroup($uid, $this->config->adminGroups());
+        return ($this->groups->isAdmin($uid) && $this->temporaryAdminAccess->hasActiveGrant($uid)) || $this->isInAnyGroup($uid, $this->config->adminGroups());
     }
 
     public function assertCanView(): void {

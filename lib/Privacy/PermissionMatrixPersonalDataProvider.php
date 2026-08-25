@@ -71,20 +71,56 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
 
         return new PersonalDataPage(
             $hasMore ? 'partial' : 'complete',
-            array_map(fn(array $record): PersonalDataEntry => $this->entry($record, $asOf), $pageRecords),
+            array_map(fn(array $record): PersonalDataEntry => $this->entry($record, $asOf, $request->subject()->subjectId()), $pageRecords),
             $hasMore ? ['Weitere eigene Permission-Matrix-Nachweise sind auf einer Folgeseite verfügbar.'] : [],
             $hasMore ? $this->encodeCursor($asOf, $offset + $limit) : null,
         );
     }
 
     /** @param array<string, scalar|null> $record */
-    private function entry(array $record, string $asOf): PersonalDataEntry {
+    private function entry(array $record, string $asOf, string $subjectUid): PersonalDataEntry {
         return match ($record['source'] ?? '') {
             'snapshot' => $this->snapshotEntry($record),
             'export' => $this->exportEntry($record, $asOf),
             'audit' => $this->auditEntry($record, $asOf),
+            'admin_access' => $this->adminAccessEntry($record, $subjectUid),
             default => throw new InvalidArgumentException('Unknown personal-data projection record.'),
         };
+    }
+
+    private function adminAccessEntry(array $record, string $subjectUid): PersonalDataEntry {
+        $roles = [];
+        if ($record['targetUid'] === $subjectUid) {
+            $roles[] = 'Ziel der Vollzugriffsfreigabe';
+        }
+        if ($record['grantedBy'] === $subjectUid) {
+            $roles[] = 'Freigebende Administration';
+        }
+        if ($record['revokedBy'] === $subjectUid) {
+            $roles[] = 'Widerrufende Administration';
+        }
+        $actualEnd = $record['revokedAt'] ?? $record['endsAt'];
+
+        return new PersonalDataEntry(
+            categoryId: 'admin-access',
+            categoryLabel: 'Zeitlich begrenzter Admin-Vollzugriff',
+            reference: 'permission-matrix:admin-access:' . (string)$record['id'],
+            summary: 'Admin-Vollzugriff vom ' . $this->dateLabel((string)$record['startsAt']),
+            purpose: 'Nachweis einer zeitlich begrenzten administrativen Matrix-Freigabe',
+            source: 'App-lokale Freigabe im Nextcloud-Adminbereich',
+            recipientCategories: $this->recipients(),
+            retention: 'Keine feste Löschfrist festgelegt; die sicherheitsrelevante Freigabehistorie bleibt bis zu einer gesonderten Aufbewahrungsentscheidung erhalten.',
+            thirdCountryTransfer: 'Durch die Permission-Matrix sind keine Drittlandübermittlungen vorgesehen.',
+            automatedDecision: 'Der Server beendet den Vollzugriff spätestens nach 24 Stunden automatisch.',
+            thirdPartyContentNotice: 'Kennungen anderer beteiligter Administrator*innen werden nicht ausgegeben.',
+            attributes: [
+                'Eigene Rolle im Vorgang' => implode(', ', $roles),
+                'Beginn' => (string)$record['startsAt'],
+                'Geplantes Ende' => (string)$record['endsAt'],
+                'Tatsächliches Ende' => (string)$actualEnd,
+                'Status' => $record['revokedAt'] === null ? 'planmäßig beendet oder noch aktiv' : 'widerrufen',
+            ],
+        );
     }
 
     /** @param array<string, scalar|null> $record */

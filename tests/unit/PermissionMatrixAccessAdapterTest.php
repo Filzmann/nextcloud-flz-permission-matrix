@@ -40,12 +40,13 @@ $rows = $result->rows();
 assertSameValue(2, count($rows), 'The matrix should expose its own view and management permissions.');
 assertSameValue('X', $rows[0]->cells()['Matrix-Viewer'], 'Configured viewer groups should be able to read.');
 assertSameValue('X', $rows[0]->cells()['Matrix-Admin'], 'Management must imply view access.');
-assertSameValue('X', $rows[0]->cells()['admin'], 'Native Nextcloud admins should retain view access.');
+assertSameValue('-', $rows[0]->cells()['admin'], 'Native admin group membership alone must not imply view access.');
 assertSameValue('-', $rows[0]->cells()['Andere'], 'Unconfigured groups must remain denied.');
 assertSameValue('A', $rows[1]->cells()['Matrix-Admin'], 'Configured app admins should be able to manage.');
-assertSameValue('A', $rows[1]->cells()['admin'], 'Native Nextcloud admins should retain management access.');
+assertSameValue('-', $rows[1]->cells()['admin'], 'Native admin group membership alone must not imply management access.');
 assertSameValue('-', $rows[1]->cells()['Matrix-Viewer'], 'Viewer groups must not gain management access.');
-assertContainsText('(Gruppe Matrix-Admin ODER Gruppe Matrix-Viewer ODER Gruppe admin)', $rows[0]->accessRules()[0]->conditionText(), 'The own view rule should be machine-readable from canonical configured groups.');
+assertContainsText('(Gruppe Matrix-Admin ODER Gruppe Matrix-Viewer ODER (Nextcloud-Administration UND Aktive zeitlich begrenzte App-Adminfreigabe))', $rows[0]->accessRules()[0]->conditionText(), 'The own view rule should expose the configured groups and the compound temporary admin grant.');
+assertContainsText('(Gruppe Matrix-Admin ODER (Nextcloud-Administration UND Aktive zeitlich begrenzte App-Adminfreigabe))', $rows[1]->accessRules()[0]->conditionText(), 'The own management rule should never describe native admin status as sufficient.');
 
 $missing = (new PermissionMatrixAccessAdapter(
     new MatrixAccessFakeInventory(),

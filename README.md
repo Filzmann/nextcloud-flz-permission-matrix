@@ -226,9 +226,17 @@ php occ permission-matrix:status
 - Die App schreibt nur in eigene Tabellen mit Prefix `permission_matrix_*`.
 - Exporte enthalten standardmaessig keine Dateiinhalte, Passwoerter, Tokens, privaten Schluessel, Benutzerlisten oder personenbezogenen Dateipfade.
 - Unbekannte oder nicht unterstuetzte Rechtequellen werden nicht als erlaubt dargestellt.
-- Matrix, Snapshots und Exporte sind auf konfigurierte Viewer-/Admin-Gruppen bzw. Nextcloud-Admins beschraenkt.
-- Konfiguration, Baseline-Freigabe und manuelle Scans sind auf Nextcloud-Admins bzw. konfigurierte Admin-Gruppen beschraenkt.
+- Matrix, Snapshots und Exporte sind auf konfigurierte Viewer-/Admin-Gruppen
+  sowie Nextcloud-Admins mit aktiver app-lokaler Vollzugriffsfreigabe
+  beschraenkt.
+- Konfiguration, Baseline-Freigabe und manuelle Scans sind auf konfigurierte
+  Admin-Gruppen sowie Nextcloud-Admins mit aktiver app-lokaler
+  Vollzugriffsfreigabe beschraenkt. Die Freigabe gilt je Admin hoechstens 24
+  Stunden; Beginn, geplantes Ende und Widerruf werden in der App protokolliert.
 - App-Zugriffe werden in der eigenen Audit-Tabelle protokolliert, ohne sensible Inhalte zu loggen.
+- Die Art.-15-Auskunft umfasst auch die eigene Rolle in app-lokalen
+  Adminfreigaben; Kennungen anderer beteiligter Administrator*innen werden
+  dabei nicht ausgegeben.
 
 ## Entwicklungsstand
 

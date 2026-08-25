@@ -15,6 +15,10 @@ use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
 use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
 use OCA\FilzmannPermissionMatrix\Service\NextcloudPermissionProviderSource;
 use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
+use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepository;
+use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
+use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessChecker;
+use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
 use OCP\AppFramework\App;
@@ -38,6 +42,8 @@ class Application extends App implements IBootstrap {
         $context->registerServiceAlias(GroupFoldersSourceInterface::class, NextcloudGroupFoldersSource::class);
         $context->registerServiceAlias(GroupFoldersManagerProviderInterface::class, NextcloudGroupFoldersManagerProvider::class);
         $context->registerServiceAlias(PermissionProviderSourceInterface::class, NextcloudPermissionProviderSource::class);
+        $context->registerServiceAlias(TemporaryAdminAccessChecker::class, TemporaryAdminAccessService::class);
+        $context->registerServiceAlias(TemporaryAdminAccessRepositoryInterface::class, TemporaryAdminAccessRepository::class);
     }
 
     public function boot(IBootContext $context): void {

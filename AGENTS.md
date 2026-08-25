@@ -88,12 +88,18 @@ Wichtige Pruefungen:
 
 ## Zugriff und Sicherheit
 
-- Matrix, Snapshots und Exporte sind nur fuer konfigurierte Viewer-Gruppen, konfigurierte Admin-Gruppen oder Nextcloud-Admins sichtbar.
+- Matrix, Snapshots und Exporte sind nur fuer konfigurierte Viewer-Gruppen,
+  konfigurierte Admin-Gruppen oder Nextcloud-Admins mit aktiver app-lokaler
+  Vollzugriffsfreigabe sichtbar.
 - `Betriebsrat`, `IKT-Ausschuss`, `Datenschutzbeauftragte` und
   `IT-Administration` sind anpassbare Ausgangsbeispiele, keine fest
   vorausgesetzten Organisationsrollen. Ein Personalrat kann die
   Betriebsratsgruppe vollständig ersetzen.
-- App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer Nextcloud-Admins oder konfigurierte Admin-Gruppen erlaubt.
+- App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer
+  konfigurierte Admin-Gruppen oder Nextcloud-Admins mit aktiver app-lokaler
+  Vollzugriffsfreigabe erlaubt. Die Freigabe wird je Admin erteilt, endet
+  spaetestens nach 24 Stunden und bleibt mit Beginn, geplantem Ende und
+  gegebenenfalls vorzeitigem Widerruf nachvollziehbar.
 - Alle App-Zugriffe werden mit Zeitpunkt, Benutzer-ID, Aktion, Export-Flag und optionaler Snapshot-ID in eigenen Audit-Tabellen protokolliert.
 - Exportmetadaten und Auditprotokolle besitzen getrennt konfigurierbare
   REVIEW-Fristen mit jeweils 180 Tagen als Standard. Ein Fristablauf darf
@@ -103,7 +109,8 @@ Wichtige Pruefungen:
 - Exporte enthalten standardmaessig keine Benutzerlisten, keine Share-Metadaten und nur redigierte Pfadangaben.
 - Art.-15-Selbstauskunft wird optional und lazy über den öffentlichen
   V1-Vertrag von `filzmann_data_protection` registriert. Sie liest nur
-  app-eigene Snapshot-Ersteller-, Export- und Auditbezüge der betroffenen UID.
+  app-eigene Snapshot-Ersteller-, Export-, Audit- und
+  Adminfreigabebezüge der betroffenen UID.
   Snapshot-/Exportinhalte, freie Dateinamen, freie Auditdetails und Angaben
   anderer Personen bleiben ausgeschlossen. Fehlt oder ist die Privacy-App
   deaktiviert, muss die Permission-Matrix unverändert starten.

@@ -15,7 +15,7 @@ use OCA\FilzmannPermissionMatrix\Service\InventoryService;
  *
  * Vertrag:
  * - Verwaltung umfasst Lesen, Viewer erhalten jedoch keine Verwaltungsrechte.
- * - Nextcloud-Admins bleiben entsprechend AccessService fuer beide Funktionen berechtigt.
+ * - Native Nextcloud-Admins benoetigen zusaetzlich eine aktive app-lokale Adminfreigabe.
  * - Veraltete konfigurierte Gruppen fuehren zu UNKNOWN statt zu einer erfundenen Freigabe.
  */
 final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface {
@@ -35,7 +35,6 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         }
 
         $groups = $this->inventory->groups();
-        $nativeAdminGroups = in_array('admin', $groups, true) ? ['admin'] : [];
         $configuredView = array_values(array_unique([
             ...$this->config->adminGroups(),
             ...$this->config->viewerGroups(),
@@ -43,8 +42,8 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $configuredManage = array_values(array_unique($this->config->adminGroups()));
         $missingView = array_values(array_diff($configuredView, $groups));
         $missingManage = array_values(array_diff($configuredManage, $groups));
-        $viewGroups = array_values(array_intersect([...$configuredView, ...$nativeAdminGroups], $groups));
-        $manageGroups = array_values(array_intersect([...$configuredManage, ...$nativeAdminGroups], $groups));
+        $viewGroups = array_values(array_intersect($configuredView, $groups));
+        $manageGroups = array_values(array_intersect($configuredManage, $groups));
         $warnings = [];
         if ($missingView !== []) {
             $warnings[] = 'Mindestens eine konfigurierte View-/Admin-Gruppe ist nicht im Gruppeninventar vorhanden.';
@@ -62,19 +61,32 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             $manageCells[$group] = 'A';
         }
 
-        $viewRules = $viewGroups === [] ? [] : [new AccessRule(
+        $temporaryAdminCondition = AccessCondition::all([
+            AccessCondition::nextcloudAdmin(),
+            AccessCondition::temporaryAppAdminGrant(),
+        ]);
+        $viewConditions = [
+            ...array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $viewGroups),
+            $temporaryAdminCondition,
+        ];
+        $manageConditions = [
+            ...array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $manageGroups),
+            $temporaryAdminCondition,
+        ];
+
+        $viewRules = [new AccessRule(
             'matrix.view',
             'allow',
             'app:filzmann_permission_matrix',
-            AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $viewGroups)),
+            AccessCondition::any($viewConditions),
             'filzmann_permission_matrix:AccessService::canViewUserId',
             $missingView === [] ? 'high' : 'low'
         )];
-        $manageRules = $manageGroups === [] ? [] : [new AccessRule(
+        $manageRules = [new AccessRule(
             'matrix.manage',
             'allow',
             'app:filzmann_permission_matrix',
-            AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $manageGroups)),
+            AccessCondition::any($manageConditions),
             'filzmann_permission_matrix:AccessService::canManageUserId',
             $missingManage === [] ? 'high' : 'low'
         )];
@@ -84,7 +96,7 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
                 'AppPermission',
                 'filzmann_permission_matrix',
                 'Matrix ansehen',
-                'Konfigurierte Viewer- und Admin-Gruppen; Nextcloud-Admins',
+                'Konfigurierte Viewer-/Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Lesen',
                 $missingView === [] ? 'NEW' : 'UNKNOWN',
                 'filzmann_permission_matrix:AccessService::canViewUserId',
@@ -97,7 +109,7 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
                 'AppPermission',
                 'filzmann_permission_matrix',
                 'Matrix verwalten',
-                'Konfigurierte Admin-Gruppen; Nextcloud-Admins',
+                'Konfigurierte Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Administrieren',
                 $missingManage === [] ? 'NEW' : 'UNKNOWN',
                 'filzmann_permission_matrix:AccessService::canManageUserId',

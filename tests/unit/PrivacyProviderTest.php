@@ -34,6 +34,9 @@ namespace {
             'memberUids' => ['subject-17', 'third-person'],
         ],
         [
+            'source'=>'admin_access','id'=>'15','createdAt'=>'2026-08-22T10:00:00+00:00','targetUid'=>'subject-17','grantedBy'=>'other-admin','startsAt'=>'2026-08-22T10:00:00+00:00','endsAt'=>'2026-08-22T14:00:00+00:00','revokedAt'=>null,'revokedBy'=>null,
+        ],
+        [
             'source' => 'export',
             'id' => '12',
             'createdAt' => '2026-01-01T11:00:00+00:00',
@@ -98,17 +101,21 @@ namespace {
         2,
         ['filzmann_permission_matrix' => $first->nextCursor()],
     ));
-    assertSameValue('complete', $second->status(), 'Die letzte Seite muss vollständig abschließen.');
-    assertSameValue(2, count($second->entries()), 'Die Folgeseite muss die verbleibenden Datensätze liefern.');
-    assertSameValue(null, $second->nextCursor(), 'Die letzte Seite darf keinen weiteren Cursor behaupten.');
-    $references = array_map(static fn($entry): string => $entry->toArray()['reference'], [...$first->entries(), ...$second->entries()]);
-    assertSameValue(4, count(array_unique($references)), 'Paging darf Datensätze weder doppeln noch auslassen.');
+    assertSameValue('partial', $second->status(), 'Die zweite Seite muss wegen des verbleibenden Datensatzes teilweise bleiben.');
+    assertSameValue(2, count($second->entries()), 'Die zweite Seite muss die nächsten Datensätze liefern.');
+    if ($second->nextCursor() === null) throw new RuntimeException('Fünf Datensätze benötigen eine dritte Seite.');
+    $third = $provider->collect(new PersonalDataRequest($subject,'de','access-report',2,['filzmann_permission_matrix'=>$second->nextCursor()]));
+    assertSameValue('complete',$third->status(),'Die dritte Seite muss vollständig abschließen.');
+    assertSameValue(1,count($third->entries()),'Die dritte Seite muss den letzten Datensatz liefern.');
+    assertSameValue(null, $third->nextCursor(), 'Die letzte Seite darf keinen weiteren Cursor behaupten.');
+    $references = array_map(static fn($entry): string => $entry->toArray()['reference'], [...$first->entries(), ...$second->entries(), ...$third->entries()]);
+    assertSameValue(5, count(array_unique($references)), 'Paging darf Datensätze weder doppeln noch auslassen.');
 
-    $allPayload = json_encode(array_map(static fn($entry): array => $entry->toArray(), [...$first->entries(), ...$second->entries()]), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-    foreach (['pm-snapshot-own', 'snapshot.view', 'config.view', 'csv', '2048'] as $contextValue) {
+    $allPayload = json_encode(array_map(static fn($entry): array => $entry->toArray(), [...$first->entries(), ...$second->entries(), ...$third->entries()]), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+    foreach (['pm-snapshot-own', 'snapshot.view', 'config.view', 'csv', '2048', 'Admin-Vollzugriff'] as $contextValue) {
         if (!str_contains($allPayload, $contextValue)) throw new RuntimeException('Erforderlicher eigener Fachkontext fehlt: ' . $contextValue);
     }
-    if (str_contains($allPayload, 'third-person')) throw new RuntimeException('Drittpersonenangaben wurden nicht entfernt.');
+    if (str_contains($allPayload, 'third-person') || str_contains($allPayload, 'other-admin')) throw new RuntimeException('Drittpersonenangaben wurden nicht entfernt.');
     foreach (['REVIEW erforderlich', '120 Tage', '240 Tage', 'Keine automatische Löschung'] as $retentionValue) {
         if (!str_contains($allPayload, $retentionValue)) throw new RuntimeException('Konfigurierbarer REVIEW-Hinweis fehlt: ' . $retentionValue);
     }
