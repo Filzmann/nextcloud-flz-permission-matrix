@@ -1,20 +1,34 @@
 # Roadmap – Berechtigungsmatrix
 
-Diese Datei enthält ausschließlich zukünftige Adapter, Exportziele und offene
-Produktentscheidungen. Der geltende read-only Sicherheitsvertrag steht in
+Diese Datei enthält die offenen Adapter, Exportziele und Produktentscheidungen.
+Bereits umgesetzte Grundlagen werden nur als Abgrenzung der verbleibenden
+Arbeit genannt. Der geltende read-only Sicherheitsvertrag steht in
 `AGENTS.md`; der aktuelle Funktionsumfang steht in `README.md`.
 
 Die Berechtigungsmatrix steht noch am Anfang ihrer Entwicklung. Die folgenden
 Aufgaben legen deshalb fachliche Zielverträge und Sicherheitsgrenzen fest,
 ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
 
+## Nextcloud-Kompatibilitätsgate
+
+### BPM-NC-COMPAT – Core-Bereich 29–35 und optionale Adapter getrennt belegen
+
+`info.xml` umfasst Nextcloud 33 bereits. Vor dem nächsten Release werden alle
+deklarierten Majors lückenlos mit Fresh Install/Upgrade, DI, Provider-Scan,
+Permission-V1-Vertrag, Assets und sichtbarer Matrix geprüft. Die private,
+eng begrenzte Groupfolders-Ausnahme bleibt davon getrennt: auf nicht
+nachgewiesenen Groupfolders-/Nextcloud-Kombinationen liefert sie
+`UNKNOWN`/`UNSUPPORTED`, ohne den Core-Betrieb als vollständig zu behaupten.
+Eine höhere `max-version` folgt nur aus dem app-lokalen
+`verify-nextcloud-future-compatibility`-Nachweis.
+
 ## Freigegebene Umsetzungsaufgaben
 
 ### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
 
-Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; Provider aller
-sechs AD-Fachapps und beider BR-Apps implementiert und im Parent gemeinsam
-gegen die echten V1-Klassen geprüft
+Status: öffentlicher V1-Provider-/Consumervertrag umgesetzt; die Provider der
+sechs AD-Fachapps, beider BR-Apps und von `filzmann_data_protection` sind im
+Parent gemeinsam gegen die echten V1-Klassen geprüft
 
 - Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
   Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
@@ -155,30 +169,20 @@ Offen bleiben die vollständige Abbildung erweiterter Groupfolders-ACLs,
 Files Access Control und externe Speicher. Sie
 werden nicht aus internen App-Klassen oder fremden Tabellen gelesen.
 
-## Zukunftsplanung – nicht freigegeben
+### BPM-L10N – app-lokale Matrixdarstellung lokalisieren
 
-### BPM-L10N – Berechtigungsmatrix vollständig lokalisieren
-
-Status: später, nicht freigegeben; Matrixmodell, Pilot-App, Reihenfolge und
-Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
-
-- Oberfläche, Status-, Warn-, Export- und Fehlermeldungen auf
-  Nextcloud-l10n umstellen.
-- Berechtigungsschlüssel, Effekte, Scope-IDs, Snapshotdaten und Adapterstatus
-  sprachneutral lassen; lokalisierte Labels erst bei Darstellung und Export
-  erzeugen.
-- Deutsche Ausgabe, eine weitere Locale, Fallback, Pluralformen,
-  Platzhalter, Escaping sowie reproduzierbare Exportlocale testen.
-- Erst nach vollständiger Migration einen Rohtext-Check für die App
-  verbindlich schalten.
+Aktivierung ausschließlich nach Freigabe des systemweiten Root-Vorhabens
+`ZM-06`. Sichtbare Status-, Warn-, Export- und Fehlermeldungen wechseln auf
+Nextcloud-l10n; Berechtigungsschlüssel, Effekte, Scope-IDs, Snapshotdaten und
+Adapterstatus bleiben sprachneutral. Eine gewählte Exportlocale muss
+reproduzierbar sein.
 
 ## Aktueller Fokus
 
-- Als nächste Eigen-App-Lücke den `PermissionProvider` von
-  `filzmann_data_protection` aus dessen kanonischen Reviewer-Gruppen,
-  optionalem Nextcloud-Adminzugang und reinem Admin-Konfigurationsrecht
-  implementieren. Self-Service erteilt darüber hinaus kein fremdes
-  Auskunftsrecht.
+- Die Eigen-App-Providerbasis einschließlich `filzmann_data_protection` ist
+  umgesetzt. Als nächste Produktlücke native Files-/Calendar-Coverage und
+  danach Fremd-App-Coverage ausschließlich über belastbare öffentliche
+  Quellen erweitern.
 - Für `filzmann_permission_matrix` bleibt der eigene
   `PermissionMatrixAccessAdapter` die direkte Projektion derselben
   `ConfigService`, die der serverseitige `AccessService` nutzt; ein
