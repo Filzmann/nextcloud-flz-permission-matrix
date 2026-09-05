@@ -69,6 +69,13 @@ For permission changes, verify at least:
 
 For database or migration changes, verify at least:
 
+First apply the development-phase decision in the repository's `AGENTS.md`.
+Historical app upgrades, preservation and backfills below require a concrete
+preservation reason. An approved development reset instead proves the
+canonical empty-schema installation/reinstall, integrity, current application
+behavior and necessary recovery of external test-user configuration. This
+does not waive supported platform-transition or security tests.
+
 - fresh installation on an empty schema;
 - upgrade from at least the immediately relevant prior version;
 - preservation or correct migration of realistic existing data, including

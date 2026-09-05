@@ -20,10 +20,18 @@ app-lokalen `verify-nextcloud-future-compatibility`-Nachweis.
 
 ### BPM-NEXTCLOUD-NATIVE-PERMISSIONS – Files und Calendar vervollständigen
 
+- Die eigene PermissionProvider-Projektion bei jeder relevanten Weiterentwicklung
+  gegen neue oder geänderte Berechtigungen und Scopes abgleichen.
+- Eine leere Gruppenbeschränkung als appweite Verfügbarkeit für jede erfasste
+  Gruppe behandeln; fehlende Detailabdeckung bleibt davon getrennt
+  `UNSUPPORTED`.
 - Files Access Control, externe Speicher und weitere öffentliche
   Files-Verträge als getrennte Quellen bewerten.
+- Metadaten und Rechte nur über öffentliche Files-Verträge erfassen;
+  Dateiinhalte bleiben ausgeschlossen.
 - Für Calendar Scan-Scope, Principal-Auswahl, Eigentümer-, Share- und
-  Public-Link-Semantik sowie die Vollständigkeitsgrenze festlegen.
+  Public-Link-Semantik sowie die Vollständigkeitsgrenze auf Basis von
+  `OCP\Calendar\IManager` festlegen.
 - Ausschließlich öffentliche OCP-Verträge verwenden; private DAV-Backends,
   fremde Tabellen oder Reflection bleiben ausgeschlossen.
 
@@ -37,7 +45,7 @@ app-lokalen `verify-nextcloud-future-compatibility`-Nachweis.
 - Pfadredaktion, Datenschutzgrenzen sowie positive, negative, unbekannte und
   widersprüchliche Zustände testen.
 
-### BPM-THIRD-PARTY-COVERAGE – Fremd-Apps kontrolliert bewerten
+### BPM-THIRD-PARTY-COVERAGE – Fremd-App-Coverage kontrolliert bewerten
 
 - Nach den nativen Quellen aktivierte Fremd-Apps nach Zweck,
   Berechtigungsmodell und offizieller öffentlicher Schnittstelle
