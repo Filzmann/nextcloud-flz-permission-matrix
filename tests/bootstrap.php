@@ -3,14 +3,13 @@
 declare(strict_types=1);
 
 $appRoot = dirname(__DIR__);
-$workspaceRoot = dirname($appRoot);
 
-spl_autoload_register(static function(string $class) use ($appRoot, $workspaceRoot): void {
+spl_autoload_register(static function(string $class) use ($appRoot): void {
     $prefixes = [
         'OCA\\FilzmannPermissionMatrix\\Tests\\' => $appRoot . '/tests/',
         'OCA\\FilzmannPermissionMatrix\\' => $appRoot . '/lib/',
         'OCA\\FilzmannDataProtection\\' => $appRoot . '/tests/stubs/FilzmannDataProtection/',
-        'OCA\\LocalBase\\' => $workspaceRoot . '/localbase/lib/',
+        'OCA\\LocalBase\\' => $appRoot . '/tests/stubs/LocalBase/',
     ];
     foreach ($prefixes as $prefix => $directory) {
         if (!str_starts_with($class, $prefix)) {

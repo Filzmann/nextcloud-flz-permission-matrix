@@ -65,7 +65,6 @@ Eine Exportlocale muss reproduzierbar sein.
 
 ## Staging und weitere Produkte
 
-- Organisationsvertrag und kontrollierte `UNKNOWN`-Fallbacks abnehmen.
 - Viewer-, Admin-, Export- und Auditgrenzen positiv und negativ prüfen.
 - Danach Detailadapter für Deck, Collectives, Tables, Talk, Contacts, Forms,
   Notes, Richdocuments, OnlyOffice, LDAP und Two-Factor einzeln bewerten.

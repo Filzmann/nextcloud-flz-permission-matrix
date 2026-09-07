@@ -24,7 +24,12 @@ require_pattern() {
     local file=$1
     local pattern=$2
     local label=$3
-    if ! rg --quiet --pcre2 "$pattern" "$file"; then
+    if command -v rg >/dev/null 2>&1; then
+        rg --quiet --pcre2 "$pattern" "$file" || {
+            echo "Groupfolders compatibility check failed: $label" >&2
+            exit 1
+        }
+    elif ! grep --perl-regexp --quiet "$pattern" "$file"; then
         echo "Groupfolders compatibility check failed: $label" >&2
         exit 1
     fi
@@ -39,7 +44,11 @@ require_pattern "$definition_file" 'public\s+readonly\s+int\s+\$id\b' 'FolderDef
 require_pattern "$definition_file" 'public\s+readonly\s+string\s+\$mountPoint\b' 'FolderDefinition::$mountPoint changed; path exclusion must be re-reviewed.'
 require_pattern "$definition_file" 'public\s+readonly\s+bool\s+\$acl\b' 'FolderDefinition::$acl changed; advanced-permission handling must be re-reviewed.'
 
-mapfile -t mapping_files < <(rg --files-with-matches 'class\s+FolderDefinitionWithMappings\b' "$folder_dir" --glob '*.php')
+if command -v rg >/dev/null 2>&1; then
+    mapfile -t mapping_files < <(rg --files-with-matches 'class\s+FolderDefinitionWithMappings\b' "$folder_dir" --glob '*.php')
+else
+    mapfile -t mapping_files < <(grep --perl-regexp --files-with-matches 'class\s+FolderDefinitionWithMappings\b' "$folder_dir"/*.php)
+fi
 if [[ ${#mapping_files[@]} -ne 1 ]]; then
     echo 'Groupfolders compatibility check failed: the mapping DTO is missing or ambiguous.' >&2
     exit 1

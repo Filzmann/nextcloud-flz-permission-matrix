@@ -43,9 +43,11 @@ Ausführungspfad.
 
 ## Gruppenfamilien
 
-Die Matrix deutet Rollen und Bereiche ausschließlich über den validierten,
-versionierten Organisationssnapshot von LocalBase. Dessen Vertragsversion,
-Definitionsversion und Prüfsumme werden mit jedem Matrixsnapshot festgehalten.
+Die Matrix deutet Rollen und Bereiche ausschließlich über
+`OCA\\LocalBase\\PublicApi\\V1` und dessen validierten, versionierten
+Organisationssnapshot. Interne LocalBase-Klassen gehören nicht zum
+Consumervertrag. Vertragsversion, Definitionsversion und Prüfsumme werden mit
+jedem Matrixsnapshot festgehalten.
 Für die AdPlaner-Schemata `ad-ASN-<Kürzel>` und
 `ad-ASN-<Kürzel>-Urlaub` stehen bei gültigem Organisationsvertrag zusätzlich
 Team-, Familien- und vollständige Rohgruppenansichten zur Verfügung.
@@ -65,7 +67,9 @@ Fehlt LocalBase, ist sein Vertrag ungültig oder inkompatibel oder enthält er
 mehrdeutige Gruppenzuordnungen, bleibt der Scan verfügbar. Die Matrix zeigt
 dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
 speichert den konkreten Providerstatus im historischen Snapshot. Spätere
-Konfigurationsänderungen deuten vorhandene Snapshots nicht neu.
+Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Fresh Installs
+auf Nextcloud 34 sind sowohl ohne installierte LocalBase-App als auch mit dem
+realen V1-Provider geprüft.
 
 ## Installation lokal
 

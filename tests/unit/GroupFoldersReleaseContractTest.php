@@ -45,8 +45,9 @@ class FolderDefinitionWithMappings extends FolderDefinition {
 PHP);
 };
 
-$run = static function(string $checkout) use ($appRoot): array {
-    $command = 'bash ' . escapeshellarg($appRoot . '/scripts/check-groupfolders-source-compatibility') . ' ' . escapeshellarg($checkout) . ' 2>&1';
+$run = static function(string $checkout, ?string $path = null) use ($appRoot): array {
+    $environment = $path === null ? '' : 'env PATH=' . escapeshellarg($path) . ' ';
+    $command = $environment . 'bash ' . escapeshellarg($appRoot . '/scripts/check-groupfolders-source-compatibility') . ' ' . escapeshellarg($checkout) . ' 2>&1';
     exec($command, $output, $status);
 
     return [$status, implode("\n", $output)];
@@ -55,6 +56,13 @@ $run = static function(string $checkout) use ($appRoot): array {
 $writeValidFixture();
 [$status, $output] = $run($root);
 assertSameValue(0, $status, 'The release gate must accept the pinned official 22.x/Nextcloud 34 source contract. ' . $output);
+
+$fallbackBin = $root . '/fallback-bin';
+mkdir($fallbackBin, 0770, true);
+symlink('/bin/bash', $fallbackBin . '/bash');
+symlink('/usr/bin/grep', $fallbackBin . '/grep');
+[$status, $output] = $run($root, $fallbackBin);
+assertSameValue(0, $status, 'The release gate must work in the DDEV image without ripgrep. ' . $output);
 
 file_put_contents($root . '/appinfo/info.xml', str_replace('22.0.6', '23.0.0', file_get_contents($root . '/appinfo/info.xml')));
 [$status] = $run($root);
@@ -74,6 +82,9 @@ $files = [
 foreach ($files as $file) {
     @unlink($file);
 }
+@unlink($fallbackBin . '/bash');
+@unlink($fallbackBin . '/grep');
+@rmdir($fallbackBin);
 @rmdir($folderDir);
 @rmdir($root . '/lib');
 @rmdir($root . '/appinfo');

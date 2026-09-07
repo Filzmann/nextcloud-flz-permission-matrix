@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+use OCA\FilzmannPermissionMatrix\Service\OrganizationSnapshotService;
+use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+
+return [
+    'uiPath' => '/index.php/apps/filzmann_permission_matrix/',
+    'preGrantUiStatuses' => [403],
+    'postGrantUiStatuses' => [200],
+    'grantService' => TemporaryAdminAccessService::class,
+    'permissionProbe' => static function(string $uid): bool {
+        $organization = OCP\Server::get(OrganizationSnapshotService::class)->snapshot();
+        if (!in_array($organization['status'], ['MISSING', 'INVALID', 'VALID'], true)) {
+            throw new RuntimeException('LocalBase organization contract did not resolve to a controlled runtime state.');
+        }
+
+        return OCP\Server::get(TemporaryAdminAccessService::class)->hasActiveGrant($uid);
+    },
+    'apiSmokes' => [
+        ['/index.php/apps/filzmann_permission_matrix/api/state', [200]],
+    ],
+];

@@ -13,11 +13,21 @@ aber weder Nextcloud-Rechte noch Konfigurationen anderer Apps.
 - App-eigene Berechtigungen werden ausschließlich über öffentliche
   Permission-Provider gelesen. Native Nextcloud-Rechte und optionale
   Fremd-App-Adapter bleiben getrennte Quellen.
+- Semantische Rollen und Bereiche stammen ausschließlich aus
+  `OCA\\LocalBase\\PublicApi\\V1`. Die Matrix prüft App-Aktivierung und
+  Vertragsversion vor der Nutzung; das Provider-DTO verantwortet
+  Gültigkeit, eindeutige Gruppenabbildungen und Prüfsumme.
 - Fehlende, mehrdeutige oder inkompatible Quellen liefern `UNKNOWN`,
   `UNSUPPORTED` oder eine sichtbar partielle Coverage und niemals eine
   vermutete Freigabe.
 - Die eng begrenzte Groupfolders-Ausnahme ist versionsgebunden und wird vor
   Releases gegen den offiziellen Quellstand geprüft.
+
+Der Matrixsnapshot hält den LocalBase-Status als `VALID`, `MISSING`,
+`INVALID`, `INCOMPATIBLE` oder `UNAVAILABLE` fest. Nur `VALID` liefert
+semantische Zuordnungen. LocalBase bleibt eine optionale Laufzeit-App; ihr
+Fehlen verhindert weder Installation noch Scan oder Darstellung der
+Berechtigungsmatrix.
 
 ## Datenschutz und Rechte
 
