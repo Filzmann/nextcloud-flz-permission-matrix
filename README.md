@@ -69,7 +69,10 @@ dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
 speichert den konkreten Providerstatus im historischen Snapshot. Spätere
 Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Fresh Installs
 auf Nextcloud 34 sind sowohl ohne installierte LocalBase-App als auch mit dem
-realen V1-Provider geprüft.
+realen V1-Provider geprüft. Zusätzlich bleiben Scan, Oberfläche und API bei
+Deaktivierung und Entfernung des Providers verfügbar. Die Wiederinstallation
+ist sowohl mit dem aktuellen V1-Stand als auch mit einem älteren LocalBase ohne
+V1-Service geprüft; der ältere Stand bleibt dabei kontrolliert `INCOMPATIBLE`.
 
 ## Installation lokal
 

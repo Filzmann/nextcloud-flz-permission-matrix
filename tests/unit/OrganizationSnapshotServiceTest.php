@@ -7,6 +7,13 @@ namespace OCP\App {
     }
 }
 
+namespace OCP {
+    final class Server {
+        public static mixed $service = null;
+        public static function get(string $name): mixed { return self::$service; }
+    }
+}
+
 namespace Psr\Log {
     interface LoggerInterface {
         public function emergency($message, array $context = []): void;
@@ -24,10 +31,16 @@ namespace Psr\Log {
 namespace {
     use OCA\FilzmannPermissionMatrix\Service\OrganizationSnapshotService;
     use OCA\LocalBase\PublicApi\V1\OrganizationSnapshot;
+    use OCA\LocalBase\PublicApi\V1\OrganizationSnapshotService as LocalBaseOrganizationSnapshotService;
     use OCP\App\IAppManager;
+    use OCP\Server;
     use Psr\Log\LoggerInterface;
 
     final class OrganizationTestApps implements IAppManager {
+    }
+
+    final class OrganizationEnabledApps implements IAppManager {
+        public function getEnabledApps(): array { return ['localbase']; }
     }
 
     final class OrganizationTestLogger implements LoggerInterface {
@@ -49,7 +62,7 @@ namespace {
             private OrganizationSnapshot|\Throwable|null $providerSnapshot,
             OrganizationTestLogger $logger
         ) {
-            parent::__construct(new OrganizationTestApps(), $logger, null);
+            parent::__construct(new OrganizationTestApps(), $logger);
         }
 
         protected function isProviderEnabled(): bool {
@@ -73,6 +86,10 @@ namespace {
         'north' => ['groupId' => 'area-north', 'label' => 'Nord'],
     ]);
     $logger = new OrganizationTestLogger();
+    Server::$service = new LocalBaseOrganizationSnapshotService($validSnapshot);
+    $resolved = (new OrganizationSnapshotService(new OrganizationEnabledApps(), $logger))->snapshot();
+    assertSameValue('VALID', $resolved['status'], 'The enabled public V1 service must be resolved lazily through the Nextcloud container.');
+
     $valid = (new OrganizationTestService(true, $validSnapshot, $logger))->snapshot();
 
     assertSameValue('VALID', $valid['status'], 'A matching, valid provider snapshot must be consumable.');
@@ -109,6 +126,8 @@ namespace {
     $failedLogger = new OrganizationTestLogger();
     $failed = (new OrganizationTestService(true, new RuntimeException('synthetic provider failure'), $failedLogger))->snapshot();
     assertSameValue('UNAVAILABLE', $failed['status'], 'Provider failures need a stable, controlled state.');
+    assertSameValue([], $failed['roles'], 'A failed provider must not contribute role meaning.');
+    assertSameValue([], $failed['areas'], 'A failed provider must not contribute area meaning.');
     assertSameValue(1, count($failedLogger->warnings), 'Provider failures must be diagnosable without exposing payload data.');
 
     echo 'OrganizationSnapshotService tests passed' . PHP_EOL;

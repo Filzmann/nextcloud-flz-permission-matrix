@@ -8,14 +8,16 @@ use InvalidArgumentException;
 use OCA\LocalBase\PublicApi\V1\OrganizationSnapshot;
 use OCA\LocalBase\PublicApi\V1\OrganizationSnapshotService as LocalBaseOrganizationSnapshotService;
 use OCP\App\IAppManager;
+use OCP\Server;
 use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
 
 /**
  * Konsumiert den öffentlichen, datensparsamen LocalBase-Organisationssnapshot fail-closed.
  *
- * Der nullable Provider ist ab Nextcloud 28 ein unterstützter DI-Vertrag: Eine fehlende oder
- * nicht auflösbare optionale Runtime-App führt damit zu einem kontrollierten Matrixstatus.
+ * Der Provider wird erst nach Aktivierungs- und Klassenprüfung über den öffentlichen
+ * Nextcloud-Container aufgelöst. Dadurch bleibt auch eine aktivierte ältere LocalBase-Version
+ * ohne V1-Service ein kontrollierter, nicht berechtigender Zustand.
  */
 class OrganizationSnapshotService {
     private const PROVIDER_APP_ID = 'localbase';
@@ -23,8 +25,7 @@ class OrganizationSnapshotService {
 
     public function __construct(
         private IAppManager $apps,
-        private LoggerInterface $logger,
-        private ?LocalBaseOrganizationSnapshotService $provider
+        private LoggerInterface $logger
     ) {
     }
 
@@ -95,13 +96,20 @@ class OrganizationSnapshotService {
     }
 
     protected function readProviderSnapshot(): OrganizationSnapshot {
-        if ($this->provider === null) {
+        if (!class_exists(LocalBaseOrganizationSnapshotService::class)) {
             throw new UnexpectedValueException(
                 'LocalBase-Organisationsschnittstelle fehlt; Gruppenbedeutungen bleiben UNKNOWN.'
             );
         }
 
-        return $this->provider->snapshot();
+        $provider = Server::get(LocalBaseOrganizationSnapshotService::class);
+        if (!$provider instanceof LocalBaseOrganizationSnapshotService) {
+            throw new UnexpectedValueException(
+                'LocalBase-Organisationsschnittstelle ist nicht auflösbar; Gruppenbedeutungen bleiben UNKNOWN.'
+            );
+        }
+
+        return $provider->snapshot();
     }
 
     private function unavailable(

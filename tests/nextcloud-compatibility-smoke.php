@@ -12,8 +12,12 @@ return [
     'grantService' => TemporaryAdminAccessService::class,
     'permissionProbe' => static function(string $uid): bool {
         $organization = OCP\Server::get(OrganizationSnapshotService::class)->snapshot();
-        if (!in_array($organization['status'], ['MISSING', 'INVALID', 'VALID'], true)) {
+        if (!in_array($organization['status'], ['MISSING', 'INVALID', 'INCOMPATIBLE', 'UNAVAILABLE', 'VALID'], true)) {
             throw new RuntimeException('LocalBase organization contract did not resolve to a controlled runtime state.');
+        }
+        if ($organization['status'] !== 'VALID'
+            && ($organization['roles'] !== [] || $organization['areas'] !== [])) {
+            throw new RuntimeException('A non-valid LocalBase organization contract exposed semantic mappings.');
         }
 
         return OCP\Server::get(TemporaryAdminAccessService::class)->hasActiveGrant($uid);

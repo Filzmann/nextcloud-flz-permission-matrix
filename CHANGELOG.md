@@ -5,7 +5,12 @@
 - Organisationsconsumer auf `OCA\\LocalBase\\PublicApi\\V1` umgestellt und
   fehlende, ungültige sowie inkompatible Provider weiterhin fail-closed
   behandelt.
+- Die optionale Providerklasse wird erst nach Aktivierungs- und Klassenprüfung
+  über `OCP\\Server` aufgelöst. Damit bleibt auch ein aktivierter älterer
+  LocalBase-Stand ohne V1-Service kontrolliert inkompatibel.
 - Fresh Install und Runtime auf Nextcloud 34 mit und ohne LocalBase geprüft.
+- Deaktivierung, Entfernung und Wiederinstallation des aktuellen V1-Providers
+  sowie eines älteren LocalBase-Stands ohne V1 auf Nextcloud 34 geprüft.
 - Standalone-Testlauf von benachbarten Repositories entkoppelt, JavaScript-
   Tests für ESM-Hostprojekte als CommonJS gekennzeichnet und das
   Groupfolders-Quellgate um einen `grep`-Fallback für Images ohne `rg`
