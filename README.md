@@ -73,6 +73,9 @@ realen V1-Provider geprüft. Zusätzlich bleiben Scan, Oberfläche und API bei
 Deaktivierung und Entfernung des Providers verfügbar. Die Wiederinstallation
 ist sowohl mit dem aktuellen V1-Stand als auch mit einem älteren LocalBase ohne
 V1-Service geprüft; der ältere Stand bleibt dabei kontrolliert `INCOMPATIBLE`.
+Das In-place-Update von LocalBase `0.12.0-dev.1` auf `0.12.0-dev.2` erhält die
+synthetische Organisationskonfiguration bytegenau und hält den Consumer
+verfügbar.
 
 ## Installation lokal
 
