@@ -6,6 +6,7 @@ namespace OCA\FilzmannPermissionMatrix\AppInfo;
 
 use OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener;
 use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
+use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener;
 use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
 use OCA\FilzmannPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
 use OCA\FilzmannPermissionMatrix\Service\GroupFoldersSourceInterface;
@@ -20,6 +21,7 @@ use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
 use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessChecker;
 use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+use OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -37,6 +39,7 @@ class Application extends App implements IBootstrap {
     public function register(IRegistrationContext $context): void {
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
         $context->registerEventListener(RegisterPersonalDataProvidersEvent::class, PermissionMatrixPersonalDataProviderListener::class);
+        $context->registerEventListener(RegisterProcessingMetadataProvidersEvent::class, PermissionMatrixProcessingMetadataProviderListener::class);
         $context->registerEventListener(RegisterRetentionProvidersEvent::class, PermissionMatrixRetentionProviderListener::class);
         $context->registerServiceAlias(NativeSharingSourceInterface::class, NextcloudSharingSource::class);
         $context->registerServiceAlias(GroupFoldersSourceInterface::class, NextcloudGroupFoldersSource::class);

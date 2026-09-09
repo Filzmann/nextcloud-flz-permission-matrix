@@ -41,6 +41,23 @@ beim Datenschutz-Center. Er meldet fällige technische Referenzen ohne UIDs,
 freie Dateinamen, Auditdetails oder Inhalte. Der Vertrag besitzt keinen
 Ausführungspfad.
 
+## Verarbeitungsverzeichnis
+
+Die App veröffentlicht ihren statischen, app-eigenen Verarbeitungskatalog
+optional und lazy über den öffentlichen V1-Vertrag des Datenschutz-Centers.
+`resources/privacy-processing.json` ist die kanonische Quelle für die vier
+belegten Verarbeitungen Snapshot/Matrix, Matrixexport, Auditprotokoll und
+temporäre Adminfreigabe. Der Katalog folgt dem Root-Vertrag
+`docs/contracts/privacy-processing-metadata.schema.json`, enthält keine
+personenbezogenen Laufzeitdaten und markiert offene fachliche oder rechtliche
+Entscheidungen als `PRIVACY-DECISION-REQUIRED`.
+
+Die vorhandenen PersonalData- und Retention-Provider bleiben die
+subjectgebundenen beziehungsweise laufzeitbezogenen Quellen. Insbesondere
+bleiben die beiden 180-Tage-Fristen nicht-destruktive `REVIEW`-Policies; nur
+die bereits implementierte mengenbasierte Snapshotbegrenzung löscht
+verdrängte Snapshotdaten.
+
 ## Gruppenfamilien
 
 Die Matrix deutet Rollen und Bereiche ausschließlich über

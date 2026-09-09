@@ -114,6 +114,13 @@ Wichtige Pruefungen:
   Snapshot-/Exportinhalte, freie Dateinamen, freie Auditdetails und Angaben
   anderer Personen bleiben ausgeschlossen. Fehlt oder ist die Privacy-App
   deaktiviert, muss die Permission-Matrix unverändert starten.
+- Der app-eigene statische Verarbeitungskatalog liegt ausschließlich in
+  `resources/privacy-processing.json`, folgt dem Root-Vertrag
+  `docs/contracts/privacy-processing-metadata.schema.json` und wird optional
+  sowie lazy über den öffentlichen Processing-Metadata-V1-Vertrag des
+  Datenschutz-Centers registriert. Er enthält keine personenbezogenen
+  Laufzeitdaten; offene Fachentscheidungen bleiben
+  `PRIVACY-DECISION-REQUIRED`.
 
 ## Tests
 

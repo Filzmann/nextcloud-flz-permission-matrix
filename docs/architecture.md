@@ -35,3 +35,12 @@ Standardscans und Exporte vermeiden Benutzerlisten, Secrets, Dateiinhalte und
 personenbezogene Pfade. Viewer-, Administrations-, Baseline-, Scan- und
 Exportrechte werden serverseitig geprüft. Native Administration allein
 erteilt keinen fachlichen Vollzugriff.
+
+Der statische Processing-Katalog in `resources/privacy-processing.json` ist
+die app-eigene Policyquelle für Snapshot/Matrix, Export, Audit und temporäre
+Adminfreigaben. Er wird über den öffentlichen
+`OCA\FilzmannDataProtection\PublicApi\V1`-Vertrag lazy registriert und enthält
+keine Laufzeitdatensätze. PersonalData- und Retention-Provider lesen weiterhin
+nur app-eigene Laufzeitdaten; sie werden nicht durch den Katalog ersetzt.
+Offene Rechtsgrundlagen, Fachverantwortung, Backup-, Einschränkungs- oder
+Löschentscheidungen bleiben explizit `PRIVACY-DECISION-REQUIRED`.

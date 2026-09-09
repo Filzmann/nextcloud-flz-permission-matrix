@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- App-eigenen Processing-Metadata-Katalog für Snapshot/Matrix, Export, Audit
+  und temporäre Adminfreigaben über den optionalen V1-Vertrag des
+  Datenschutz-Centers veröffentlicht.
 - Organisationsconsumer auf `OCA\\LocalBase\\PublicApi\\V1` umgestellt und
   fehlende, ungültige sowie inkompatible Provider weiterhin fail-closed
   behandelt.

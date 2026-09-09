@@ -76,6 +76,11 @@ namespace {
         $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class] ?? null,
         'The app must register its optional V1 retention preview provider lazily.'
     );
+    assertSameValue(
+        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener::class,
+        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class] ?? null,
+        'The app must register its optional V1 processing metadata provider lazily.'
+    );
 
     echo 'Application registration tests passed' . PHP_EOL;
 }
