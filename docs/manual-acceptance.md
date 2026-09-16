@@ -82,6 +82,21 @@ Begründung verpflichtend.
 | E6 | Datensparsame Abnahme | Formular, Screenshots, Exporte und Auditbelege prüfen. | Es wurden nur synthetische beziehungsweise redigierte Daten dokumentiert; keine Secrets oder Dateiinhalte sind enthalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E7 | Datenschutz-REVIEW-Fristen | Für Exportmetadaten und Auditprotokolle unterschiedliche Fristen speichern und die Art.-15-Auskunft mit synthetischen alten Datensätzen öffnen. | Beide Werte bleiben unabhängig erhalten; fällige Datensätze erscheinen als `REVIEW erforderlich`, ohne dass ein Datensatz gelöscht wird. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
+## Automatisierter lokaler Nachweis vom 11.09.2026
+
+Im Rahmen der risikoarmen Luna-Prüfung wurden ausschließlich lokale, nicht
+mutierende Prüfungen ausgeführt:
+
+| Prüfung | Ergebnis | Aussagegrenze |
+|---|---|---|
+| `php tests/run.php` | erfolgreich | PHP-Syntax sowie Adapter-, Scan-, Matrix-, Rechte-, Export-, Privacy-, Processing-Metadata-, Retention- und Adminverträge sind grün. |
+| `node tests/run-js.mjs` | erfolgreich | JavaScript-Syntax sowie Render-, Accessibility- und Navigation-Smokes sind grün. |
+| `git diff --check` | erfolgreich | Keine Whitespace-Fehler im Arbeitsstand. |
+
+DDEV, `occ`, Installation, App-Aktivierung, Nextcloud-Berechtigungen und
+Snapshots wurden nicht verändert. Dieser Nachweis ersetzt weder die manuelle
+Abnahme noch das kontrollierte Groupfolders-/Future-Compatibility-Gate.
+
 ## Abschlussentscheidung
 
 | Feld | Eintrag |

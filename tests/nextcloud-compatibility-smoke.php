@@ -6,6 +6,13 @@ use OCA\FilzmannPermissionMatrix\Service\OrganizationSnapshotService;
 use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 
 return [
+    'providerRegistrations' => [
+        'filzmann_data_protection' => [
+            OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class,
+            OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class,
+            OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class,
+        ],
+    ],
     'uiPath' => '/index.php/apps/filzmann_permission_matrix/',
     'preGrantUiStatuses' => [403],
     'postGrantUiStatuses' => [200],
