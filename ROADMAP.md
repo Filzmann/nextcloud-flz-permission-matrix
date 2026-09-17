@@ -54,15 +54,6 @@ app-lokalen `verify-nextcloud-future-compatibility`-Nachweis.
 - Einen versionsgebundenen Adapter nur nach separater Risiko-, Datenschutz-,
   Update- und Releaseentscheidung implementieren.
 
-## Systemweit gegatete Aufgabe
-
-### BPM-L10N – Matrix und Exporte lokalisieren
-
-Aktivierung ausschließlich nach Freigabe von Root-Vorhaben `ZM-06`.
-Sichtbare Meldungen dürfen lokalisiert werden; Berechtigungsschlüssel,
-Effekte, Scope-IDs, Snapshotdaten und Adapterstatus bleiben sprachneutral.
-Eine Exportlocale muss reproduzierbar sein.
-
 ## Staging und weitere Produkte
 
 - Viewer-, Admin-, Export- und Auditgrenzen positiv und negativ prüfen.
@@ -73,3 +64,17 @@ Eine Exportlocale muss reproduzierbar sein.
 
 Vor jedem neuen Adapter sind Eigentümer, Coverage, Unknown-/Unsupported-
 Fallback, Allow-/Deny-Fälle, Personenbezug und Pfadredaktion festzulegen.
+
+## Bewusst zurückgestellt – niedrigste Priorität
+
+### BPM-L10N – Matrix und Exporte lokalisieren
+
+Status seit 17. September 2026: Die Umsetzung beginnt erst nach allen höher
+priorisierten Roadmap-Aufgaben und einer erneuten ausdrücklichen Freigabe des
+Root-Vorhabens `ZM-06`. Neue Funktionen und Codeänderungen berücksichtigen
+die spätere Lokalisierbarkeit an den jeweils berührten Stellen, lösen aber
+keine flächige Umstellung oder Übersetzungsimplementierung aus.
+
+Bei der späteren Umsetzung dürfen sichtbare Meldungen lokalisiert werden;
+Berechtigungsschlüssel, Effekte, Scope-IDs, Snapshotdaten und Adapterstatus
+bleiben sprachneutral. Eine Exportlocale muss reproduzierbar sein.
