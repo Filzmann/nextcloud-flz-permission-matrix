@@ -149,8 +149,10 @@ vorhandene Gruppe, etwa `Personalrat`, ersetzt werden. Ein IKT-Ausschuss und
 Datenschutzbeauftragte benötigen typischerweise Leserechte für technische
 Prüfung beziehungsweise datenschutzrechtliche Beratung, aber keine
 Konfigurations-, Scan- oder Baseline-Rechte. Diese administrativen Rechte
-sollten auf eine kleine zuständige Gruppe wie `IT-Administration` und native
-Nextcloud-Administratoren begrenzt bleiben.
+sollten auf eine kleine zuständige Gruppe wie `IT-Administration` sowie
+native Nextcloud-Administrationskonten mit aktiver app-lokaler Freigabe
+begrenzt bleiben. Die Freigabe selbst steuert ausschließlich die kanonische
+Gruppe `Datenschutzbeauftragte`.
 
 ### Native Nextcloud-Gruppenfreigaben
 
@@ -259,10 +261,14 @@ php occ permission-matrix:status
 - Konfiguration, Baseline-Freigabe und manuelle Scans sind auf konfigurierte
   Admin-Gruppen sowie Nextcloud-Admins mit aktiver app-lokaler
   Vollzugriffsfreigabe beschraenkt. Die Freigabe gilt je Admin hoechstens 24
-  Stunden; Beginn, geplantes Ende und Widerruf werden in der App protokolliert.
+  Stunden. Ausschliesslich Mitglieder der kanonischen Nextcloud-Gruppe
+  `Datenschutzbeauftragte` koennen die Freigabehistorie in der Fachapp lesen
+  sowie Freigaben fuer aktuelle Nextcloud-Administrationskonten erteilen und
+  widerrufen; nativer Adminstatus allein reicht nicht. Beginn, geplantes Ende,
+  handelnde Datenschutzbeauftragte und Widerruf werden app-lokal protokolliert.
 - App-Zugriffe werden in der eigenen Audit-Tabelle protokolliert, ohne sensible Inhalte zu loggen.
 - Die Art.-15-Auskunft umfasst auch die eigene Rolle in app-lokalen
-  Adminfreigaben; Kennungen anderer beteiligter Administrator*innen werden
+  Adminfreigaben; Kennungen anderer beteiligter Personen werden
   dabei nicht ausgegeben.
 
 ## Entwicklungsstand

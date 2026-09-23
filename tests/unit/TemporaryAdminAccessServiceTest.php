@@ -7,7 +7,7 @@ namespace Psr\Log { interface LoggerInterface { public function emergency(string
 namespace OCP {
     interface IUser { public function getUID(): string; }
     interface IUserSession { public function getUser(): ?IUser; }
-    interface IGroupManager { public function isAdmin(string $uid): bool; }
+    interface IGroupManager { public function isAdmin(string $uid): bool; public function isInGroup(string $uid,string $gid):bool; }
 }
 namespace OCP\AppFramework\Utility {
     interface ITimeFactory extends \Psr\Clock\ClockInterface { public function getTime(): int; public function getDateTime(string $time='now',?\DateTimeZone $timezone=null):\DateTime; public function withTimeZone(\DateTimeZone $timezone):static; public function getTimeZone(?string $timezone=null):\DateTimeZone; }
@@ -24,9 +24,14 @@ namespace {
     use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
     use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 
-    $actor = new class implements OCP\IUser { public function getUID(): string { return 'admin-operator'; } };
+    $actor = new class implements OCP\IUser { public function getUID(): string { return 'privacy-officer'; } };
     $session = new class($actor) implements OCP\IUserSession { public function __construct(public ?OCP\IUser $user) {} public function getUser(): ?OCP\IUser { return $this->user; } };
-    $groups = new class implements OCP\IGroupManager { public array $admins=['admin-operator','admin-target']; public function isAdmin(string $uid): bool { return in_array($uid,$this->admins,true); } };
+    $groups = new class implements OCP\IGroupManager {
+        public array $admins=['admin-operator','admin-target'];
+        public array $privacyOfficers=['privacy-officer'];
+        public function isAdmin(string $uid): bool { return in_array($uid,$this->admins,true); }
+        public function isInGroup(string $uid,string $gid):bool { return $gid==='Datenschutzbeauftragte' && in_array($uid,$this->privacyOfficers,true); }
+    };
     $clock = new class implements OCP\AppFramework\Utility\ITimeFactory {
         public function now(): DateTimeImmutable { return new DateTimeImmutable('2026-08-25T10:00:00+00:00'); }
         public function getTime(): int { return $this->now()->getTimestamp(); }
@@ -51,7 +56,11 @@ namespace {
     $logger = new class implements Psr\Log\LoggerInterface { public array $messages=[];public function emergency(string|Stringable $m,array $c=[]):void{}public function alert(string|Stringable $m,array $c=[]):void{}public function critical(string|Stringable $m,array $c=[]):void{}public function error(string|Stringable $m,array $c=[]):void{$this->messages[]=['error',(string)$m,$c];}public function warning(string|Stringable $m,array $c=[]):void{}public function notice(string|Stringable $m,array $c=[]):void{}public function info(string|Stringable $m,array $c=[]):void{$this->messages[]=['info',(string)$m,$c];}public function debug(string|Stringable $m,array $c=[]):void{}public function log($l,string|Stringable $m,array $c=[]):void{} };
     $service = new TemporaryAdminAccessService($session,$groups,$repository,$clock,$logger);
 
+    if (!$service->canManage() || $service->currentAdminNeedsGrant()) throw new RuntimeException('Datenschutzbeauftragte ohne Adminstatus müssen die Freigaben verwalten können.');
+    if ($service->state()['history'] !== []) throw new RuntimeException('Datenschutzbeauftragte müssen die Historie lesen können.');
     try { $service->activate('admin-target',1441); throw new RuntimeException('Mehr als 24 Stunden wurden akzeptiert.'); } catch (InvalidArgumentException) {}
+    try { $service->activate('ordinary',60); throw new RuntimeException('Ein manipuliertes Nicht-Admin-Ziel wurde akzeptiert.'); } catch (InvalidArgumentException $error) { if ($error->getMessage()==='Ein manipuliertes Nicht-Admin-Ziel wurde akzeptiert.') throw $error; }
+    try { $service->revoke('ordinary'); throw new RuntimeException('Ein manipuliertes Nicht-Admin-Ziel wurde widerrufen.'); } catch (InvalidArgumentException $error) { if ($error->getMessage()==='Ein manipuliertes Nicht-Admin-Ziel wurde widerrufen.') throw $error; }
     if ($repository->mutations!==0) throw new RuntimeException('Eine ungültige Dauer darf keine Historie verändern.');
 
     $grant=$service->activate('admin-target',1440);
@@ -61,14 +70,36 @@ namespace {
     $groups->admins=['admin-operator'];
     if ($service->hasActiveGrant('admin-target')) throw new RuntimeException('Entzogener Nextcloud-Adminstatus muss die Freigabe sofort unwirksam machen.');
     $groups->admins=['admin-operator','admin-target'];
-    if (!$service->revoke('admin-target')||$service->hasActiveGrant('admin-target')) throw new RuntimeException('Widerruf muss den aktiven Zeitraum beenden.');
-
-    $session->user=new class implements OCP\IUser { public function getUID():string{return 'ordinary';} };
+    $groups->privacyOfficers=[];
     $before=$repository->mutations;
-    try { $service->activate('admin-target',60); throw new RuntimeException('Nicht-Admin durfte freigeben.'); } catch (RuntimeException $error) { if ($error->getMessage()==='Nicht-Admin durfte freigeben.') throw $error; }
-    if ($repository->mutations!==$before) throw new RuntimeException('Abgewiesene Freigabe darf nichts persistieren.');
+    try { $service->revoke('admin-target'); throw new RuntimeException('Nach Rollenverlust durfte widerrufen werden.'); } catch (RuntimeException $error) { if ($error->getMessage()==='Nach Rollenverlust durfte widerrufen werden.') throw $error; }
+    if ($repository->mutations!==$before) throw new RuntimeException('Rollenverlust muss ohne Mutation verweigern.');
+    $groups->privacyOfficers=['privacy-officer'];
+    if (!$service->revoke('admin-target')||$service->hasActiveGrant('admin-target')) throw new RuntimeException('Widerruf muss den aktiven Zeitraum beenden.');
+    if (($repository->rows[0]['revokedBy'] ?? null)!=='privacy-officer') throw new RuntimeException('Die freigebende Datenschutzrolle muss auditierbar bleiben.');
+
+    foreach (['admin-operator','ordinary'] as $deniedUid) {
+        $session->user=new class($deniedUid) implements OCP\IUser { public function __construct(private string $uid){} public function getUID():string{return $this->uid;} };
+        $before=$repository->mutations;
+        if ($service->canManage()) throw new RuntimeException('Native Administration oder gewöhnliches Konto darf keine Freigaben verwalten.');
+        foreach (['state','activate','revoke'] as $operation) {
+            try {
+                if ($operation==='state') $service->state();
+                elseif ($operation==='activate') $service->activate('admin-target',60);
+                else $service->revoke('admin-target');
+                throw new RuntimeException('Unberechtigter Zugriff wurde akzeptiert: '.$operation);
+            } catch (RuntimeException $error) {
+                if (str_starts_with($error->getMessage(),'Unberechtigter Zugriff wurde akzeptiert:')) throw $error;
+            }
+        }
+        if ($repository->mutations!==$before) throw new RuntimeException('Abgewiesene Aktionen dürfen nichts persistieren.');
+    }
+
+    $session->user=new class implements OCP\IUser { public function getUID():string{return 'admin-operator';} };
+    if (!$service->currentAdminNeedsGrant()) throw new RuntimeException('Ein aktueller Admin ohne Freigabe benötigt den sicheren Hinweis.');
+    $groups->privacyOfficers=['privacy-officer','admin-operator'];
+    if (!$service->canManage() || !$service->currentAdminNeedsGrant()) throw new RuntimeException('Nur dasselbe kombinierte Admin-/Datenschutzkonto darf Link und Hinweis erhalten.');
 
     echo "Permission Matrix temporary admin access service tests passed\n";
 }
-
 

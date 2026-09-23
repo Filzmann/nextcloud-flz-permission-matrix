@@ -94,10 +94,10 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
             $roles[] = 'Ziel der Vollzugriffsfreigabe';
         }
         if ($record['grantedBy'] === $subjectUid) {
-            $roles[] = 'Freigebende Administration';
+            $roles[] = 'Freigebende Datenschutzbeauftragte';
         }
         if ($record['revokedBy'] === $subjectUid) {
-            $roles[] = 'Widerrufende Administration';
+            $roles[] = 'Widerrufende Datenschutzbeauftragte';
         }
         $actualEnd = $record['revokedAt'] ?? $record['endsAt'];
 
@@ -107,7 +107,7 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
             reference: 'permission-matrix:admin-access:' . (string)$record['id'],
             summary: 'Admin-Vollzugriff vom ' . $this->dateLabel((string)$record['startsAt']),
             purpose: 'Nachweis einer zeitlich begrenzten administrativen Matrix-Freigabe',
-            source: 'App-lokale Freigabe im Nextcloud-Adminbereich',
+            source: 'App-lokale Freigabe in der Fachapp durch Datenschutzbeauftragte',
             recipientCategories: $this->recipients(),
             retention: 'Keine feste Löschfrist festgelegt; die sicherheitsrelevante Freigabehistorie bleibt bis zu einer gesonderten Aufbewahrungsentscheidung erhalten.',
             thirdCountryTransfer: 'Durch die Permission-Matrix sind keine Drittlandübermittlungen vorgesehen.',

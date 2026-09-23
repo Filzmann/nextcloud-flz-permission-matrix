@@ -12,7 +12,7 @@ foreach (['pm_admin_access', 'target_uid', 'granted_by', 'revoked_by', "'source'
     }
 }
 
-foreach (['Zeitlich begrenzter Admin-Vollzugriff', 'Eigene Rolle im Vorgang', 'Kennungen anderer beteiligter'] as $contract) {
+foreach (['Zeitlich begrenzter Admin-Vollzugriff', 'Eigene Rolle im Vorgang', 'Kennungen anderer beteiligter', 'Datenschutzbeauftragte', 'Fachapp'] as $contract) {
     if (!str_contains($provider, $contract)) {
         throw new RuntimeException('Datensparsame Adminfreigabe-Auskunft fehlt: ' . $contract);
     }

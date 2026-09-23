@@ -94,12 +94,17 @@ Wichtige Pruefungen:
 - `Betriebsrat`, `IKT-Ausschuss`, `Datenschutzbeauftragte` und
   `IT-Administration` sind anpassbare Ausgangsbeispiele, keine fest
   vorausgesetzten Organisationsrollen. Ein Personalrat kann die
-  Betriebsratsgruppe vollständig ersetzen.
+  Betriebsratsgruppe vollständig ersetzen. Davon ausgenommen ist allein die
+  app-lokale Adminfreigabe: deren Steuerungsrolle ist die kanonische native
+  Gruppe `Datenschutzbeauftragte`.
 - App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer
   konfigurierte Admin-Gruppen oder Nextcloud-Admins mit aktiver app-lokaler
   Vollzugriffsfreigabe erlaubt. Die Freigabe wird je Admin erteilt, endet
   spaetestens nach 24 Stunden und bleibt mit Beginn, geplantem Ende und
-  gegebenenfalls vorzeitigem Widerruf nachvollziehbar.
+  gegebenenfalls vorzeitigem Widerruf nachvollziehbar. Nur Mitglieder von
+  `Datenschutzbeauftragte` duerfen die Historie lesen sowie Freigaben fuer
+  aktuelle Nextcloud-Administrationskonten erteilen oder widerrufen;
+  nativer Adminstatus allein reicht dafuer nicht.
 - Alle App-Zugriffe werden mit Zeitpunkt, Benutzer-ID, Aktion, Export-Flag und optionaler Snapshot-ID in eigenen Audit-Tabellen protokolliert.
 - Exportmetadaten und Auditprotokolle besitzen getrennt konfigurierbare
   REVIEW-Fristen mit jeweils 180 Tagen als Standard. Ein Fristablauf darf

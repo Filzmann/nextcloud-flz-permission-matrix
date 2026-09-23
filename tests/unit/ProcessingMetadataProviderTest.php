@@ -34,6 +34,10 @@ namespace {
     if (array_key_exists('personal_runtime_data', $catalog->toArray())) {
         throw new RuntimeException('Personenbezogene Laufzeitdaten dürfen nicht Teil des Metadatenkatalogs sein.');
     }
+    $catalogJson = json_encode($catalog->toArray(), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+    foreach (['Datenschutzbeauftragte', 'nativer Adminstatus ist dafür weder erforderlich noch ausreichend', 'Allow-, Deny- und Manipulationsprüfungen sind automatisiert belegt'] as $policy) {
+        assertContainsText($policy, $catalogJson, 'Der Processing-Katalog bildet die umgesetzte DPO-Freigabepolicy nicht korrekt ab.');
+    }
 
     $registration = new RegisterProcessingMetadataProvidersEvent();
     $listener = new PermissionMatrixProcessingMetadataProviderListener($provider);

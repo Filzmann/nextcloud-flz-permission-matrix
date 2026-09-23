@@ -36,6 +36,15 @@ personenbezogene Pfade. Viewer-, Administrations-, Baseline-, Scan- und
 Exportrechte werden serverseitig geprüft. Native Administration allein
 erteilt keinen fachlichen Vollzugriff.
 
+Die app-lokale Freigabesteuerung liegt rollenabhängig im Haupteinstieg und
+nicht im technischen Nextcloud-Adminbereich. Nur Mitglieder der kanonischen
+Gruppe `Datenschutzbeauftragte` dürfen Historie, Erteilung und Widerruf
+verwenden; Ziel bleibt ein aktuelles natives Administrationskonto. Ein
+kombiniertes Admin-/Datenschutzkonto ohne eigene aktive Freigabe erhält einen
+direkten Link zur Steuerung, während die Matrixdaten weiterhin getrennt
+serverseitig geschützt bleiben. Freigabezeiträume bilden zugleich den
+minimalen Auditnachweis.
+
 Der statische Processing-Katalog in `resources/privacy-processing.json` ist
 die app-eigene Policyquelle für Snapshot/Matrix, Export, Audit und temporäre
 Adminfreigaben. Er wird über den öffentlichen

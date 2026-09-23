@@ -7,13 +7,6 @@ $config = $_['config'];
 
 <div id="pm-admin" class="pm-admin">
     <h2>Berechtigungsmatrix</h2>
-    <section aria-labelledby="pm-full-access-heading">
-        <h3 id="pm-full-access-heading">Zeitlich begrenzter Admin-Vollzugriff</h3>
-        <p>Native Nextcloud-Administration erteilt kein automatisches Verwaltungsrecht für die Berechtigungsmatrix. Eine Freigabe gilt nur für das angegebene Administrationskonto. Maximal 24 Stunden sind zulässig.</p>
-        <form id="pm-full-access-form"><label>Admin-Benutzerkennung <input name="targetUid" required maxlength="64" autocomplete="off"></label><label>Dauer <select name="durationMinutes" required><option value="60">1 Stunde</option><option value="240">4 Stunden</option><option value="480">8 Stunden</option><option value="1440">24 Stunden</option></select></label><label><input id="pm-full-access-enabled" name="enabled" type="checkbox" required> Vollzugriff für diesen Zeitraum aktivieren</label><button type="submit">Freigabe aktivieren</button></form>
-        <p id="pm-full-access-status" role="status" aria-live="polite"></p>
-        <table><caption>Protokollierte Admin-Vollzugriffszeiträume</caption><thead><tr><th>Ziel-Admin</th><th>Freigegeben von</th><th>Von</th><th>Geplant bis</th><th>Tatsächlich bis / Status</th><th>Aktion</th></tr></thead><tbody id="pm-full-access-history"><tr><td colspan="6">Freigaben werden geladen.</td></tr></tbody></table>
-    </section>
     <form id="pm-admin-form">
         <label>
             Leseberechtigte Gruppen

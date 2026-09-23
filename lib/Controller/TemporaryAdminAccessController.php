@@ -11,6 +11,7 @@ use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessDeniedException;
 use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
@@ -24,6 +25,7 @@ final class TemporaryAdminAccessController extends Controller {
     }
 
     #[NoCSRFRequired]
+    #[NoAdminRequired]
     public function status(): JSONResponse {
         try {
             $state = $this->service->state();
@@ -36,6 +38,7 @@ final class TemporaryAdminAccessController extends Controller {
         }
     }
 
+    #[NoAdminRequired]
     public function activate(string $targetUid, int $durationMinutes): JSONResponse {
         try {
             return new JSONResponse(['grant' => $this->serializeGrant($this->service->activate($targetUid, $durationMinutes))]);
@@ -48,9 +51,12 @@ final class TemporaryAdminAccessController extends Controller {
         }
     }
 
+    #[NoAdminRequired]
     public function revoke(string $targetUid): JSONResponse {
         try {
             return new JSONResponse(['revoked' => $this->service->revoke($targetUid)]);
+        } catch (InvalidArgumentException $error) {
+            return new JSONResponse(['message' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
         } catch (TemporaryAdminAccessDeniedException) {
             return $this->denied();
         } catch (Throwable $error) {
@@ -74,5 +80,4 @@ final class TemporaryAdminAccessController extends Controller {
         return new JSONResponse(['message' => 'Der Vollzugriff konnte nicht verarbeitet werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
     }
 }
-
 

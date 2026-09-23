@@ -7,6 +7,7 @@ const template = readFileSync(join(root, 'templates', 'index.php'), 'utf8');
 const adminTemplate = readFileSync(join(root, 'templates', 'admin.php'), 'utf8');
 const main = readFileSync(join(root, 'js', 'main.js'), 'utf8');
 const admin = readFileSync(join(root, 'js', 'admin.js'), 'utf8');
+const adminAccess = readFileSync(join(root, 'js', 'admin-access.js'), 'utf8');
 const style = readFileSync(join(root, 'css', 'style.css'), 'utf8');
 const info = readFileSync(join(root, 'appinfo', 'info.xml'), 'utf8');
 
@@ -43,6 +44,9 @@ assert(main.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("export_metadata_retention_days: data.get('export_metadata_retention_days') || '180'"));
 assert(admin.includes("audit_retention_days: data.get('audit_retention_days') || '180'"));
+assert(template.includes("script('filzmann_permission_matrix', 'admin-access')"));
+assert(adminAccess.includes("type === 'error' ? 'alert' : 'status'"));
+assert(!adminTemplate.includes('pm-full-access-form'));
 assert(!style.includes('#content'));
 assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
 assert(/\.pm-admin\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none/s.test(style));

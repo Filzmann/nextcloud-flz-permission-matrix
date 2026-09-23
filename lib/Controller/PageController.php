@@ -7,6 +7,7 @@ namespace OCA\FilzmannPermissionMatrix\Controller;
 use OCA\FilzmannPermissionMatrix\AppInfo\Application;
 use OCA\FilzmannPermissionMatrix\Service\AccessService;
 use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
+use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -18,7 +19,8 @@ class PageController extends Controller {
     public function __construct(
         IRequest $request,
         private AccessService $access,
-        private AuditLogService $auditLog
+        private AuditLogService $auditLog,
+        private TemporaryAdminAccessService $temporaryAdminAccess,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -26,7 +28,10 @@ class PageController extends Controller {
     #[NoAdminRequired]
     #[NoCSRFRequired]
     public function index(): TemplateResponse {
-        if (!$this->access->canViewCurrentUser()) {
+        $hasMatrixAccess = $this->access->canViewCurrentUser();
+        $canManageAdminAccess = $this->temporaryAdminAccess->canManage();
+        $showMissingAdminGrant = $canManageAdminAccess && $this->temporaryAdminAccess->currentAdminNeedsGrant();
+        if (!$hasMatrixAccess && !$canManageAdminAccess) {
             $this->auditLog->record('page.index.denied');
             $response = new TemplateResponse(Application::APP_ID, 'denied');
             $response->setStatus(Http::STATUS_FORBIDDEN);
@@ -34,10 +39,14 @@ class PageController extends Controller {
             return $response;
         }
 
-        $this->auditLog->record('page.index');
+        $this->auditLog->record($hasMatrixAccess ? 'page.index' : 'page.index.admin_access');
 
         return new TemplateResponse(Application::APP_ID, 'index', [
-            'can_manage' => $this->access->canManageCurrentUser(),
+            'can_manage' => $hasMatrixAccess && $this->access->canManageCurrentUser(),
+            'hasMatrixAccess' => $hasMatrixAccess,
+            'canManageAdminAccess' => $canManageAdminAccess,
+            'showMissingAdminGrant' => $showMissingAdminGrant,
+            'showAdminAccessLink' => $canManageAdminAccess && $showMissingAdminGrant,
         ]);
     }
 }

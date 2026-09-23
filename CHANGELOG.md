@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Temporäre fachliche Adminfreigaben aus dem technischen Adminbereich in den
+  rollenabhängigen App-Einstieg verschoben. Nur Mitglieder von
+  `Datenschutzbeauftragte` können die Historie lesen und für aktuelle native
+  Administrationskonten höchstens 24 Stunden gültige Freigaben erteilen oder
+  widerrufen; native Administration allein bleibt ohne Steuerungsrecht.
+- DPO-Freigaberechte, Audit-/Art.-15-Projektion und Processing-Metadaten an
+  die serverseitig getestete Allow-, Deny- und Manipulationspolicy angepasst.
 - App-eigenen Processing-Metadata-Katalog für Snapshot/Matrix, Export, Audit
   und temporäre Adminfreigaben über den optionalen V1-Vertrag des
   Datenschutz-Centers veröffentlicht.

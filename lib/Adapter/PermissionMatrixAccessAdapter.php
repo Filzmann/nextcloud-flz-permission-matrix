@@ -19,6 +19,8 @@ use OCA\FilzmannPermissionMatrix\Service\InventoryService;
  * - Veraltete konfigurierte Gruppen fuehren zu UNKNOWN statt zu einer erfundenen Freigabe.
  */
 final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface {
+    private const PRIVACY_OFFICER_GROUP = 'Datenschutzbeauftragte';
+
     public function __construct(
         private InventoryService $inventory,
         private ConfigService $config
@@ -42,6 +44,7 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $configuredManage = array_values(array_unique($this->config->adminGroups()));
         $missingView = array_values(array_diff($configuredView, $groups));
         $missingManage = array_values(array_diff($configuredManage, $groups));
+        $missingPrivacyOfficer = !in_array(self::PRIVACY_OFFICER_GROUP, $groups, true);
         $viewGroups = array_values(array_intersect($configuredView, $groups));
         $manageGroups = array_values(array_intersect($configuredManage, $groups));
         $warnings = [];
@@ -51,6 +54,9 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         if ($missingManage !== []) {
             $warnings[] = 'Mindestens eine konfigurierte Admin-Gruppe ist nicht im Gruppeninventar vorhanden.';
         }
+        if ($missingPrivacyOfficer) {
+            $warnings[] = 'Die kanonische Gruppe Datenschutzbeauftragte ist nicht im Gruppeninventar vorhanden.';
+        }
 
         $viewCells = array_fill_keys($groups, '-');
         foreach ($viewGroups as $group) {
@@ -59,6 +65,10 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $manageCells = array_fill_keys($groups, '-');
         foreach ($manageGroups as $group) {
             $manageCells[$group] = 'A';
+        }
+        $adminAccessCells = array_fill_keys($groups, '-');
+        if (!$missingPrivacyOfficer) {
+            $adminAccessCells[self::PRIVACY_OFFICER_GROUP] = 'A';
         }
 
         $temporaryAdminCondition = AccessCondition::all([
@@ -90,6 +100,14 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             'filzmann_permission_matrix:AccessService::canManageUserId',
             $missingManage === [] ? 'high' : 'low'
         )];
+        $adminAccessRules = [new AccessRule(
+            'matrix.temporary-admin-access.manage',
+            'allow',
+            'app:filzmann_permission_matrix',
+            AccessCondition::group(self::PRIVACY_OFFICER_GROUP),
+            'filzmann_permission_matrix:TemporaryAdminAccessService::canManage',
+            $missingPrivacyOfficer ? 'low' : 'high'
+        )];
 
         return new AdapterResult([
             new MatrixRow(
@@ -117,6 +135,19 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
                 $manageCells,
                 $missingManage === [] ? [] : ['Mindestens eine konfigurierte Admin-Gruppe fehlt.'],
                 $manageRules
+            ),
+            new MatrixRow(
+                'AppPermission',
+                'filzmann_permission_matrix',
+                'Temporären Admin-Vollzugriff verwalten',
+                'Ausschließlich die kanonische Datenschutzgruppe erteilt, liest und widerruft Freigaben für aktuelle Nextcloud-Administrationskonten',
+                'Administrieren',
+                $missingPrivacyOfficer ? 'UNKNOWN' : 'NEW',
+                'filzmann_permission_matrix:TemporaryAdminAccessService::canManage',
+                $missingPrivacyOfficer ? 'low' : 'high',
+                $adminAccessCells,
+                $missingPrivacyOfficer ? ['Die kanonische Gruppe Datenschutzbeauftragte fehlt.'] : [],
+                $adminAccessRules
             ),
         ], $warnings, [], [[
             'app_id' => 'filzmann_permission_matrix',
