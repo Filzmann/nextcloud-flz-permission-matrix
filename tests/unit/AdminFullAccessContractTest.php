@@ -21,6 +21,8 @@ foreach (['canManageAdminAccess','showMissingAdminGrant','showAdminAccessLink','
     if (!str_contains($appTemplate.$page,$contract)) throw new RuntimeException('Sichere Rollenprojektion fehlt: '.$contract);
 }
 if (!str_contains($page,'$canManageAdminAccess && $showMissingAdminGrant')) throw new RuntimeException('Direktlink ist nicht auf dasselbe kombinierte Admin- und Datenschutzkonto begrenzt.');
-if (!str_contains($page,'$showMissingAdminGrant = $canManageAdminAccess && $this->temporaryAdminAccess->currentAdminNeedsGrant()')) throw new RuntimeException('Der fehlende-Freigabe-Hinweis ist nicht auf dasselbe kombinierte Admin- und Datenschutzkonto begrenzt.');
+if (!str_contains($page,'$showMissingAdminGrant = $this->temporaryAdminAccess->currentAdminNeedsGrant()')) throw new RuntimeException('Der fehlende-Freigabe-Hinweis wird nicht unabhängig von der Datenschutzrolle für das betroffene Administrationskonto projiziert.');
+if (!str_contains($page,'!$showMissingAdminGrant')) throw new RuntimeException('Das betroffene Administrationskonto kann die sichere Eintrittswarnung nicht erreichen.');
+foreach (['pm-admin-access-warning', '<details', '<summary', 'Datenschutzbeauftragte', 'target="_blank"', 'rel="noopener noreferrer"'] as $contract) if (!str_contains($appTemplate, $contract)) throw new RuntimeException("Kompakte Vollzugriffswarnung am App-Titel fehlt: {$contract}");
 
 echo "Permission Matrix admin full access UI contract tests passed\n";

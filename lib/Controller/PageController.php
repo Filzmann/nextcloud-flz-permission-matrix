@@ -30,8 +30,8 @@ class PageController extends Controller {
     public function index(): TemplateResponse {
         $hasMatrixAccess = $this->access->canViewCurrentUser();
         $canManageAdminAccess = $this->temporaryAdminAccess->canManage();
-        $showMissingAdminGrant = $canManageAdminAccess && $this->temporaryAdminAccess->currentAdminNeedsGrant();
-        if (!$hasMatrixAccess && !$canManageAdminAccess) {
+        $showMissingAdminGrant = $this->temporaryAdminAccess->currentAdminNeedsGrant();
+        if (!$hasMatrixAccess && !$canManageAdminAccess && !$showMissingAdminGrant) {
             $this->auditLog->record('page.index.denied');
             $response = new TemplateResponse(Application::APP_ID, 'denied');
             $response->setStatus(Http::STATUS_FORBIDDEN);

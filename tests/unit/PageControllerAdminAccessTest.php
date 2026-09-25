@@ -46,15 +46,29 @@ namespace {
 
     $request = new class implements OCP\IRequest {};
 
-    foreach ([
-        'ordinary account' => new TemporaryAdminAccessService(false, false),
-        'native admin alone' => new TemporaryAdminAccessService(false, true),
-    ] as $label => $temporaryAccess) {
-        $audit = new AuditLogService();
-        $response = (new PageController($request, new AccessService(false, false), $audit, $temporaryAccess))->index();
-        assertSameValue(403, $response->status(), $label . ' must be denied at the main entry.');
-        assertSameValue(['page.index.denied'], $audit->actions, $label . ' denial must be audited.');
-    }
+    $audit = new AuditLogService();
+    $ordinaryResponse = (new PageController(
+        $request,
+        new AccessService(false, false),
+        $audit,
+        new TemporaryAdminAccessService(false, false),
+    ))->index();
+    assertSameValue(403, $ordinaryResponse->status(), 'An ordinary account must be denied at the main entry.');
+    assertSameValue(['page.index.denied'], $audit->actions, 'The ordinary-account denial must be audited.');
+
+    $audit = new AuditLogService();
+    $adminResponse = (new PageController(
+        $request,
+        new AccessService(false, false),
+        $audit,
+        new TemporaryAdminAccessService(false, true),
+    ))->index();
+    assertSameValue(200, $adminResponse->status(), 'A native admin without a grant must reach its own safe warning.');
+    assertSameValue(false, $adminResponse->params()['hasMatrixAccess'], 'The warning must not disclose matrix data.');
+    assertSameValue(false, $adminResponse->params()['canManageAdminAccess'], 'Native admin status alone must not expose grant controls.');
+    assertSameValue(true, $adminResponse->params()['showMissingAdminGrant'], 'The affected native admin must receive the missing-grant warning.');
+    assertSameValue(false, $adminResponse->params()['showAdminAccessLink'], 'A native admin outside Datenschutzbeauftragte must not receive the grant-management link.');
+    assertSameValue(['page.index.admin_access'], $audit->actions, 'The warning-only entry must be distinguishably audited.');
 
     $audit = new AuditLogService();
     $dpoResponse = (new PageController(
@@ -75,7 +89,7 @@ namespace {
         new AuditLogService(),
         new TemporaryAdminAccessService(true, true),
     ))->index();
-    assertSameValue(true, $combinedResponse->params()['showMissingAdminGrant'], 'Only a combined admin/DPO account should see its missing-grant notice.');
+    assertSameValue(true, $combinedResponse->params()['showMissingAdminGrant'], 'The combined admin/DPO account should see its missing-grant notice.');
     assertSameValue(true, $combinedResponse->params()['showAdminAccessLink'], 'Only the same combined account should receive the direct control link.');
 
     echo "Permission Matrix page controller admin access tests passed\n";
