@@ -83,20 +83,6 @@ Begründung verpflichtend.
 | E7 | Datenschutz-REVIEW-Fristen | Für Exportmetadaten und Auditprotokolle unterschiedliche Fristen speichern und die Art.-15-Auskunft mit synthetischen alten Datensätzen öffnen. | Beide Werte bleiben unabhängig erhalten; fällige Datensätze erscheinen als `REVIEW erforderlich`, ohne dass ein Datensatz gelöscht wird. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E8 | DPO-gesteuerte Adminfreigabe | Mit Datenschutzbeauftragten-Konto ohne nativen Adminstatus Historie lesen, einem aktuellen Test-Admin maximal 24 Stunden Zugriff erteilen und widerrufen; dieselben Requests als nativer Admin allein, gewöhnliches Konto und mit manipuliertem Ziel wiederholen. | Nur die Datenschutzrolle kann steuern; ungültige und unberechtigte Fälle bleiben mutationsfrei, Schreibrequests ohne CSRF-Token werden abgewiesen, und die Freigabehistorie nennt Beginn, Ende sowie handelnde UIDs. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
-## Automatisierter lokaler Nachweis vom 11.09.2026
-
-Im Rahmen der risikoarmen Luna-Prüfung wurden ausschließlich lokale, nicht
-mutierende Prüfungen ausgeführt:
-
-| Prüfung | Ergebnis | Aussagegrenze |
-|---|---|---|
-| `php tests/run.php` | erfolgreich | PHP-Syntax sowie Adapter-, Scan-, Matrix-, Rechte-, Export-, Privacy-, Processing-Metadata-, Retention- und Adminverträge sind grün. |
-| `node tests/run-js.mjs` | erfolgreich | JavaScript-Syntax sowie Render-, Accessibility- und Navigation-Smokes sind grün. |
-| `git diff --check` | erfolgreich | Keine Whitespace-Fehler im Arbeitsstand. |
-
-DDEV, `occ`, Installation, App-Aktivierung, Nextcloud-Berechtigungen und
-Snapshots wurden nicht verändert. Dieser Nachweis ersetzt weder die manuelle
-Abnahme noch das kontrollierte Groupfolders-/Future-Compatibility-Gate.
 
 ## Abschlussentscheidung
 
