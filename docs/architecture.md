@@ -51,5 +51,17 @@ Adminfreigaben. Er wird über den öffentlichen
 `OCA\FilzmannDataProtection\PublicApi\V1`-Vertrag lazy registriert und enthält
 keine Laufzeitdatensätze. PersonalData- und Retention-Provider lesen weiterhin
 nur app-eigene Laufzeitdaten; sie werden nicht durch den Katalog ersetzt.
-Offene Rechtsgrundlagen, Fachverantwortung, Backup-, Einschränkungs- oder
-Löschentscheidungen bleiben explizit `PRIVACY-DECISION-REQUIRED`.
+Die fachliche Verantwortung für Matrix-, Snapshot-, Export- und Auditdaten
+bleibt offen; IKT-Betrieb ersetzt keinen Data Owner. Datenschutzbeauftragte
+verantworten dagegen die Policy der temporären Adminfreigaben und begründete
+Holds.
+
+Für Exportmetadaten und Auditdatensätze ist vollständige Löschung nach 180
+Tagen ohne Restbestand das beschlossene Ziel. Die laufende V1-Schnittstelle
+bleibt dennoch `REVIEW`, bis app-lokale Ausführung, Restore, Holds,
+Nebenläufigkeit und Fehlerpfade vollständig getestet sind. Die Matrix bleibt
+fachlich read-only. Adminfreigabehistorien werden sechs Monate nach dem
+tatsächlichen Ende vollständig gelöscht und durch Restore nie reaktiviert.
+Offene Rechtsgrundlagen, Fachverantwortung der Matrixdaten, Backup- und
+Einschränkungsfragen bleiben `PRIVACY-DECISION-REQUIRED`; die Policy behauptet
+weder rechtliche Freigabe noch bereits produktive Löschvollständigkeit.
