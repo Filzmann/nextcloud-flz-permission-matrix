@@ -50,6 +50,11 @@ assert(!adminTemplate.includes('pm-full-access-form'));
 assert(!style.includes('#content'));
 assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
 assert(/\.pm-admin\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none/s.test(style));
-assert(style.includes('max-height: calc(100vh - 300px)'));
+assert(/\.pm-table-wrap\s*\{[^}]*overflow-x:\s*auto[^}]*overflow-y:\s*visible/s.test(style));
+assert(!style.includes('max-height: calc(100vh - 300px)'));
+assert(/\.pm-head\s*\{[^}]*gap:\s*8px[^}]*margin-bottom:\s*8px/s.test(style));
+assert(/\.pm-filters\s*\{[^}]*gap:\s*6px[^}]*margin-bottom:\s*8px/s.test(style));
+assert(/\.pm-access-notice,\s*\.pm-access-card\s*\{[^}]*margin-bottom:\s*8px[^}]*padding:\s*10px/s.test(style));
+assert(/\.pm-notice\s*\{[^}]*margin:\s*6px 0 8px[^}]*padding:\s*6px 8px/s.test(style));
 
 console.log('Permission Matrix accessibility contract test passed.');

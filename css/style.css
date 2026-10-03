@@ -7,8 +7,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     margin: 0;
-    padding: 24px;
-    padding-bottom: 120px;
+    padding: 12px 16px 32px;
     background: var(--color-main-background);
     color: var(--color-main-text);
 }
@@ -18,22 +17,22 @@
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 24px;
+    padding: 16px;
     color: var(--color-main-text);
 }
 
 .pm-head {
     display: flex;
     justify-content: space-between;
-    gap: 16px;
+    gap: 8px;
     align-items: flex-start;
-    margin-bottom: 18px;
+    margin-bottom: 8px;
 }
 
 .pm-head h1,
 .pm-admin h2 {
-    margin: 0 0 6px;
-    font-size: 28px;
+    margin: 0 0 2px;
+    font-size: 24px;
     font-weight: 700;
 }
 
@@ -56,7 +55,7 @@
 .pm-matrix-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
 }
 
@@ -65,12 +64,12 @@
 .pm-filters button,
 .pm-table button,
 .pm-admin button {
-    min-height: 36px;
+    min-height: 32px;
 }
 
 .pm-tabs {
     border-bottom: 1px solid var(--color-border);
-    margin-bottom: 18px;
+    margin-bottom: 8px;
 }
 
 .pm-tabs button {
@@ -100,8 +99,8 @@
 
 .pm-access-notice,
 .pm-access-card {
-    margin-bottom: 18px;
-    padding: 16px;
+    margin-bottom: 8px;
+    padding: 10px;
     border: 1px solid var(--color-border);
     border-radius: 6px;
     background: var(--color-main-background);
@@ -110,7 +109,7 @@
 .pm-access-notice {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: baseline;
     border-width: 2px;
     border-color: var(--color-warning);
@@ -119,7 +118,7 @@
 .pm-access-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-    gap: 12px;
+    gap: 8px;
     align-items: end;
 }
 
@@ -130,7 +129,7 @@
 }
 
 .pm-access-history {
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .pm-view {
@@ -142,11 +141,12 @@
 }
 
 .pm-filters {
-    margin-bottom: 12px;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
 .pm-matrix-toolbar {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .pm-matrix-toolbar span {
@@ -156,7 +156,7 @@
 .pm-filters label,
 .pm-admin label {
     display: grid;
-    gap: 4px;
+    gap: 2px;
     font-weight: 600;
 }
 
@@ -165,14 +165,14 @@
 .pm-admin input,
 .pm-admin select,
 .pm-admin textarea {
-    min-width: 180px;
+    min-width: 150px;
 }
 
 .pm-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    margin: 14px 0 20px;
+    gap: 8px;
+    margin: 8px 0 12px;
 }
 
 .pm-stat,
@@ -180,7 +180,7 @@
 .pm-diff {
     border: 1px solid var(--color-border);
     border-radius: 6px;
-    padding: 12px;
+    padding: 8px;
     background: var(--color-main-background);
 }
 
@@ -197,11 +197,31 @@
 }
 
 .pm-table-wrap {
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: visible;
     max-width: 100%;
-    max-height: calc(100vh - 300px);
     border: 1px solid var(--color-border);
     border-radius: 6px;
+}
+
+.pm-matrix-scroll-track {
+    box-sizing: border-box;
+    height: 18px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 6px 6px 0 0;
+    background: var(--color-main-background);
+    scrollbar-gutter: stable;
+}
+
+.pm-matrix-scroll-track-active {
+    position: fixed;
+    z-index: 10;
+}
+
+.pm-matrix-scroll-track [data-pm-matrix-scroll-spacer] {
+    height: 1px;
 }
 
 .pm-table {
@@ -213,7 +233,7 @@
 
 .pm-table th,
 .pm-table td {
-    padding: 9px 10px;
+    padding: 7px 8px;
     border-bottom: 1px solid var(--color-border);
     text-align: left;
     vertical-align: top;
@@ -278,7 +298,7 @@
     align-items: baseline;
     gap: 8px;
     width: 100%;
-    padding: 10px;
+    padding: 8px;
     border: 0;
     background: transparent;
     text-align: left;
@@ -396,8 +416,8 @@
 }
 
 .pm-notice {
-    margin: 10px 0 16px;
-    padding: 10px 12px;
+    margin: 6px 0 8px;
+    padding: 6px 8px;
     border-radius: 6px;
     border: 1px solid var(--color-border);
 }
@@ -417,14 +437,14 @@
 
 .pm-admin form {
     display: grid;
-    gap: 14px;
+    gap: 10px;
     max-width: 680px;
 }
 
 @media (max-width: 720px) {
     #permission-matrix-app,
     .pm-admin {
-        padding: 14px;
+        padding: 10px;
     }
 
     .pm-head {

@@ -69,7 +69,10 @@ assert(overview.includes('Deck &lt;unklar&gt;'));
 assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
 assert(!matrix.includes('Deck <Test>'));
-assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar"'));
+assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal scrollbar"'));
+assert(matrix.includes('data-pm-matrix-scroll-track'));
+assert(matrix.includes('data-pm-matrix-scroll-spacer'));
+assert(matrix.includes('data-pm-matrix-scroll'));
 assert(matrix.includes('data-app-toggle="deck"'));
 assert(matrix.includes('<strong>Deck &lt;Test&gt;</strong>'));
 assert(matrix.includes('1 Berechtigung'));
@@ -111,5 +114,53 @@ assert.deepStrictEqual(
 assert.strictEqual(render.adapterCoverage(snapshot, 'deck'), 'UNSUPPORTED');
 assert.deepStrictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: 'PARTIAL', text: '' }), []);
 assert.strictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: '', text: 'IKT-Ausschuss' }).length, 1);
+
+function scrollNode(scrollWidth, clientWidth) {
+    const listeners = new Map();
+    return {
+        scrollWidth,
+        clientWidth,
+        scrollLeft: 0,
+        style: {},
+        hidden: false,
+        addEventListener(type, listener) {
+            listeners.set(type, listener);
+        },
+        removeEventListener(type) {
+            listeners.delete(type);
+        },
+        emit(type) {
+            listeners.get(type)?.();
+        },
+        listenerCount() {
+            return listeners.size;
+        }
+    };
+}
+
+const tableWrap = scrollNode(1200, 600);
+const scrollTrack = scrollNode(0, 600);
+const scrollSpacer = { style: {} };
+scrollTrack.querySelector = (selector) => selector === '[data-pm-matrix-scroll-spacer]' ? scrollSpacer : null;
+const scrollRoot = {
+    querySelector(selector) {
+        if (selector === '[data-pm-matrix-scroll]') return tableWrap;
+        if (selector === '[data-pm-matrix-scroll-track]') return scrollTrack;
+        return null;
+    }
+};
+
+render.bindMatrixScrollTrack(scrollRoot);
+assert.strictEqual(scrollTrack.hidden, false);
+assert.strictEqual(scrollSpacer.style.width, '1200px');
+tableWrap.scrollLeft = 240;
+tableWrap.emit('scroll');
+assert.strictEqual(scrollTrack.scrollLeft, 240);
+scrollTrack.scrollLeft = 80;
+scrollTrack.emit('scroll');
+assert.strictEqual(tableWrap.scrollLeft, 80);
+render.bindMatrixScrollTrack(scrollRoot);
+assert.strictEqual(tableWrap.listenerCount(), 1);
+assert.strictEqual(scrollTrack.listenerCount(), 1);
 
 console.log('Permission Matrix render smoke test passed.');
