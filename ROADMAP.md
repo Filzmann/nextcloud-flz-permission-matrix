@@ -61,6 +61,14 @@ Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 ## Staging und weitere Produkte
 
+### BPM-MATRIX-SCROLL – horizontale Matrixnavigation dauerhaft erreichbar machen
+
+- Die horizontale Scrollleiste der Matrix unabhängig von der Inhaltshöhe am
+  unteren Rand des sichtbaren Matrix-Viewports erreichbar halten.
+- Kleine Viewports, Tastaturbedienung, Fokus, fixierte Kontextinformationen
+  und gleichzeitiges horizontales sowie vertikales Scrollen manuell
+  nachprüfen.
+
 - Viewer-, Admin-, Export- und Auditgrenzen positiv und negativ prüfen.
 - Danach Detailadapter für Deck, Collectives, Tables, Talk, Contacts, Forms,
   Notes, Richdocuments, OnlyOffice, LDAP und Two-Factor einzeln bewerten.

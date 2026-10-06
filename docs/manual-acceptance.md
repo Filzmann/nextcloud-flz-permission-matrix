@@ -91,7 +91,7 @@ Begründung verpflichtend.
 | Anzahl erfolgreich | |
 | Anzahl nicht erfolgreich | |
 | Anzahl nicht geprüft | |
-| Kritische Abweichungen / Ticketreferenzen | |
+| Kritische Abweichungen / Ticketreferenzen | E5: Die horizontale Scrollleiste war nicht dauerhaft im sichtbaren Matrixbereich erreichbar; siehe `BPM-MATRIX-SCROLL` in `ROADMAP.md`. |
 | Erneute Prüfung erforderlich bis | |
 | Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [ ] nicht abgenommen |
 | Begründung der Gesamtentscheidung | |
