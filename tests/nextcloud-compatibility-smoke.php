@@ -14,8 +14,9 @@ return [
         ],
     ],
     'uiPath' => '/index.php/apps/filzmann_permission_matrix/',
-    'preGrantUiStatuses' => [403],
+    'preGrantUiStatuses' => [200],
     'postGrantUiStatuses' => [200],
+    'grantManagerGroups' => ['Datenschutzbeauftragte'],
     'grantService' => TemporaryAdminAccessService::class,
     'permissionProbe' => static function(string $uid): bool {
         $organization = OCP\Server::get(OrganizationSnapshotService::class)->snapshot();

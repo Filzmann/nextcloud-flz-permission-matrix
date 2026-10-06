@@ -30,7 +30,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('compliance_status', Types::STRING, ['notnull' => true, 'length' => 16, 'default' => 'UNKNOWN']);
             $table->addColumn('summary_json', Types::TEXT, ['notnull' => false]);
             $table->addColumn('snapshot_json', Types::TEXT, ['notnull' => true]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_snap_pk');
             $table->addUniqueIndex(['snapshot_uuid'], 'pm_snap_uuid');
             $table->addIndex(['created_at'], 'pm_snap_created');
         }
@@ -49,7 +49,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('source', Types::STRING, ['notnull' => true, 'length' => 128]);
             $table->addColumn('confidence', Types::STRING, ['notnull' => true, 'length' => 16]);
             $table->addColumn('warnings_json', Types::TEXT, ['notnull' => false]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_rows_pk');
             $table->addIndex(['snapshot_uuid'], 'pm_rows_snap');
             $table->addIndex(['snapshot_uuid', 'row_key'], 'pm_rows_key');
             $table->addIndex(['app_id'], 'pm_rows_app');
@@ -63,7 +63,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('row_key', Types::STRING, ['notnull' => true, 'length' => 64]);
             $table->addColumn('group_id', Types::STRING, ['notnull' => true, 'length' => 190]);
             $table->addColumn('cell_value', Types::STRING, ['notnull' => true, 'length' => 64]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_cells_pk');
             $table->addIndex(['snapshot_uuid'], 'pm_cells_snap');
             $table->addIndex(['snapshot_uuid', 'row_key'], 'pm_cells_row');
             $table->addIndex(['group_id'], 'pm_cells_group');
@@ -81,7 +81,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('old_value', Types::STRING, ['notnull' => false, 'length' => 128]);
             $table->addColumn('new_value', Types::STRING, ['notnull' => false, 'length' => 128]);
             $table->addColumn('message', Types::TEXT, ['notnull' => false]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_diffs_pk');
             $table->addIndex(['snapshot_uuid'], 'pm_diff_snap');
             $table->addIndex(['baseline_uuid'], 'pm_diff_base');
             $table->addIndex(['diff_type'], 'pm_diff_type');
@@ -96,7 +96,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('format', Types::STRING, ['notnull' => true, 'length' => 16]);
             $table->addColumn('filename', Types::STRING, ['notnull' => false, 'length' => 255]);
             $table->addColumn('size_bytes', Types::BIGINT, ['notnull' => true, 'default' => 0]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_exports_pk');
             $table->addIndex(['snapshot_uuid'], 'pm_exp_snap');
             $table->addIndex(['created_at'], 'pm_exp_created');
         }
@@ -110,7 +110,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('export_generated', Types::BOOLEAN, ['notnull' => true, 'default' => false]);
             $table->addColumn('snapshot_uuid', Types::STRING, ['notnull' => false, 'length' => 64]);
             $table->addColumn('details_json', Types::TEXT, ['notnull' => false]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_audit_pk');
             $table->addIndex(['created_at'], 'pm_audit_created');
             $table->addIndex(['user_id'], 'pm_audit_user');
             $table->addIndex(['action'], 'pm_audit_action');
@@ -125,7 +125,7 @@ class Version000001Date202607050001 extends SimpleMigrationStep {
             $table->addColumn('status', Types::STRING, ['notnull' => true, 'length' => 32]);
             $table->addColumn('confidence', Types::STRING, ['notnull' => true, 'length' => 16]);
             $table->addColumn('warnings_json', Types::TEXT, ['notnull' => false]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_adapter_pk');
             $table->addIndex(['snapshot_uuid'], 'pm_adapt_snap');
             $table->addIndex(['app_id'], 'pm_adapt_app');
         }

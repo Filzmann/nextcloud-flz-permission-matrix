@@ -10,13 +10,10 @@
     <author>Simon Filzmann</author>
     <namespace>FilzmannPermissionMatrix</namespace>
     <category>organization</category>
+    <bugs>https://github.com/Filzmann/nextcloud-filzmann-permission-matrix/issues</bugs>
     <dependencies>
         <nextcloud min-version="29" max-version="35"/>
     </dependencies>
-    <settings>
-        <admin>OCA\FilzmannPermissionMatrix\Settings\Admin</admin>
-        <admin-section>OCA\FilzmannPermissionMatrix\Settings\AdminSection</admin-section>
-    </settings>
     <background-jobs>
         <job>OCA\FilzmannPermissionMatrix\BackgroundJob\ScanJob</job>
     </background-jobs>
@@ -28,4 +25,8 @@
         <command>OCA\FilzmannPermissionMatrix\Command\DiffCommand</command>
         <command>OCA\FilzmannPermissionMatrix\Command\StatusCommand</command>
     </commands>
+    <settings>
+        <admin>OCA\FilzmannPermissionMatrix\Settings\Admin</admin>
+        <admin-section>OCA\FilzmannPermissionMatrix\Settings\AdminSection</admin-section>
+    </settings>
 </info>

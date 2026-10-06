@@ -25,12 +25,11 @@ final class Version000002Date202608250001 extends SimpleMigrationStep {
             $table->addColumn('revoked_at', Types::DATETIME_IMMUTABLE, ['notnull' => false]);
             $table->addColumn('revoked_by', Types::STRING, ['length' => 64, 'notnull' => false]);
             $table->addColumn('created_at', Types::DATETIME_IMMUTABLE, ['notnull' => true]);
-            $table->setPrimaryKey(['id']);
+            $table->setPrimaryKey(['id'], 'pm_admin_pk');
             $table->addIndex(['target_uid', 'starts_at', 'ends_at'], 'pm_admin_target_time');
             $table->addIndex(['granted_by', 'starts_at'], 'pm_admin_grantor_time');
         }
         return $schema;
     }
 }
-
 

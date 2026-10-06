@@ -7,14 +7,19 @@ Architektur in `docs/architecture.md`.
 
 ## Nextcloud-Kompatibilitätsgate
 
-### BPM-NC-COMPAT – Core-Bereich 29–35 und optionale Adapter getrennt belegen
+### BPM-NC-COMPAT – RC-Kompatibilität und optionale Adapter getrennt belegen
 
-Vor dem nächsten Release werden alle deklarierten Majors lückenlos mit Fresh
-Install/Upgrade, DI, Provider-Scan, Permission-V1-Vertrag, Assets und
-sichtbarer Matrix geprüft. Die private Groupfolders-Ausnahme bleibt separat
-versionsgebunden und liefert auf unbekannten Kombinationen sichtbar
-`UNKNOWN` oder `UNSUPPORTED`. Eine höhere `max-version` folgt nur aus dem
-app-lokalen `verify-nextcloud-future-compatibility`-Nachweis.
+Die `min-version` muss beim Release Candidate die aktuelle, autoritativ
+ermittelte openDesk-Nextcloud-Hauptversion abdecken. Erst beim Erstellen eines
+veröffentlichungsfähigen RC werden alle deklarierten Core-Majors lückenlos mit
+Fresh Install/Upgrade, DI, Provider-Scan, Permission-V1-Vertrag, Assets und
+sichtbarer Matrix geprüft. `max-version` folgt ausschließlich der höchsten
+lückenlos nachgewiesenen Major aus offiziellen, gepinnten Nextcloud-Git-Quellen;
+eine offiziell benannte und testbare künftige Major (z. B. NC36) wird dabei
+geprüft. Der regelmäßige Check der neuesten veröffentlichten Entwicklungsruntime
+ist davon getrennt und ersetzt keinen RC-Nachweis. Die private Groupfolders-
+Ausnahme bleibt separat versionsgebunden und liefert auf unbekannten
+Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 ## Priorisierte offene Adapter
 
