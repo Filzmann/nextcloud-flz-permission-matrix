@@ -16,11 +16,13 @@ namespace OCP {
         public function isInGroup(string $uid, string $groupId): bool;
     }
 }
+namespace OCA\FlzPermissionMatrix\Service { interface TemporaryAdminAccessChecker { public function hasActiveGrant(string $uid): bool; } }
 
 namespace {
-    use OCA\BrPermissionMatrix\Exception\AccessDeniedException;
-    use OCA\BrPermissionMatrix\Service\AccessService;
-    use OCA\BrPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Exception\AccessDeniedException;
+    use OCA\FlzPermissionMatrix\Service\AccessService;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessChecker;
     use OCP\IGroupManager;
     use OCP\IUser;
     use OCP\IUserSession;
@@ -69,7 +71,7 @@ namespace {
         }
     }
 
-    function accessServiceFor(?string $uid): AccessService {
+    function accessServiceFor(?string $uid, bool $activeGrant = false): AccessService {
         return new AccessService(
             new AccessTestSession($uid === null ? null : new AccessTestUser($uid)),
             new AccessTestGroups(
@@ -80,7 +82,8 @@ namespace {
                     'other' => ['Unrelated'],
                 ]
             ),
-            new AccessTestConfig()
+            new AccessTestConfig(),
+            new class($activeGrant) implements TemporaryAdminAccessChecker { public function __construct(private bool $active) {} public function hasActiveGrant(string $uid): bool { return $this->active; } }
         );
     }
 
@@ -89,7 +92,8 @@ namespace {
     assertSameValue(false, accessServiceFor('viewer')->canManageCurrentUser(), 'Viewer groups must not gain management rights.');
     assertSameValue(true, accessServiceFor('app-admin')->canManageCurrentUser(), 'Configured app admins may manage the matrix.');
     assertSameValue(true, accessServiceFor('app-admin')->canViewCurrentUser(), 'Management rights include read access.');
-    assertSameValue(true, accessServiceFor('cloud-admin')->canManageCurrentUser(), 'Nextcloud admins may manage the matrix.');
+    assertSameValue(false, accessServiceFor('cloud-admin')->canManageCurrentUser(), 'Nextcloud admins must not manage the matrix without an app-local grant.');
+    assertSameValue(true, accessServiceFor('cloud-admin', true)->canManageCurrentUser(), 'An active app-local grant enables matrix management for a Nextcloud admin.');
     assertSameValue(false, accessServiceFor('other')->canViewCurrentUser(), 'Unrelated group membership must be denied.');
 
     try {

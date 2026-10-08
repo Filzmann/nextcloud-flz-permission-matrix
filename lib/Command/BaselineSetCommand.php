@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Command;
+namespace OCA\FlzPermissionMatrix\Command;
 
-use OCA\BrPermissionMatrix\Service\BaselineService;
+use OCA\FlzPermissionMatrix\Service\BaselineService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

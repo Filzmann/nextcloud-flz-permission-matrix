@@ -13,14 +13,14 @@ const snapshot = {
     snapshot_id: 'pm-test',
     created_at: '2026-07-05T12:00:00+00:00',
     nextcloud_version: '34.0.0',
-    groups: ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta', 'ad-EB-Ada'],
+    groups: ['Betriebsrat', 'IKT-Ausschuss', 'flz-ASN-Ada', 'flz-ASN-Berta', 'flz-EB-Ada'],
     group_catalog: [
-        { key: 'family:adplaner_assistance_teams', label: 'AdPlaner · Assistenznehmer-Teams', type: 'family', groups: ['ad-ASN-Ada', 'ad-ASN-Berta'], count: 2, members: [
-            { group: 'ad-ASN-Ada', label: 'Team Ada · Assistenz', team: 'Ada', role: 'assistant' },
-            { group: 'ad-ASN-Berta', label: 'Team Berta · Assistenz', team: 'Berta', role: 'assistant' }
+        { key: 'family:flzplaner_assistance_teams', label: 'Filzmann Assistenzplanung · Assistenznehmer-Teams', type: 'family', groups: ['flz-ASN-Ada', 'flz-ASN-Berta'], count: 2, members: [
+            { group: 'flz-ASN-Ada', label: 'Team Ada · Assistenz', team: 'Ada', role: 'assistant' },
+            { group: 'flz-ASN-Berta', label: 'Team Berta · Assistenz', team: 'Berta', role: 'assistant' }
         ] },
-        { key: 'family:adplaner_eb_roles', label: 'AdPlaner · Einsatzbegleitung', type: 'family', groups: ['ad-EB-Ada'], count: 1, members: [
-            { group: 'ad-EB-Ada', label: 'Rolle EB · Ada', team: null, role: 'eb' }
+        { key: 'family:flzplaner_eb_roles', label: 'Filzmann Assistenzplanung · Einsatzbegleitung', type: 'family', groups: ['flz-EB-Ada'], count: 1, members: [
+            { group: 'flz-EB-Ada', label: 'Rolle EB · Ada', team: null, role: 'eb' }
         ] },
         { key: 'Betriebsrat', label: 'Betriebsrat', type: 'group', groups: ['Betriebsrat'], count: 1, meaning_status: 'UNKNOWN' },
         { key: 'IKT-Ausschuss', label: 'IKT-Ausschuss', type: 'group', groups: ['IKT-Ausschuss'], count: 1, meaning_status: 'KNOWN' }
@@ -43,7 +43,7 @@ const snapshot = {
         status: 'NEW',
         source: 'core-app-config',
         confidence: 'high',
-        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '-', 'ad-EB-Ada': 'X' },
+        cells: { Betriebsrat: '-', 'IKT-Ausschuss': 'X', 'flz-ASN-Ada': 'X', 'flz-ASN-Berta': '-', 'flz-EB-Ada': 'X' },
         access_rules: [{
             permission: 'app.use', effect: 'allow', scope: 'app:deck',
             condition_text: 'Gruppe IKT-Ausschuss', source: 'core-app-config', confidence: 'high'
@@ -69,20 +69,23 @@ assert(overview.includes('Deck &lt;unklar&gt;'));
 assert(!overview.includes('Deck <unklar>'));
 assert(matrix.includes('Deck &lt;Test&gt;'));
 assert(!matrix.includes('Deck <Test>'));
-assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar"'));
+assert(matrix.includes('tabindex="0" aria-label="Berechtigungsmatrix, horizontal scrollbar"'));
+assert(matrix.includes('data-pm-matrix-scroll-track'));
+assert(matrix.includes('data-pm-matrix-scroll-spacer'));
+assert(matrix.includes('data-pm-matrix-scroll'));
 assert(matrix.includes('data-app-toggle="deck"'));
 assert(matrix.includes('<strong>Deck &lt;Test&gt;</strong>'));
 assert(matrix.includes('1 Berechtigung'));
 assert(matrix.includes('Details <span class="pm-badge pm-badge-unsupported">UNSUPPORTED</span>'));
 assert(matrix.includes('<strong>Bedingung:</strong> Gruppe IKT-Ausschuss'));
 assert(matrix.includes('core-app-config · high'));
-assert(matrix.includes('AdPlaner · Assistenznehmer-Teams'));
+assert(matrix.includes('Filzmann Assistenzplanung · Assistenznehmer-Teams'));
 assert(matrix.includes('<small>1 Gruppe</small>'));
 assert(matrix.includes('X (1/2)'));
-assert(matrix.includes('ad-ASN-Ada: X; ad-ASN-Berta: -'));
-assert(matrix.includes('aria-label="AdPlaner · Assistenznehmer-Teams: X (1/2). Einzelwerte: ad-ASN-Ada: X; ad-ASN-Berta: -"'));
-assert(!matrix.includes('data-group-focus="ad-ASN-Ada"'));
-assert(rawMatrix.includes('data-group-focus="ad-ASN-Ada"'));
+assert(matrix.includes('flz-ASN-Ada: X; flz-ASN-Berta: -'));
+assert(matrix.includes('aria-label="Filzmann Assistenzplanung · Assistenznehmer-Teams: X (1/2). Einzelwerte: flz-ASN-Ada: X; flz-ASN-Berta: -"'));
+assert(!matrix.includes('data-group-focus="flz-ASN-Ada"'));
+assert(rawMatrix.includes('data-group-focus="flz-ASN-Ada"'));
 assert(teamMatrix.includes('Team Ada · Assistenz'));
 assert(teamMatrix.includes('Rolle EB · Ada'));
 assert(teamMatrix.indexOf('Team Ada · Assistenz') < teamMatrix.indexOf('Rolle EB · Ada'));
@@ -90,18 +93,18 @@ assert(!collapsedMatrix.includes('<td>App-Verfuegbarkeit</td>'));
 assert(apps.includes('Deck &lt;Test&gt;'));
 assert(apps.includes('<dt>Detailabdeckung</dt><dd><span class="pm-badge pm-badge-unsupported">UNSUPPORTED</span></dd>'));
 assert(groups.includes('<summary>Rohgruppen anzeigen</summary>'));
-assert(groups.includes('<li>ad-ASN-Ada</li>'));
+assert(groups.includes('<li>flz-ASN-Ada</li>'));
 assert(groups.includes('<dt>Bedeutung</dt><dd><span class="pm-badge pm-badge-unknown">UNKNOWN</span></dd>'));
 assert(diffs.includes('APP_GROUP_EXPANDED'));
 
 const mixed = render.aggregateCell(
-    { 'ad-ASN-Ada': 'X', 'ad-ASN-Berta': '?' },
+    { 'flz-ASN-Ada': 'X', 'flz-ASN-Berta': '?' },
     render.groupColumns(snapshot, 'summary')[0]
 );
 assert.deepStrictEqual(mixed, {
     value: 'gemischt (2/2)',
     className: 'mixed',
-    title: 'ad-ASN-Ada: X; ad-ASN-Berta: ?'
+    title: 'flz-ASN-Ada: X; flz-ASN-Berta: ?'
 });
 
 assert.deepStrictEqual(
@@ -111,5 +114,53 @@ assert.deepStrictEqual(
 assert.strictEqual(render.adapterCoverage(snapshot, 'deck'), 'UNSUPPORTED');
 assert.deepStrictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: 'PARTIAL', text: '' }), []);
 assert.strictEqual(render.matrixSections(snapshot, { app: '', status: '', coverage: '', text: 'IKT-Ausschuss' }).length, 1);
+
+function scrollNode(scrollWidth, clientWidth) {
+    const listeners = new Map();
+    return {
+        scrollWidth,
+        clientWidth,
+        scrollLeft: 0,
+        style: {},
+        hidden: false,
+        addEventListener(type, listener) {
+            listeners.set(type, listener);
+        },
+        removeEventListener(type) {
+            listeners.delete(type);
+        },
+        emit(type) {
+            listeners.get(type)?.();
+        },
+        listenerCount() {
+            return listeners.size;
+        }
+    };
+}
+
+const tableWrap = scrollNode(1200, 600);
+const scrollTrack = scrollNode(0, 600);
+const scrollSpacer = { style: {} };
+scrollTrack.querySelector = (selector) => selector === '[data-pm-matrix-scroll-spacer]' ? scrollSpacer : null;
+const scrollRoot = {
+    querySelector(selector) {
+        if (selector === '[data-pm-matrix-scroll]') return tableWrap;
+        if (selector === '[data-pm-matrix-scroll-track]') return scrollTrack;
+        return null;
+    }
+};
+
+render.bindMatrixScrollTrack(scrollRoot);
+assert.strictEqual(scrollTrack.hidden, false);
+assert.strictEqual(scrollSpacer.style.width, '1200px');
+tableWrap.scrollLeft = 240;
+tableWrap.emit('scroll');
+assert.strictEqual(scrollTrack.scrollLeft, 240);
+scrollTrack.scrollLeft = 80;
+scrollTrack.emit('scroll');
+assert.strictEqual(tableWrap.scrollLeft, 80);
+render.bindMatrixScrollTrack(scrollRoot);
+assert.strictEqual(tableWrap.listenerCount(), 1);
+assert.strictEqual(scrollTrack.listenerCount(), 1);
 
 console.log('Permission Matrix render smoke test passed.');

@@ -39,7 +39,7 @@ namespace OCP\Share {
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
     use OCP\IAppConfig;
     use OCP\IUser;
     use OCP\IUserManager;

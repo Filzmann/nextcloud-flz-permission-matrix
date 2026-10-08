@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use DateTimeImmutable;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 class AuditLogMapper {
-    private const TABLE = 'permission_matrix_audit_log';
+    private const TABLE = 'flz_pm_audit_log';
 
     public function __construct(
         private IDBConnection $db,

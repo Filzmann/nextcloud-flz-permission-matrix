@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 use InvalidArgumentException;
-use OCA\BrPermissionMatrix\Exception\ExportFormatNotAllowedException;
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FlzPermissionMatrix\Exception\ExportFormatNotAllowedException;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\Snapshot;
 
 /**
  * Zweck: Erzeugt freigegebene, datensparsame Snapshot-Exporte ohne den fachlichen Stand zu veraendern.
@@ -148,7 +148,7 @@ class ExportService {
             'Stand: ' . $snapshot->createdAt(),
             'Instanz: Nextcloud',
             'Nextcloud-Version: ' . $snapshot->nextcloudVersion(),
-            'Erstellt durch: br_permission_matrix',
+            'Erstellt durch: flz_permission_matrix',
             'Baseline: ' . (string)($summary['baseline_snapshot'] ?? 'nicht gesetzt'),
             'Scan-ID: ' . $snapshot->snapshotId(),
             $this->organizationLabel($snapshot),

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Exception;
+namespace OCA\FlzPermissionMatrix\Exception;
 
 use InvalidArgumentException;
 

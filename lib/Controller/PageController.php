@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Controller;
+namespace OCA\FlzPermissionMatrix\Controller;
 
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Service\AccessService;
-use OCA\BrPermissionMatrix\Service\AuditLogService;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Service\AccessService;
+use OCA\FlzPermissionMatrix\Service\AuditLogService;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -18,7 +19,8 @@ class PageController extends Controller {
     public function __construct(
         IRequest $request,
         private AccessService $access,
-        private AuditLogService $auditLog
+        private AuditLogService $auditLog,
+        private TemporaryAdminAccessService $temporaryAdminAccess,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -26,7 +28,10 @@ class PageController extends Controller {
     #[NoAdminRequired]
     #[NoCSRFRequired]
     public function index(): TemplateResponse {
-        if (!$this->access->canViewCurrentUser()) {
+        $hasMatrixAccess = $this->access->canViewCurrentUser();
+        $canManageAdminAccess = $this->temporaryAdminAccess->canManage();
+        $showMissingAdminGrant = $this->temporaryAdminAccess->currentAdminNeedsGrant();
+        if (!$hasMatrixAccess && !$canManageAdminAccess && !$showMissingAdminGrant) {
             $this->auditLog->record('page.index.denied');
             $response = new TemplateResponse(Application::APP_ID, 'denied');
             $response->setStatus(Http::STATUS_FORBIDDEN);
@@ -34,10 +39,14 @@ class PageController extends Controller {
             return $response;
         }
 
-        $this->auditLog->record('page.index');
+        $this->auditLog->record($hasMatrixAccess ? 'page.index' : 'page.index.admin_access');
 
         return new TemplateResponse(Application::APP_ID, 'index', [
-            'can_manage' => $this->access->canManageCurrentUser(),
+            'can_manage' => $hasMatrixAccess && $this->access->canManageCurrentUser(),
+            'hasMatrixAccess' => $hasMatrixAccess,
+            'canManageAdminAccess' => $canManageAdminAccess,
+            'showMissingAdminGrant' => $showMissingAdminGrant,
+            'showAdminAccessLink' => $canManageAdminAccess && $showMissingAdminGrant,
         ]);
     }
 }

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
 use OCP\IDBConnection;
 
 class RowMapper {
-    private const TABLE = 'permission_matrix_rows';
+    private const TABLE = 'flz_pm_rows';
 
     public function __construct(
         private IDBConnection $db,

@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\Adapter\AdapterResult;
-use OCA\BrPermissionMatrix\Adapter\CoreAdapter;
-use OCA\BrPermissionMatrix\Adapter\FilesAccessControlAdapter;
-use OCA\BrPermissionMatrix\Adapter\FilesAdapter;
-use OCA\BrPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\BrPermissionMatrix\Adapter\GroupFoldersAdapter;
-use OCA\BrPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
-use OCA\BrPermissionMatrix\Adapter\SharingAdapter;
+use OCA\FlzPermissionMatrix\Adapter\AdapterResult;
+use OCA\FlzPermissionMatrix\Adapter\CoreAdapter;
+use OCA\FlzPermissionMatrix\Adapter\FilesAccessControlAdapter;
+use OCA\FlzPermissionMatrix\Adapter\FilesAdapter;
+use OCA\FlzPermissionMatrix\Adapter\GenericAppAdapter;
+use OCA\FlzPermissionMatrix\Adapter\GroupFoldersAdapter;
+use OCA\FlzPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
+use OCA\FlzPermissionMatrix\Adapter\PermissionProviderAdapter;
+use OCA\FlzPermissionMatrix\Adapter\SharingAdapter;
 
 /**
  * Zweck: Orchestriert alle Berechtigungsadapter zu einem noch unbewerteten Matrix-Rohbau.
@@ -31,6 +32,7 @@ class MatrixBuilder {
         private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
         private PermissionMatrixAccessAdapter $permissionMatrixAccess,
+        private PermissionProviderAdapter $permissionProviders,
         private GroupCatalogService $groupCatalog,
         private OrganizationSnapshotService $organization
     ) {
@@ -43,7 +45,8 @@ class MatrixBuilder {
             ->merge($this->files->collect())
             ->merge($this->sharing->collect())
             ->merge($this->groupFolders->collect())
-            ->merge($this->filesAccessControl->collect());
+            ->merge($this->filesAccessControl->collect())
+            ->merge($this->permissionProviders->collect());
         $result = $result->merge($this->permissionMatrixAccess->collect());
 
         $groups = $this->inventory->groups();

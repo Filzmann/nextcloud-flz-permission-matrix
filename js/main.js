@@ -160,7 +160,7 @@
         state.filters.status = render.byId('pm-filter-status').value;
         state.filters.coverage = render.byId('pm-filter-coverage').value;
         state.filters.text = render.byId('pm-filter-text').value.trim();
-        render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);
+        drawMatrix();
     }
 
     function resetFilters() {
@@ -210,7 +210,7 @@
             ? `Scan ${render.esc(state.snapshot.created_at)} ${render.badge(summary.compliance_status || 'UNKNOWN')}`
             : 'Noch kein Scan';
         render.byId('pm-overview').innerHTML = render.renderOverview(state.snapshot);
-        render.byId('pm-matrix').innerHTML = render.renderMatrix(state.snapshot, state.filters);
+        drawMatrix();
         render.byId('pm-apps').innerHTML = render.renderApps(state.snapshot);
         render.byId('pm-groups').innerHTML = render.renderGroups(state.snapshot);
         render.byId('pm-diffs').innerHTML = render.renderDiffs(state.snapshot);
@@ -218,6 +218,12 @@
         document.querySelectorAll('[data-export]').forEach((button) => {
             button.hidden = !state.exportFormats.includes(button.dataset.export);
         });
+    }
+
+    function drawMatrix() {
+        const matrix = render.byId('pm-matrix');
+        matrix.innerHTML = render.renderMatrix(state.snapshot, state.filters);
+        render.bindMatrixScrollTrack(matrix);
     }
 
     function activateTab(tab) {

@@ -1,32 +1,32 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>br_permission_matrix</id>
+    <id>flz_permission_matrix</id>
     <name>Berechtigungsmatrix</name>
     <summary>Read-only Berechtigungsmatrix und Positivlisten-Audit fuer Nextcloud-Gruppenrechte.</summary>
     <description>Dokumentiert gruppenbezogene App-Verfuegbarkeit, bekannte Berechtigungsquellen, Snapshots, Baselines, Diffs und Exporte ohne Nextcloud-Berechtigungen zu veraendern.</description>
-    <version>0.1.4</version>
+    <version>0.2.2</version>
     <licence>agpl</licence>
-    <author>Simon</author>
-    <namespace>BrPermissionMatrix</namespace>
+    <author>Simon Filzmann</author>
+    <namespace>FlzPermissionMatrix</namespace>
     <category>organization</category>
+    <bugs>https://github.com/Filzmann/nextcloud-flz-permission-matrix/issues</bugs>
     <dependencies>
         <nextcloud min-version="29" max-version="35"/>
-        <app>orgsuite</app>
     </dependencies>
-    <settings>
-        <admin>OCA\BrPermissionMatrix\Settings\Admin</admin>
-        <admin-section>OCA\BrPermissionMatrix\Settings\AdminSection</admin-section>
-    </settings>
     <background-jobs>
-        <job>OCA\BrPermissionMatrix\BackgroundJob\ScanJob</job>
+        <job>OCA\FlzPermissionMatrix\BackgroundJob\ScanJob</job>
     </background-jobs>
     <commands>
-        <command>OCA\BrPermissionMatrix\Command\ScanCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\ExportCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\BaselineSetCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\BaselineShowCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\DiffCommand</command>
-        <command>OCA\BrPermissionMatrix\Command\StatusCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\ScanCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\ExportCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\BaselineSetCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\BaselineShowCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\DiffCommand</command>
+        <command>OCA\FlzPermissionMatrix\Command\StatusCommand</command>
     </commands>
+    <settings>
+        <admin>OCA\FlzPermissionMatrix\Settings\Admin</admin>
+        <admin-section>OCA\FlzPermissionMatrix\Settings\AdminSection</admin-section>
+    </settings>
 </info>

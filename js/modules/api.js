@@ -1,5 +1,5 @@
 (function() {
-    const base = '/apps/br_permission_matrix';
+    const base = '/apps/flz_permission_matrix';
 
     function url(path) {
         if (window.OC && typeof window.OC.generateUrl === 'function') {
@@ -38,6 +38,9 @@
         setBaseline: (snapshotId) => post('/api/baseline/' + encodeURIComponent(snapshotId)),
         exportUrl: (format, snapshotId) => url('/api/export/' + encodeURIComponent(format) + (snapshotId ? '/' + encodeURIComponent(snapshotId) : '')),
         config: () => request('/api/config'),
-        saveConfig: (payload) => post('/api/config', payload)
+        saveConfig: (payload) => post('/api/config', payload),
+        adminFullAccess: () => request('/api/admin/full-access'),
+        activateAdminFullAccess: (targetUid, durationMinutes) => request('/api/admin/full-access', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUid, durationMinutes }) }),
+        revokeAdminFullAccess: (targetUid) => request('/api/admin/full-access/' + encodeURIComponent(targetUid), { method: 'DELETE' })
     };
 })();

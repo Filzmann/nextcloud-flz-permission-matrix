@@ -1,7 +1,7 @@
 <?php
-script('br_permission_matrix', 'modules/api');
-script('br_permission_matrix', 'admin');
-style('br_permission_matrix', 'style');
+script('flz_permission_matrix', 'modules/api');
+script('flz_permission_matrix', 'admin');
+style('flz_permission_matrix', 'style');
 $config = $_['config'];
 ?>
 
@@ -9,13 +9,22 @@ $config = $_['config'];
     <h2>Berechtigungsmatrix</h2>
     <form id="pm-admin-form">
         <label>
-            Viewer-Gruppen
-            <textarea name="viewer_groups" rows="4"><?php p(implode("\n", $config['viewer_groups'])); ?></textarea>
+            Leseberechtigte Gruppen
+            <textarea name="viewer_groups" rows="4" aria-describedby="pm-viewer-groups-help"><?php p(implode("\n", $config['viewer_groups'])); ?></textarea>
         </label>
+        <p id="pm-viewer-groups-help">
+            Üblich ist der lesende Zugriff für den Betriebsrat oder Personalrat.
+            IKT-Ausschuss und Datenschutzbeauftragte können für Prüfung und Beratung ergänzt werden.
+            Die Gruppennamen sind vollständig an die eigene Organisation anpassbar.
+        </p>
         <label>
             Admin-Gruppen
-            <textarea name="admin_groups" rows="3"><?php p(implode("\n", $config['admin_groups'])); ?></textarea>
+            <textarea name="admin_groups" rows="3" aria-describedby="pm-admin-groups-help"><?php p(implode("\n", $config['admin_groups'])); ?></textarea>
         </label>
+        <p id="pm-admin-groups-help">
+            Beispielsweise IT-Administration. Verwaltungsrechte umfassen Konfiguration,
+            Scans und Baseline-Freigaben und sollten restriktiv vergeben werden.
+        </p>
         <label>
             Scan-Intervall
             <select name="scan_interval">
@@ -36,6 +45,20 @@ $config = $_['config'];
             Snapshot-Retention
             <input type="number" min="1" max="500" name="retention" value="<?php p((string)$config['retention']); ?>">
         </label>
+        <fieldset>
+            <legend>Datenschutz-REVIEW</legend>
+            <label>
+                Aufbewahrungsfrist für Exportmetadaten in Tagen
+                <input type="number" min="1" max="3650" name="export_metadata_retention_days" value="<?php p((string)$config['export_metadata_retention_days']); ?>" aria-describedby="pm-retention-review-help">
+            </label>
+            <label>
+                Aufbewahrungsfrist für Auditprotokolle in Tagen
+                <input type="number" min="1" max="3650" name="audit_retention_days" value="<?php p((string)$config['audit_retention_days']); ?>" aria-describedby="pm-retention-review-help">
+            </label>
+            <p id="pm-retention-review-help">
+                Standard sind jeweils 180 Tage. Nach Fristablauf wird ein REVIEW erforderlich. Keine automatische Löschung.
+            </p>
+        </fieldset>
         <button type="submit">Speichern</button>
     </form>
     <div id="pm-admin-notice" class="pm-notice" role="status" aria-live="polite" aria-atomic="true" hidden></div>

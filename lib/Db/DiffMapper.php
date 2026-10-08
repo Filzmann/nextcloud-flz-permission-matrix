@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use OCP\IDBConnection;
 
 class DiffMapper {
-    private const TABLE = 'permission_matrix_diffs';
+    private const TABLE = 'flz_pm_diffs';
 
     public function __construct(
         private IDBConnection $db

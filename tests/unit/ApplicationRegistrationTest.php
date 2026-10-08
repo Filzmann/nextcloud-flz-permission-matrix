@@ -10,20 +10,32 @@ namespace OCP\AppFramework\Bootstrap {
     interface IBootContext {}
     interface IRegistrationContext {
         public function registerServiceAlias(string $alias, string $target): void;
+        public function registerEventListener(string $event, string $listener): void;
     }
 }
 
 namespace {
-    use OCA\BrPermissionMatrix\AppInfo\Application;
-    use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
-    use OCA\BrPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FlzPermissionMatrix\AppInfo\Application;
+    use OCA\FlzPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
+    use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
+    use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
+    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
+    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersSource;
+    use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FlzPermissionMatrix\Service\NextcloudPermissionProviderSource;
+    use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
     use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
     $context = new class implements IRegistrationContext {
         public array $aliases = [];
+        public array $listeners = [];
 
         public function registerServiceAlias(string $alias, string $target): void {
             $this->aliases[$alias] = $target;
+        }
+
+        public function registerEventListener(string $event, string $listener): void {
+            $this->listeners[$event] = $listener;
         }
     };
 
@@ -33,6 +45,41 @@ namespace {
         NextcloudSharingSource::class,
         $context->aliases[NativeSharingSourceInterface::class] ?? null,
         'The narrow read-only source contract must resolve to the native Nextcloud implementation.'
+    );
+    assertSameValue(
+        NextcloudGroupFoldersSource::class,
+        $context->aliases[GroupFoldersSourceInterface::class] ?? null,
+        'The version-aware Team Folders source must be wired through its narrow read-only contract.'
+    );
+    assertSameValue(
+        NextcloudGroupFoldersManagerProvider::class,
+        $context->aliases[GroupFoldersManagerProviderInterface::class] ?? null,
+        'The optional foreign runtime service must be resolved lazily behind an app-local boundary.'
+    );
+    assertSameValue(
+        NextcloudPermissionProviderSource::class,
+        $context->aliases[PermissionProviderSourceInterface::class] ?? null,
+        'The optional V1 permission provider event must be discovered through one cached source.'
+    );
+    assertSameValue(
+        \OCA\FlzPermissionMatrix\Listener\StandaloneNavigationListener::class,
+        $context->listeners[\OCP\Navigation\Events\LoadAdditionalEntriesEvent::class] ?? null,
+        'The standalone app must register its own native navigation entry.'
+    );
+    assertSameValue(
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class] ?? null,
+        'The app must register its optional V1 privacy provider lazily.'
+    );
+    assertSameValue(
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class] ?? null,
+        'The app must register its optional V1 retention preview provider lazily.'
+    );
+    assertSameValue(
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class] ?? null,
+        'The app must register its optional V1 processing metadata provider lazily.'
     );
 
     echo 'Application registration tests passed' . PHP_EOL;

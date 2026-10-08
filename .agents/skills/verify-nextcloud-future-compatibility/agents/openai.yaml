@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nextcloud-Zukunftskompatibilität"
+  short_description: "Release-Kompatibilität belastbar nachweisen"
+  default_prompt: "Use $verify-nextcloud-future-compatibility to prove this candidate's Nextcloud range and flag any lower-bound decision."

@@ -12,5 +12,8 @@ return [
         ['name' => 'api#exportSnapshot', 'url' => '/api/export/{format}/{snapshotId}', 'verb' => 'GET'],
         ['name' => 'config#get', 'url' => '/api/config', 'verb' => 'GET'],
         ['name' => 'config#save', 'url' => '/api/config', 'verb' => 'POST'],
+        ['name' => 'temporary_admin_access#status', 'url' => '/api/admin/full-access', 'verb' => 'GET'],
+        ['name' => 'temporary_admin_access#activate', 'url' => '/api/admin/full-access', 'verb' => 'POST'],
+        ['name' => 'temporary_admin_access#revoke', 'url' => '/api/admin/full-access/{targetUid}', 'verb' => 'DELETE'],
     ],
 ];

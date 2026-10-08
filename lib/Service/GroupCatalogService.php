@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 /**
  * Erzeugt eine historische, verlustfreie Präsentationssicht auf rohe Nextcloud-Gruppen.
  *
  * Semantische Rollen und Bereiche stammen ausschließlich aus dem validierten
- * LocalBase-Organisationssnapshot. App-spezifische AdPlaner-Teamfamilien werden nur dann
+ * LocalBase-Organisationssnapshot. App-spezifische Filzmann Assistenzplanung-Teamfamilien werden nur dann
  * ergänzt, wenn diese kanonische Organisationsquelle im selben Scan gültig war.
  */
 class GroupCatalogService {
     private const FAMILIES = [
-        'adplaner_vacation_visibility' => [
-            'label' => 'AdPlaner · Urlaubssichtbarkeit',
-            'source_app' => 'adplaner',
-            'pattern' => '/^ad-ASN-[\p{L}\p{N}]{1,16}-Urlaub$/u',
+        'flzplaner_vacation_visibility' => [
+            'label' => 'Filzmann Assistenzplanung · Urlaubssichtbarkeit',
+            'source_app' => 'flzplaner',
+            'pattern' => '/^flz-ASN-[\p{L}\p{N}]{1,16}-Urlaub$/u',
         ],
-        'adplaner_assistance_teams' => [
-            'label' => 'AdPlaner · Assistenznehmer-Teams',
-            'source_app' => 'adplaner',
-            'pattern' => '/^ad-ASN-[\p{L}\p{N}]{1,16}$/u',
+        'flzplaner_assistance_teams' => [
+            'label' => 'Filzmann Assistenzplanung · Assistenznehmer-Teams',
+            'source_app' => 'flzplaner',
+            'pattern' => '/^flz-ASN-[\p{L}\p{N}]{1,16}$/u',
         ],
     ];
 
@@ -182,7 +182,7 @@ class GroupCatalogService {
         $role = null;
         $roleLabel = null;
 
-        if (preg_match('/^ad-ASN-([\p{L}\p{N}]{1,16})(-Urlaub)?$/u', $group, $matches) === 1) {
+        if (preg_match('/^flz-ASN-([\p{L}\p{N}]{1,16})(-Urlaub)?$/u', $group, $matches) === 1) {
             $team = $matches[1];
             $role = ($matches[2] ?? '') === '-Urlaub' ? 'vacation' : 'assistant';
             $roleLabel = $role === 'vacation' ? 'Urlaub' : 'Assistenz';

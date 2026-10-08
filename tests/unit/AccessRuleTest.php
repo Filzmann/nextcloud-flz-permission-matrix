@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
 
 $rule = new AccessRule(
     'team.coordinate',
     'allow',
     'team:A1',
     AccessCondition::all([
-        AccessCondition::group('ad-ASN-A1'),
+        AccessCondition::group('flz-ASN-A1'),
         AccessCondition::any([
-            AccessCondition::group('ad-EB-Koordination'),
-            AccessCondition::group('ad-EB-Vertretung'),
+            AccessCondition::group('flz-EB-Koordination'),
+            AccessCondition::group('flz-EB-Vertretung'),
         ]),
     ]),
-    'adplaner:test-policy',
+    'flzplaner:test-policy',
     'high'
 );
 $payload = $rule->toArray();
 
 assertSameValue(
-    '(Gruppe ad-ASN-A1 UND (Gruppe ad-EB-Koordination ODER Gruppe ad-EB-Vertretung))',
+    '(Gruppe flz-ASN-A1 UND (Gruppe flz-EB-Koordination ODER Gruppe flz-EB-Vertretung))',
     $rule->conditionText(),
     'Nested AND/OR conditions should remain understandable without losing raw group IDs.'
 );

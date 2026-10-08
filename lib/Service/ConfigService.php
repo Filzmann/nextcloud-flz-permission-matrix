@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
-use OCA\BrPermissionMatrix\AppInfo\Application;
-use OCA\BrPermissionMatrix\Exception\ConfigValidationException;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Exception\ConfigValidationException;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
 
@@ -17,9 +17,11 @@ use OCP\IGroupManager;
  *   die serverseitig erzwungene Format-Allowlist.
  */
 class ConfigService {
-    private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutz', 'IT-Administration'];
+    private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutzbeauftragte', 'IT-Administration'];
     private const DEFAULT_ADMIN_GROUPS = ['IT-Administration'];
     private const DEFAULT_EXPORT_FORMATS = ['md', 'csv', 'json', 'html'];
+    private const DEFAULT_RETENTION_DAYS = 180;
+    private const MAX_RETENTION_DAYS = 3650;
 
     public function __construct(
         private IAppConfig $config,
@@ -77,6 +79,14 @@ class ConfigService {
         return max(1, min(500, $retention));
     }
 
+    public function exportMetadataRetentionDays(): int {
+        return $this->retentionDays('export_metadata_retention_days');
+    }
+
+    public function auditRetentionDays(): int {
+        return $this->retentionDays('audit_retention_days');
+    }
+
     public function toArray(): array {
         return [
             'viewer_groups' => $this->viewerGroups(),
@@ -89,6 +99,8 @@ class ConfigService {
             'include_share_metadata' => $this->includeShareMetadata(),
             'export_formats' => $this->exportFormats(),
             'retention' => $this->retention(),
+            'export_metadata_retention_days' => $this->exportMetadataRetentionDays(),
+            'audit_retention_days' => $this->auditRetentionDays(),
         ];
     }
 
@@ -104,6 +116,8 @@ class ConfigService {
         $this->config->setValueBool(Application::APP_ID, 'include_share_metadata', $validated['include_share_metadata'], true);
         $this->setStringList('export_formats', $validated['export_formats']);
         $this->config->setValueInt(Application::APP_ID, 'retention', $validated['retention'], true);
+        $this->config->setValueInt(Application::APP_ID, 'export_metadata_retention_days', $validated['export_metadata_retention_days'], true);
+        $this->config->setValueInt(Application::APP_ID, 'audit_retention_days', $validated['audit_retention_days'], true);
 
         return $this->toArray();
     }
@@ -121,6 +135,12 @@ class ConfigService {
         $value = $this->config->getValueArray(Application::APP_ID, $key, $default, true);
 
         return $this->normalizeStringList($value);
+    }
+
+    private function retentionDays(string $key): int {
+        $days = $this->config->getValueInt(Application::APP_ID, $key, self::DEFAULT_RETENTION_DAYS, true);
+
+        return max(1, min(self::MAX_RETENTION_DAYS, $days));
     }
 
     private function setStringList(string $key, array|string $value): void {
@@ -177,6 +197,15 @@ class ConfigService {
             throw new ConfigValidationException('Retention muss zwischen 1 und 500 liegen.');
         }
 
+        $exportMetadataRetentionDays = $this->validateRetentionDays(
+            $payload['export_metadata_retention_days'] ?? self::DEFAULT_RETENTION_DAYS,
+            'Aufbewahrungsfrist für Exportmetadaten',
+        );
+        $auditRetentionDays = $this->validateRetentionDays(
+            $payload['audit_retention_days'] ?? self::DEFAULT_RETENTION_DAYS,
+            'Aufbewahrungsfrist für Auditprotokolle',
+        );
+
         return [
             'viewer_groups' => $viewerGroups,
             'admin_groups' => $adminGroups,
@@ -187,7 +216,21 @@ class ConfigService {
             'include_share_metadata' => $this->toBool($payload['include_share_metadata'] ?? false),
             'export_formats' => $formats,
             'retention' => $retention,
+            'export_metadata_retention_days' => $exportMetadataRetentionDays,
+            'audit_retention_days' => $auditRetentionDays,
         ];
+    }
+
+    private function validateRetentionDays(mixed $value, string $label): int {
+        if (!(is_int($value) || (is_string($value) && preg_match('/^\d+$/D', $value) === 1))) {
+            throw new ConfigValidationException($label . ' muss eine ganze Zahl zwischen 1 und ' . self::MAX_RETENTION_DAYS . ' Tagen sein.');
+        }
+        $days = (int)$value;
+        if ($days < 1 || $days > self::MAX_RETENTION_DAYS) {
+            throw new ConfigValidationException($label . ' muss zwischen 1 und ' . self::MAX_RETENTION_DAYS . ' Tagen liegen.');
+        }
+
+        return $days;
     }
 
     private function assertKnownGroups(array $groupIds, string $label): void {

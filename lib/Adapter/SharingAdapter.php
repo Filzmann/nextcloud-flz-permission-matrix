@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
-use OCA\BrPermissionMatrix\Service\NativeSharingSourceInterface;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
 
 /**
  * Zweck: Bildet native Nextcloud-Sharing-Policies und optional konkrete Gruppenfreigaben ab.
@@ -89,7 +89,7 @@ class SharingAdapter implements PermissionAdapterInterface {
                 'Durch include_share_metadata deaktiviert',
                 'Datenschutzgrenze',
                 'NEW',
-                'br_permission_matrix:ConfigService',
+                'flz_permission_matrix:ConfigService',
                 'high',
                 array_fill_keys($groups, 'n/a')
             );

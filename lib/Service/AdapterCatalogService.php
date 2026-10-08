@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 /**
  * Zweck: Trennt tatsaechlich implementierte Detailadapter vom fachlich geforderten Mindestumfang.
@@ -12,6 +12,8 @@ namespace OCA\BrPermissionMatrix\Service;
  *   sichtbar als UNSUPPORTED statt versehentlich als freigegeben zu markieren.
  */
 class AdapterCatalogService {
+    public function __construct(private PermissionProviderSourceInterface $providers) {}
+
     private const IMPLEMENTED_APP_IDS = [
         'core',
         'files',
@@ -20,7 +22,7 @@ class AdapterCatalogService {
         'files_accesscontrol',
         'groupfolders',
         'files_groupfolders',
-        'br_permission_matrix',
+        'flz_permission_matrix',
     ];
 
     private const MINIMUM_TARGET_APP_IDS = [
@@ -49,7 +51,7 @@ class AdapterCatalogService {
     ];
 
     public function hasImplementedAdapter(string $appId): bool {
-        return in_array($appId, self::IMPLEMENTED_APP_IDS, true);
+        return in_array($appId, self::IMPLEMENTED_APP_IDS, true) || $this->providers->hasProvider($appId);
     }
 
     public function isMinimumTarget(string $appId): bool {
@@ -57,7 +59,7 @@ class AdapterCatalogService {
     }
 
     public function implementedAppIds(): array {
-        return self::IMPLEMENTED_APP_IDS;
+        return array_values(array_unique([...self::IMPLEMENTED_APP_IDS, ...array_keys($this->providers->providers())]));
     }
 
     public function minimumTargetAppIds(): array {

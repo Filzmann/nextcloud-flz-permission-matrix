@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use DateTimeImmutable;
-use OCA\BrPermissionMatrix\Model\Snapshot;
+use OCA\FlzPermissionMatrix\Model\Snapshot;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 class SnapshotMapper {
-    private const TABLE = 'permission_matrix_snapshots';
+    private const TABLE = 'flz_pm_snapshots';
 
     public function __construct(
         private IDBConnection $db,
@@ -101,7 +101,7 @@ class SnapshotMapper {
 
         $deleteIds = array_slice(array_column($rows, 'snapshot_id'), $keep);
         foreach ($deleteIds as $snapshotId) {
-            foreach (['permission_matrix_cells', 'permission_matrix_rows', 'permission_matrix_diffs', 'permission_matrix_adapter_status'] as $table) {
+            foreach (['flz_pm_cells', 'flz_pm_rows', 'flz_pm_diffs', 'flz_pm_adapter_status'] as $table) {
                 $qb = $this->db->getQueryBuilder();
                 $qb->delete($table)
                     ->where($qb->expr()->eq('snapshot_uuid', $qb->createNamedParameter($snapshotId)));

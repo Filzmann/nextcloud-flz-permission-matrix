@@ -71,12 +71,20 @@ Apply these decisions proportionately during relevant implementation: reuse the 
 
 ## Persistent state and migrations
 
+Apply the development-phase decision projected into the local `AGENTS.md`
+before selecting preservation work. Upgrade, backfill and immutable historical
+migration requirements below apply only to a concretely justified state that
+must be preserved. For an approved development reset, verify the canonical
+target schema, necessary test-data recovery, fresh installation/reinstall,
+integrity and application behavior instead. Platform compatibility and domain
+state invariants still apply.
+
 - Before implementing a feature that changes persistent domain objects, determine the complete state model: allowed and forbidden starting states, preconditions, target state, side effects, error states, retry or repetition behavior, and relevant concurrency conflicts.
 - Do not expose unrestricted generic setters for status changes governed by domain transition rules. Encapsulate allowed transitions in the domain model or one clearly responsible application service and cover positive, negative, and failure cases.
 - Before a database change that can encounter existing data, document the old and new schema, transformation rules, known existing-data variants including `NULL`, special, and partially migrated states, integrity conditions, schema/code compatibility, transaction boundary, resumability, repeatability, backfill strategy, and roll-forward and rollback limits.
 - For a non-trivial structural change, prefer and verify an additive Expand, controlled Migrate/Backfill, then Contract sequence, retaining temporary compatibility where needed and removing the old structure only after code and data are verified. Do not force this sequence onto a trivial additive migration.
 - Such a database change requires at least a fresh-install test, an upgrade test from the relevant previous version with synthetic existing data, domain data- and relationship-integrity checks, handling of invalid or contradictory legacy data, and an application test on the migrated schema.
-- Never modify a published migration after the fact. Correct it with a new migration.
+- Never modify a migration for a productive or otherwise concretely preserved state after the fact. Correct it with a new migration. Purely internal development revisions follow the phase decision in local `AGENTS.md`.
 
 ## DDEV, Nextcloud, and hosting safety
 

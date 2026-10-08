@@ -2,23 +2,25 @@
 
 declare(strict_types=1);
 
-namespace OCA\BrPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Service\ConfigService;
-use OCA\BrPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 /**
  * Zweck: Liest die gruppenbezogenen View-/Manage-Rechte der Berechtigungsmatrix aus ihrer kanonischen Konfiguration.
  *
  * Vertrag:
  * - Verwaltung umfasst Lesen, Viewer erhalten jedoch keine Verwaltungsrechte.
- * - Nextcloud-Admins bleiben entsprechend AccessService fuer beide Funktionen berechtigt.
+ * - Native Nextcloud-Admins benoetigen zusaetzlich eine aktive app-lokale Adminfreigabe.
  * - Veraltete konfigurierte Gruppen fuehren zu UNKNOWN statt zu einer erfundenen Freigabe.
  */
 final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface {
+    private const PRIVACY_OFFICER_GROUP = 'Datenschutzbeauftragte';
+
     public function __construct(
         private InventoryService $inventory,
         private ConfigService $config
@@ -26,16 +28,15 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
     }
 
     public function supports(string $appId): bool {
-        return $appId === 'br_permission_matrix';
+        return $appId === 'flz_permission_matrix';
     }
 
     public function collect(): AdapterResult {
-        if (!$this->inventory->isAppEnabled('br_permission_matrix')) {
+        if (!$this->inventory->isAppEnabled('flz_permission_matrix')) {
             return AdapterResult::empty();
         }
 
         $groups = $this->inventory->groups();
-        $nativeAdminGroups = in_array('admin', $groups, true) ? ['admin'] : [];
         $configuredView = array_values(array_unique([
             ...$this->config->adminGroups(),
             ...$this->config->viewerGroups(),
@@ -43,14 +44,18 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $configuredManage = array_values(array_unique($this->config->adminGroups()));
         $missingView = array_values(array_diff($configuredView, $groups));
         $missingManage = array_values(array_diff($configuredManage, $groups));
-        $viewGroups = array_values(array_intersect([...$configuredView, ...$nativeAdminGroups], $groups));
-        $manageGroups = array_values(array_intersect([...$configuredManage, ...$nativeAdminGroups], $groups));
+        $missingPrivacyOfficer = !in_array(self::PRIVACY_OFFICER_GROUP, $groups, true);
+        $viewGroups = array_values(array_intersect($configuredView, $groups));
+        $manageGroups = array_values(array_intersect($configuredManage, $groups));
         $warnings = [];
         if ($missingView !== []) {
             $warnings[] = 'Mindestens eine konfigurierte View-/Admin-Gruppe ist nicht im Gruppeninventar vorhanden.';
         }
         if ($missingManage !== []) {
             $warnings[] = 'Mindestens eine konfigurierte Admin-Gruppe ist nicht im Gruppeninventar vorhanden.';
+        }
+        if ($missingPrivacyOfficer) {
+            $warnings[] = 'Die kanonische Gruppe Datenschutzbeauftragte ist nicht im Gruppeninventar vorhanden.';
         }
 
         $viewCells = array_fill_keys($groups, '-');
@@ -61,33 +66,58 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         foreach ($manageGroups as $group) {
             $manageCells[$group] = 'A';
         }
+        $adminAccessCells = array_fill_keys($groups, '-');
+        if (!$missingPrivacyOfficer) {
+            $adminAccessCells[self::PRIVACY_OFFICER_GROUP] = 'A';
+        }
 
-        $viewRules = $viewGroups === [] ? [] : [new AccessRule(
+        $temporaryAdminCondition = AccessCondition::all([
+            AccessCondition::nextcloudAdmin(),
+            AccessCondition::temporaryAppAdminGrant(),
+        ]);
+        $viewConditions = [
+            ...array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $viewGroups),
+            $temporaryAdminCondition,
+        ];
+        $manageConditions = [
+            ...array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $manageGroups),
+            $temporaryAdminCondition,
+        ];
+
+        $viewRules = [new AccessRule(
             'matrix.view',
             'allow',
-            'app:br_permission_matrix',
-            AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $viewGroups)),
-            'br_permission_matrix:AccessService::canViewUserId',
+            'app:flz_permission_matrix',
+            AccessCondition::any($viewConditions),
+            'flz_permission_matrix:AccessService::canViewUserId',
             $missingView === [] ? 'high' : 'low'
         )];
-        $manageRules = $manageGroups === [] ? [] : [new AccessRule(
+        $manageRules = [new AccessRule(
             'matrix.manage',
             'allow',
-            'app:br_permission_matrix',
-            AccessCondition::any(array_map(static fn(string $group): AccessCondition => AccessCondition::group($group), $manageGroups)),
-            'br_permission_matrix:AccessService::canManageUserId',
+            'app:flz_permission_matrix',
+            AccessCondition::any($manageConditions),
+            'flz_permission_matrix:AccessService::canManageUserId',
             $missingManage === [] ? 'high' : 'low'
+        )];
+        $adminAccessRules = [new AccessRule(
+            'matrix.temporary-admin-access.manage',
+            'allow',
+            'app:flz_permission_matrix',
+            AccessCondition::group(self::PRIVACY_OFFICER_GROUP),
+            'flz_permission_matrix:TemporaryAdminAccessService::canManage',
+            $missingPrivacyOfficer ? 'low' : 'high'
         )];
 
         return new AdapterResult([
             new MatrixRow(
                 'AppPermission',
-                'br_permission_matrix',
+                'flz_permission_matrix',
                 'Matrix ansehen',
-                'Konfigurierte Viewer- und Admin-Gruppen; Nextcloud-Admins',
+                'Konfigurierte Viewer-/Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Lesen',
                 $missingView === [] ? 'NEW' : 'UNKNOWN',
-                'br_permission_matrix:AccessService::canViewUserId',
+                'flz_permission_matrix:AccessService::canViewUserId',
                 $missingView === [] ? 'high' : 'low',
                 $viewCells,
                 $missingView === [] ? [] : [$warnings[0]],
@@ -95,19 +125,32 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             ),
             new MatrixRow(
                 'AppPermission',
-                'br_permission_matrix',
+                'flz_permission_matrix',
                 'Matrix verwalten',
-                'Konfigurierte Admin-Gruppen; Nextcloud-Admins',
+                'Konfigurierte Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Administrieren',
                 $missingManage === [] ? 'NEW' : 'UNKNOWN',
-                'br_permission_matrix:AccessService::canManageUserId',
+                'flz_permission_matrix:AccessService::canManageUserId',
                 $missingManage === [] ? 'high' : 'low',
                 $manageCells,
                 $missingManage === [] ? [] : ['Mindestens eine konfigurierte Admin-Gruppe fehlt.'],
                 $manageRules
             ),
+            new MatrixRow(
+                'AppPermission',
+                'flz_permission_matrix',
+                'Temporären Admin-Vollzugriff verwalten',
+                'Ausschließlich die kanonische Datenschutzgruppe erteilt, liest und widerruft Freigaben für aktuelle Nextcloud-Administrationskonten',
+                'Administrieren',
+                $missingPrivacyOfficer ? 'UNKNOWN' : 'NEW',
+                'flz_permission_matrix:TemporaryAdminAccessService::canManage',
+                $missingPrivacyOfficer ? 'low' : 'high',
+                $adminAccessCells,
+                $missingPrivacyOfficer ? ['Die kanonische Gruppe Datenschutzbeauftragte fehlt.'] : [],
+                $adminAccessRules
+            ),
         ], $warnings, [], [[
-            'app_id' => 'br_permission_matrix',
+            'app_id' => 'flz_permission_matrix',
             'adapter' => self::class,
             'status' => $warnings === [] ? 'IMPLEMENTED' : 'PARTIAL',
             'confidence' => $warnings === [] ? 'high' : 'low',

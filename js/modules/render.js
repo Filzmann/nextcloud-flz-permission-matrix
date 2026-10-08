@@ -178,8 +178,9 @@
                 <button type="button" data-matrix-action="collapse-all">Alle Apps einklappen</button>
                 <span>${esc(sections.length)} Apps · Gruppenueberschrift anklicken, um eine Gruppe zu fokussieren</span>
             </div>
-            <div class="pm-table-wrap" tabindex="0" aria-label="Berechtigungsmatrix, horizontal und vertikal scrollbar">
-                <table class="pm-table">
+            <div class="pm-matrix-scroll-track" data-pm-matrix-scroll-track tabindex="0" role="region" aria-label="Berechtigungsmatrix horizontal scrollen" aria-controls="pm-matrix-table" hidden><div data-pm-matrix-scroll-spacer></div></div>
+            <div class="pm-table-wrap" data-pm-matrix-scroll tabindex="0" aria-label="Berechtigungsmatrix, horizontal scrollbar">
+                <table id="pm-matrix-table" class="pm-table">
                     <thead><tr>
                         <th scope="col">Berechtigung</th><th scope="col">Detail</th><th scope="col">Art</th><th scope="col">Status</th>
                         ${groups.map((group) => `<th scope="col"><button type="button" class="pm-group-head" data-group-focus="${esc(group.key)}" aria-pressed="${groupFilter === group.key ? 'true' : 'false'}">${esc(group.label)}${group.type === 'family' ? `<small>${groupCountLabel(group.count)}</small>` : ''}</button></th>`).join('')}
@@ -437,6 +438,83 @@
         return { value: `gemischt (${relevant.length}/${values.length})`, className: 'mixed', title };
     }
 
+    /**
+     * Hält den dauerhaft sichtbaren horizontalen Track mit der breiten Matrix synchron.
+     * Der Track besitzt keinen vertikalen Scrollbereich; vertikal scrollt ausschließlich
+     * der App-Root. Bei jedem Matrix-Render wird die vorherige Bindung sauber entfernt.
+     */
+    function bindMatrixScrollTrack(root) {
+        root.__pmMatrixScrollCleanup?.();
+
+        const tableWrap = root.querySelector('[data-pm-matrix-scroll]');
+        const track = root.querySelector('[data-pm-matrix-scroll-track]');
+        const spacer = track?.querySelector('[data-pm-matrix-scroll-spacer]');
+        if (!tableWrap || !track || !spacer) {
+            return () => {};
+        }
+
+        const appRoot = root.closest?.('#permission-matrix-app');
+        let syncing = false;
+        const setTrackVisibility = () => {
+            const hasOverflow = tableWrap.scrollWidth > tableWrap.clientWidth;
+            let visible = hasOverflow;
+            if (typeof tableWrap.getBoundingClientRect === 'function' && typeof window.innerHeight === 'number') {
+                const tableBounds = tableWrap.getBoundingClientRect();
+                const appBounds = appRoot?.getBoundingClientRect?.();
+                const top = Math.max(tableBounds.top, appBounds?.top ?? 0);
+                const bottom = Math.min(tableBounds.bottom, appBounds?.bottom ?? window.innerHeight);
+                visible = hasOverflow && bottom > 0 && top < window.innerHeight;
+                if (visible) {
+                    track.style.left = `${Math.max(tableBounds.left, appBounds?.left ?? 0)}px`;
+                    track.style.width = `${Math.min(tableBounds.width, appBounds?.width ?? tableBounds.width)}px`;
+                    track.style.bottom = `${Math.max(0, window.innerHeight - (appBounds?.bottom ?? window.innerHeight))}px`;
+                }
+            }
+            track.hidden = !visible;
+            track.classList?.toggle('pm-matrix-scroll-track-active', visible);
+        };
+        const syncDimensions = () => {
+            spacer.style.width = `${tableWrap.scrollWidth}px`;
+            setTrackVisibility();
+        };
+        const syncFromTable = () => {
+            if (syncing) return;
+            syncing = true;
+            track.scrollLeft = tableWrap.scrollLeft;
+            syncing = false;
+        };
+        const syncFromTrack = () => {
+            if (syncing) return;
+            syncing = true;
+            tableWrap.scrollLeft = track.scrollLeft;
+            syncing = false;
+        };
+
+        tableWrap.addEventListener('scroll', syncFromTable);
+        track.addEventListener('scroll', syncFromTrack);
+        appRoot?.addEventListener('scroll', setTrackVisibility);
+        window.addEventListener?.('resize', syncDimensions);
+        const ResizeObserverClass = window.ResizeObserver;
+        const resizeObserver = ResizeObserverClass ? new ResizeObserverClass(syncDimensions) : null;
+        resizeObserver?.observe(tableWrap);
+        resizeObserver?.observe(appRoot || root);
+        syncDimensions();
+        syncFromTable();
+
+        const cleanup = () => {
+            tableWrap.removeEventListener('scroll', syncFromTable);
+            track.removeEventListener('scroll', syncFromTrack);
+            appRoot?.removeEventListener('scroll', setTrackVisibility);
+            window.removeEventListener?.('resize', syncDimensions);
+            resizeObserver?.disconnect();
+            if (root.__pmMatrixScrollCleanup === cleanup) {
+                delete root.__pmMatrixScrollCleanup;
+            }
+        };
+        root.__pmMatrixScrollCleanup = cleanup;
+        return cleanup;
+    }
+
     window.PermissionMatrix = window.PermissionMatrix || {};
     window.PermissionMatrix.render = {
         byId,
@@ -452,6 +530,7 @@
         adapterCoverage,
         matrixSections,
         groupColumns,
-        aggregateCell
+        aggregateCell,
+        bindMatrixScrollTrack
     };
 })();

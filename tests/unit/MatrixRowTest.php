@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use OCA\BrPermissionMatrix\Model\MatrixRow;
-use OCA\BrPermissionMatrix\Model\AccessCondition;
-use OCA\BrPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
 
 $row = MatrixRow::get([
     'object_type' => 'App',
@@ -21,7 +21,7 @@ $row = MatrixRow::get([
         'team.view',
         'allow',
         'team:A1',
-        AccessCondition::group('ad-ASN-A1'),
+        AccessCondition::group('flz-ASN-A1'),
         'test:policy',
         'high'
     )],
@@ -30,7 +30,7 @@ $row = MatrixRow::get([
 assertSameValue('App', $row->objectType(), 'object type should hydrate');
 assertSameValue('UNSUPPORTED', $row->status(), 'status should hydrate');
 assertSameValue(['Alle' => '-', 'Betriebsrat' => 'X'], $row->cells(), 'cells should be sorted');
-assertSameValue('Gruppe ad-ASN-A1', $row->accessRules()[0]->conditionText(), 'access rules should preserve their machine-readable condition');
+assertSameValue('Gruppe flz-ASN-A1', $row->accessRules()[0]->conditionText(), 'access rules should preserve their machine-readable condition');
 assertSameValue($row->key(), MatrixRow::get($row->toArray())->key(), 'row key should be stable across serialization');
 
 echo 'MatrixRow tests passed' . PHP_EOL;

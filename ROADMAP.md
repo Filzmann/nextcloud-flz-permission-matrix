@@ -1,112 +1,93 @@
 # Roadmap – Berechtigungsmatrix
 
-Diese Datei enthält ausschließlich zukünftige Adapter, Exportziele und offene
-Produktentscheidungen. Der geltende read-only Sicherheitsvertrag steht in
-`AGENTS.md`; der aktuelle Funktionsumfang steht in `README.md`.
+Diese Datei enthält ausschließlich offene Adapter, Exportziele,
+Produktentscheidungen und Freigabegates. Der aktuelle Coverage-Stand steht in
+`README.md`, erledigte Änderungen in `CHANGELOG.md` und geltende
+Architektur in `docs/architecture.md`.
 
-Die Berechtigungsmatrix steht noch am Anfang ihrer Entwicklung. Die folgenden
-Aufgaben legen deshalb fachliche Zielverträge und Sicherheitsgrenzen fest,
-ohne das heutige Matrixmodell vorschnell als endgültige Struktur zu behandeln.
+## Nextcloud-Kompatibilitätsgate
 
-## Freigegebene Umsetzungsaufgaben
+### BPM-NC-COMPAT – RC-Kompatibilität und optionale Adapter getrennt belegen
 
-### BPM-CUSTOM-APP-PERMISSIONS – Berechtigungen aus der zuständigen App lesen
+Die `min-version` muss beim Release Candidate die aktuelle, autoritativ
+ermittelte openDesk-Nextcloud-Hauptversion abdecken. Erst beim Erstellen eines
+veröffentlichungsfähigen RC werden alle deklarierten Core-Majors lückenlos mit
+Fresh Install/Upgrade, DI, Provider-Scan, Permission-V1-Vertrag, Assets und
+sichtbarer Matrix geprüft. `max-version` folgt ausschließlich der höchsten
+lückenlos nachgewiesenen Major aus offiziellen, gepinnten Nextcloud-Git-Quellen;
+eine offiziell benannte und testbare künftige Major (z. B. NC36) wird dabei
+geprüft. Der regelmäßige Check der neuesten veröffentlichten Entwicklungsruntime
+ist davon getrennt und ersetzt keinen RC-Nachweis. Die private Groupfolders-
+Ausnahme bleibt separat versionsgebunden und liefert auf unbekannten
+Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
-Status: installierte Apps geprüft; öffentliche Providerverträge und appübergreifende Umsetzung noch ausstehend
+## Priorisierte offene Adapter
 
-- Jede Custom App mit eigener Berechtigungssteuerung stellt ihr vollständiges
-  Berechtigungsmodell über eine stabile, direkt und read-only auslesbare
-  öffentliche Schnittstelle bereit.
-- Die Berechtigungsmatrix ruft diese Detailberechtigungen ausschließlich bei
-  der jeweils zuständigen App ab. Sie liest dafür weder deren Tabellen,
-  Entitäten, interne Services oder Konfiguration direkt noch führt sie eine
-  zweite, unabhängig gepflegte Abbildung der App-Berechtigungen.
-- Die Custom App bleibt die kanonische Quelle und liefert die fachliche
-  Bedeutung sowie die effektiv geltenden Rechte, Scopes und Einschränkungen.
-  Nicht eindeutig gelieferte Zustände werden als `UNKNOWN` oder `UNSUPPORTED`
-  ausgewiesen und niemals als erlaubt ergänzt.
-- Besitzt eine App keine eigene Berechtigungssteuerung, bewertet die Matrix
-  ausschließlich die native Nextcloud-Gruppeneinschränkung der App. Mit einer
-  solchen Einschränkung ist die App nur für die dort eingetragenen Gruppen
-  verfügbar; ohne Einschränkung steht die App vollständig allen
-  Nextcloud-Benutzern zur Verfügung und wird für alle erfassten Gruppen als
-  nutzbar ausgewiesen.
-- Provider-/Consumer-Vertrag, Versionierung, Fehlerfälle sowie positive und
-  negative Berechtigungsfälle werden vor der ersten appübergreifenden
-  Umsetzung gemeinsam festgelegt und getestet.
+### BPM-NEXTCLOUD-NATIVE-PERMISSIONS – Files und Calendar vervollständigen
 
-### BPM-FOLDER-RIGHTS – Konkrete Ordnerrechte ausweisen
+- Die eigene PermissionProvider-Projektion bei jeder relevanten Weiterentwicklung
+  gegen neue oder geänderte Berechtigungen und Scopes abgleichen.
+- Eine leere Gruppenbeschränkung als appweite Verfügbarkeit für jede erfasste
+  Gruppe behandeln; fehlende Detailabdeckung bleibt davon getrennt
+  `UNSUPPORTED`.
+- Files Access Control, externe Speicher und weitere öffentliche
+  Files-Verträge als getrennte Quellen bewerten.
+- Metadaten und Rechte nur über öffentliche Files-Verträge erfassen;
+  Dateiinhalte bleiben ausgeschlossen.
+- Für Calendar Scan-Scope, Principal-Auswahl, Eigentümer-, Share- und
+  Public-Link-Semantik sowie die Vollständigkeitsgrenze auf Basis von
+  `OCP\Calendar\IManager` festlegen.
+- Ausschließlich öffentliche OCP-Verträge verwenden; private DAV-Backends,
+  fremde Tabellen oder Reflection bleiben ausgeschlossen.
 
-Status: native Nextcloud-Gruppenfreigaben umgesetzt; weitere Adapter offen
+### BPM-FOLDER-RIGHTS – weitere konkrete Ordnerrechte
 
-- Für jeden belastbar auslesbaren konkreten Ordner und jede erfasste Gruppe
-  getrennt Lesen, Schreiben beziehungsweise Ändern, Ausführen und Löschen
-  darstellen.
-- Native zusätzliche Rechte wie Erstellen und Teilen getrennt abbilden.
-  `Ausführen` nur anzeigen, wenn die konkrete Quelle dieses Recht wirklich
-  liefert; sonst `nicht anwendbar` oder `UNKNOWN`.
-- Group Folders, Files Access Control, Shares und externe Speicher jeweils
-  über eigene read-only Adapter mit Quellen- und Confidence-Angabe behandeln.
-- Konkrete Ordner in der geschützten Matrix sichtbar machen, aber die
-  bestehende standardmäßige Pfadredaktion in Exporten und den Ausschluss von
-  Dateiinhalten, Credentials und unnötigen Personenbezügen erhalten.
-- Pro Adapter positive Rechte, Deny, Vererbung, widersprüchliche Regeln,
-  unbekannte Quelle, deaktivierte App, Redaction und unveränderte
-  Nextcloud-Rechte testen.
+- Erweiterte Groupfolders-ACLs, Files Access Control und externe Speicher
+  jeweils über eigene read-only Adapter mit Quellen- und Confidence-Angabe
+  abbilden.
+- Lesen, Schreiben/Ändern, Erstellen, Löschen, Teilen und nur tatsächlich
+  gelieferte Ausführungsrechte getrennt darstellen.
+- Pfadredaktion, Datenschutzgrenzen sowie positive, negative, unbekannte und
+  widersprüchliche Zustände testen.
 
-Umgesetzt für native Nextcloud-Gruppenfreigaben:
+### BPM-THIRD-PARTY-COVERAGE – Fremd-App-Coverage kontrolliert bewerten
 
-- Öffentliche `OCP\Share\IManager`-Quelle mit read-only Abfrage einschließlich
-  direkter Freigaben und Weiterfreigaben.
-- Getrennte R/W/C/D/S-Zeilen, explizites `n/a` für Ausführen sowie
-  fail-closed Behandlung von Teilständen, unbekannten Gruppen, Permission-Bits,
-  Node-Typen, Pfaden und widersprüchlichen Datensätzen.
-- Standardmäßig deaktivierte Einzelfreigaben-Erfassung und pfadredigierte
-  JSON-/CSV-/Markdown-/HTML-Exporte einschließlich Diffangaben.
+- Nach den nativen Quellen aktivierte Fremd-Apps nach Zweck,
+  Berechtigungsmodell und offizieller öffentlicher Schnittstelle
+  inventarisieren.
+- Fehlende oder unvollständige Verträge sichtbar fail-closed behandeln.
+- Einen versionsgebundenen Adapter nur nach separater Risiko-, Datenschutz-,
+  Update- und Releaseentscheidung implementieren.
 
-Offen bleiben Group Folders, Files Access Control und externe Speicher. Sie
-werden nicht aus internen App-Klassen oder fremden Tabellen gelesen.
+## Staging und weitere Produkte
 
-## Zukunftsplanung – nicht freigegeben
+### BPM-MATRIX-SCROLL – horizontale Matrixnavigation dauerhaft erreichbar machen
 
-### BPM-L10N – Berechtigungsmatrix vollständig lokalisieren
+- Die horizontale Scrollleiste der Matrix unabhängig von der Inhaltshöhe am
+  unteren Rand des sichtbaren Matrix-Viewports erreichbar halten.
+- Kleine Viewports, Tastaturbedienung, Fokus, fixierte Kontextinformationen
+  und gleichzeitiges horizontales sowie vertikales Scrollen manuell
+  nachprüfen.
 
-Status: später, nicht freigegeben; Matrixmodell, Pilot-App, Reihenfolge und
-Rohtext-Gate werden vor jeder Umsetzung appübergreifend separat freigegeben
+- Viewer-, Admin-, Export- und Auditgrenzen positiv und negativ prüfen.
+- Danach Detailadapter für Deck, Collectives, Tables, Talk, Contacts, Forms,
+  Notes, Richdocuments, OnlyOffice, LDAP und Two-Factor einzeln bewerten.
+- XLSX- und PDF-Export erst nach geklärtem Datenschutz-,
+  Dokumenterzeugungs- und Aufbewahrungsvertrag ergänzen.
 
-- Oberfläche, Status-, Warn-, Export- und Fehlermeldungen auf
-  Nextcloud-l10n umstellen.
-- Berechtigungsschlüssel, Effekte, Scope-IDs, Snapshotdaten und Adapterstatus
-  sprachneutral lassen; lokalisierte Labels erst bei Darstellung und Export
-  erzeugen.
-- Deutsche Ausgabe, eine weitere Locale, Fallback, Pluralformen,
-  Platzhalter, Escaping sowie reproduzierbare Exportlocale testen.
-- Erst nach vollständiger Migration einen Rohtext-Check für die App
-  verbindlich schalten.
+Vor jedem neuen Adapter sind Eigentümer, Coverage, Unknown-/Unsupported-
+Fallback, Allow-/Deny-Fälle, Personenbezug und Pfadredaktion festzulegen.
 
-## Aktueller Fokus
+## Bewusst zurückgestellt – niedrigste Priorität
 
-- Die manuellen Prüfungen werden im ausfüllbaren
-  [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
-- Den versionierten AD-Organisationsvertrag und seinen kontrollierten
-  `UNKNOWN`-Fallback auf Staging abnehmen.
-- Sicherstellen, dass unbekannte, nicht eindeutige oder nicht unterstützte
-  Rechtequellen nie als freigegeben erscheinen.
-- Viewer-, Admin-, Export- und Auditgrenzen auf einem realitätsnahen Staging
-  positiv und negativ abnehmen.
+### BPM-L10N – Matrix und Exporte lokalisieren
 
-## Geplante Erweiterungen
+Status seit 17. September 2026: Die Umsetzung beginnt erst nach allen höher
+priorisierten Roadmap-Aufgaben und einer erneuten ausdrücklichen Freigabe des
+Root-Vorhabens `ZM-06`. Neue Funktionen und Codeänderungen berücksichtigen
+die spätere Lokalisierbarkeit an den jeweils berührten Stellen, lösen aber
+keine flächige Umstellung oder Übersetzungsimplementierung aus.
 
-- Konkrete Team- und Group-Folder-Rechte sowie externe Speicherrechte.
-- Files-Access-Control-Regelgruppen.
-- App-spezifische Detailadapter für Deck, Collectives, Tables, Talk,
-  Calendar, Contacts, Forms, Notes, Richdocuments, OnlyOffice, LDAP und
-  Two-Factor.
-- XLSX- und PDF-Export nach geklärtem Datenschutz- und
-  Dokumenterzeugungsvertrag.
-
-## Vor der Umsetzung zu klären
-
-- Adaptereigentümer, Unknown-/Unsupported-Fallback und vollständige
-  Allow-/Deny-Fälle je neuer Rechtequelle.
-- Personenbezug, Pfadredaktion und Aufbewahrung je neuem Exportformat.
+Bei der späteren Umsetzung dürfen sichtbare Meldungen lokalisiert werden;
+Berechtigungsschlüssel, Effekte, Scope-IDs, Snapshotdaten und Adapterstatus
+bleiben sprachneutral. Eine Exportlocale muss reproduzierbar sein.
