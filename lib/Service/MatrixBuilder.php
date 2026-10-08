@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
-use OCA\FilzmannPermissionMatrix\Adapter\AdapterResult;
-use OCA\FilzmannPermissionMatrix\Adapter\CoreAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\FilesAccessControlAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\FilesAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\GroupFoldersAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\PermissionProviderAdapter;
-use OCA\FilzmannPermissionMatrix\Adapter\SharingAdapter;
+use OCA\FlzPermissionMatrix\Adapter\AdapterResult;
+use OCA\FlzPermissionMatrix\Adapter\CoreAdapter;
+use OCA\FlzPermissionMatrix\Adapter\FilesAccessControlAdapter;
+use OCA\FlzPermissionMatrix\Adapter\FilesAdapter;
+use OCA\FlzPermissionMatrix\Adapter\GenericAppAdapter;
+use OCA\FlzPermissionMatrix\Adapter\GroupFoldersAdapter;
+use OCA\FlzPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
+use OCA\FlzPermissionMatrix\Adapter\PermissionProviderAdapter;
+use OCA\FlzPermissionMatrix\Adapter\SharingAdapter;
 
 /**
  * Zweck: Orchestriert alle Berechtigungsadapter zu einem noch unbewerteten Matrix-Rohbau.

@@ -2,7 +2,7 @@
 
 Die Berechtigungsmatrix entdeckt app-eigene Detailrechte ausschließlich über
 den optionalen read-only Vertrag im Namespace
-`OCA\FilzmannPermissionMatrix\PublicApi\V1`. Die Fachapp bleibt Eigentümerin
+`OCA\FlzPermissionMatrix\PublicApi\V1`. Die Fachapp bleibt Eigentümerin
 ihrer Regeln. Der Consumer liest weder ihre Tabellen noch ihre privaten
 Services oder Konfigurationen direkt.
 

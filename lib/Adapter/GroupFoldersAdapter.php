@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
-use OCA\FilzmannPermissionMatrix\Model\AccessRule;
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Service\GroupFoldersSourceInterface;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 class GroupFoldersAdapter implements PermissionAdapterInterface {
     private const KNOWN_PERMISSION_MASK = 31;

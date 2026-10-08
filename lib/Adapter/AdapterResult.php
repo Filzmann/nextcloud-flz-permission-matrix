@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
 
 /**
  * Zweck: Unveraenderliches Sammelergebnis eines oder mehrerer read-only Adapter.

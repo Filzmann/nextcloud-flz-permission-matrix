@@ -16,13 +16,13 @@ namespace OCP {
         public function isInGroup(string $uid, string $groupId): bool;
     }
 }
-namespace OCA\FilzmannPermissionMatrix\Service { interface TemporaryAdminAccessChecker { public function hasActiveGrant(string $uid): bool; } }
+namespace OCA\FlzPermissionMatrix\Service { interface TemporaryAdminAccessChecker { public function hasActiveGrant(string $uid): bool; } }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
-    use OCA\FilzmannPermissionMatrix\Service\AccessService;
-    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
-    use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessChecker;
+    use OCA\FlzPermissionMatrix\Exception\AccessDeniedException;
+    use OCA\FlzPermissionMatrix\Service\AccessService;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessChecker;
     use OCP\IGroupManager;
     use OCP\IUser;
     use OCP\IUserSession;

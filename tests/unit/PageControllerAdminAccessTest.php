@@ -21,8 +21,8 @@ namespace OCP\AppFramework\Http\Attribute {
     #[\Attribute(\Attribute::TARGET_METHOD)] final class NoAdminRequired {}
     #[\Attribute(\Attribute::TARGET_METHOD)] final class NoCSRFRequired {}
 }
-namespace OCA\FilzmannPermissionMatrix\AppInfo { final class Application { public const APP_ID = 'filzmann_permission_matrix'; } }
-namespace OCA\FilzmannPermissionMatrix\Service {
+namespace OCA\FlzPermissionMatrix\AppInfo { final class Application { public const APP_ID = 'flz_permission_matrix'; } }
+namespace OCA\FlzPermissionMatrix\Service {
     class AccessService {
         public function __construct(public bool $view = false, public bool $manage = false) {}
         public function canViewCurrentUser(): bool { return $this->view; }
@@ -39,10 +39,10 @@ namespace OCA\FilzmannPermissionMatrix\Service {
     }
 }
 namespace {
-    use OCA\FilzmannPermissionMatrix\Controller\PageController;
-    use OCA\FilzmannPermissionMatrix\Service\AccessService;
-    use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
-    use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+    use OCA\FlzPermissionMatrix\Controller\PageController;
+    use OCA\FlzPermissionMatrix\Service\AccessService;
+    use OCA\FlzPermissionMatrix\Service\AuditLogService;
+    use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 
     $request = new class implements OCP\IRequest {};
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 use OCP\Server;
 use RuntimeException;

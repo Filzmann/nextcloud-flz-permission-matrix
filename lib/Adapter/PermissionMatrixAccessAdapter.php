@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
-use OCA\FilzmannPermissionMatrix\Model\AccessRule;
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 /**
  * Zweck: Liest die gruppenbezogenen View-/Manage-Rechte der Berechtigungsmatrix aus ihrer kanonischen Konfiguration.
@@ -28,11 +28,11 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
     }
 
     public function supports(string $appId): bool {
-        return $appId === 'filzmann_permission_matrix';
+        return $appId === 'flz_permission_matrix';
     }
 
     public function collect(): AdapterResult {
-        if (!$this->inventory->isAppEnabled('filzmann_permission_matrix')) {
+        if (!$this->inventory->isAppEnabled('flz_permission_matrix')) {
             return AdapterResult::empty();
         }
 
@@ -87,37 +87,37 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
         $viewRules = [new AccessRule(
             'matrix.view',
             'allow',
-            'app:filzmann_permission_matrix',
+            'app:flz_permission_matrix',
             AccessCondition::any($viewConditions),
-            'filzmann_permission_matrix:AccessService::canViewUserId',
+            'flz_permission_matrix:AccessService::canViewUserId',
             $missingView === [] ? 'high' : 'low'
         )];
         $manageRules = [new AccessRule(
             'matrix.manage',
             'allow',
-            'app:filzmann_permission_matrix',
+            'app:flz_permission_matrix',
             AccessCondition::any($manageConditions),
-            'filzmann_permission_matrix:AccessService::canManageUserId',
+            'flz_permission_matrix:AccessService::canManageUserId',
             $missingManage === [] ? 'high' : 'low'
         )];
         $adminAccessRules = [new AccessRule(
             'matrix.temporary-admin-access.manage',
             'allow',
-            'app:filzmann_permission_matrix',
+            'app:flz_permission_matrix',
             AccessCondition::group(self::PRIVACY_OFFICER_GROUP),
-            'filzmann_permission_matrix:TemporaryAdminAccessService::canManage',
+            'flz_permission_matrix:TemporaryAdminAccessService::canManage',
             $missingPrivacyOfficer ? 'low' : 'high'
         )];
 
         return new AdapterResult([
             new MatrixRow(
                 'AppPermission',
-                'filzmann_permission_matrix',
+                'flz_permission_matrix',
                 'Matrix ansehen',
                 'Konfigurierte Viewer-/Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Lesen',
                 $missingView === [] ? 'NEW' : 'UNKNOWN',
-                'filzmann_permission_matrix:AccessService::canViewUserId',
+                'flz_permission_matrix:AccessService::canViewUserId',
                 $missingView === [] ? 'high' : 'low',
                 $viewCells,
                 $missingView === [] ? [] : [$warnings[0]],
@@ -125,12 +125,12 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             ),
             new MatrixRow(
                 'AppPermission',
-                'filzmann_permission_matrix',
+                'flz_permission_matrix',
                 'Matrix verwalten',
                 'Konfigurierte Admin-Gruppen; Nextcloud-Admins nur mit aktiver app-lokaler Freigabe',
                 'Administrieren',
                 $missingManage === [] ? 'NEW' : 'UNKNOWN',
-                'filzmann_permission_matrix:AccessService::canManageUserId',
+                'flz_permission_matrix:AccessService::canManageUserId',
                 $missingManage === [] ? 'high' : 'low',
                 $manageCells,
                 $missingManage === [] ? [] : ['Mindestens eine konfigurierte Admin-Gruppe fehlt.'],
@@ -138,19 +138,19 @@ final class PermissionMatrixAccessAdapter implements PermissionAdapterInterface 
             ),
             new MatrixRow(
                 'AppPermission',
-                'filzmann_permission_matrix',
+                'flz_permission_matrix',
                 'Temporären Admin-Vollzugriff verwalten',
                 'Ausschließlich die kanonische Datenschutzgruppe erteilt, liest und widerruft Freigaben für aktuelle Nextcloud-Administrationskonten',
                 'Administrieren',
                 $missingPrivacyOfficer ? 'UNKNOWN' : 'NEW',
-                'filzmann_permission_matrix:TemporaryAdminAccessService::canManage',
+                'flz_permission_matrix:TemporaryAdminAccessService::canManage',
                 $missingPrivacyOfficer ? 'low' : 'high',
                 $adminAccessCells,
                 $missingPrivacyOfficer ? ['Die kanonische Gruppe Datenschutzbeauftragte fehlt.'] : [],
                 $adminAccessRules
             ),
         ], $warnings, [], [[
-            'app_id' => 'filzmann_permission_matrix',
+            'app_id' => 'flz_permission_matrix',
             'adapter' => self::class,
             'status' => $warnings === [] ? 'IMPLEMENTED' : 'PARTIAL',
             'confidence' => $warnings === [] ? 'high' : 'low',

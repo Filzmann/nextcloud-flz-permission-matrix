@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Settings;
+namespace OCA\FlzPermissionMatrix\Settings;
 
-use OCA\FilzmannPermissionMatrix\AppInfo\Application;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
 

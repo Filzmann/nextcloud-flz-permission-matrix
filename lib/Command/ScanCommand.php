@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Command;
+namespace OCA\FlzPermissionMatrix\Command;
 
-use OCA\FilzmannPermissionMatrix\Service\ScannerService;
+use OCA\FlzPermissionMatrix\Service\ScannerService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

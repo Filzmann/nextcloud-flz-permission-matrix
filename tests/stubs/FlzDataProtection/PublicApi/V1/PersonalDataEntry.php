@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannDataProtection\PublicApi\V1;
+namespace OCA\FlzDataProtection\PublicApi\V1;
 
 final class PersonalDataEntry {
     public function __construct(

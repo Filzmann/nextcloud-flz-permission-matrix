@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\AppInfo;
+namespace OCA\FlzPermissionMatrix\AppInfo;
 
-use OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener;
-use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
-use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener;
-use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
-use OCA\FilzmannPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
-use OCA\FilzmannPermissionMatrix\Service\GroupFoldersSourceInterface;
-use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
-use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
-use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
-use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
-use OCA\FilzmannPermissionMatrix\Service\NextcloudPermissionProviderSource;
-use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
-use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepository;
-use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessChecker;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
-use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
-use OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
-use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
+use OCA\FlzPermissionMatrix\Listener\StandaloneNavigationListener;
+use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
+use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener;
+use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
+use OCA\FlzPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
+use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
+use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
+use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
+use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersSource;
+use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
+use OCA\FlzPermissionMatrix\Service\NextcloudPermissionProviderSource;
+use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
+use OCA\FlzPermissionMatrix\Db\TemporaryAdminAccessRepository;
+use OCA\FlzPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessChecker;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
+use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
+use OCA\FlzDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;

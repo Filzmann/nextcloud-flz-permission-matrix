@@ -2,15 +2,15 @@
 
 ## Projekt
 
-Nextcloud-App `filzmann_permission_matrix` fuer eine dauerhaft einsehbare, exportierbare Berechtigungsmatrix der lokalen bzw. betrieblichen Nextcloud.
+Nextcloud-App `flz_permission_matrix` fuer eine dauerhaft einsehbare, exportierbare Berechtigungsmatrix der lokalen bzw. betrieblichen Nextcloud.
 
 Lokale App-URL in der gemeinsamen DDEV-Umgebung:
 
-    https://nextcloud-dev.ddev.site/apps/filzmann_permission_matrix/
+    https://nextcloud-dev.ddev.site/apps/flz_permission_matrix/
 
 Nextcloud-App-ID:
 
-    filzmann_permission_matrix
+    flz_permission_matrix
 
 ## Zielsetzung
 
@@ -28,7 +28,7 @@ Kernprinzipien:
 
 ## Repository und gemeinsamer Arbeitsablauf
 
-- Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `filzmann_permission_matrix`.
+- Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `flz_permission_matrix`.
 - Andere Apps und der Parent-Workspace werden nicht aus diesem Repo heraus gestaged oder committed.
 - Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.
 - Fuer Git-, Sandbox-, DDEV-/`occ`-Sicherheit, Verifikation und Learning Candidates gilt der lokal mitgefuehrte Skill `work-in-nextcloud-app`; die folgenden Matrix-Regeln und Pruefungen ergaenzen ihn.
@@ -43,8 +43,8 @@ ermitteln.
 Wichtige Pruefungen:
 
     ddev exec -d /var/www/html/html php occ status
-    ddev exec -d /var/www/html/html php occ app:list | grep -i filzmann_permission_matrix
-    ddev exec -d /var/www/html/html php occ app:enable filzmann_permission_matrix
+    ddev exec -d /var/www/html/html php occ app:list | grep -i flz_permission_matrix
+    ddev exec -d /var/www/html/html php occ app:enable flz_permission_matrix
     ddev exec -d /var/www/html/html php occ permission-matrix:status
     ddev exec -d /var/www/html/html php occ permission-matrix:scan
 
@@ -113,7 +113,7 @@ Wichtige Pruefungen:
 - API-Aktionen mit Zustandsaenderung behalten CSRF-Schutz.
 - Exporte enthalten standardmaessig keine Benutzerlisten, keine Share-Metadaten und nur redigierte Pfadangaben.
 - Art.-15-Selbstauskunft wird optional und lazy über den öffentlichen
-  V1-Vertrag von `filzmann_data_protection` registriert. Sie liest nur
+  V1-Vertrag von `flz_data_protection` registriert. Sie liest nur
   app-eigene Snapshot-Ersteller-, Export-, Audit- und
   Adminfreigabebezüge der betroffenen UID.
   Snapshot-/Exportinhalte, freie Dateinamen, freie Auditdetails und Angaben

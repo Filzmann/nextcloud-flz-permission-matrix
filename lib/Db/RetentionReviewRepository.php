@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -16,8 +16,8 @@ class RetentionReviewRepository {
 
     public function collectDue(string $source, string $cutoff, int $limit): array {
         $table = match ($source) {
-            'export' => 'permission_matrix_exports',
-            'audit' => 'permission_matrix_audit_log',
+            'export' => 'flz_pm_exports',
+            'audit' => 'flz_pm_audit_log',
             default => throw new InvalidArgumentException('Invalid retention review source.'),
         };
         if ($limit < 1 || $limit > 1000201) throw new InvalidArgumentException('Invalid retention review limit.');

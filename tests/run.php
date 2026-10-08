@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
-use OCA\FilzmannPermissionMatrix\Tests\Support\PhpTestRunner;
+use OCA\FlzPermissionMatrix\Tests\Support\PhpTestRunner;
 
 PhpTestRunner::run(
     root: dirname(__DIR__),

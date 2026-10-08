@@ -1,6 +1,6 @@
 # Berechtigungsmatrix
 
-Nextcloud-App `filzmann_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
+Nextcloud-App `flz_permission_matrix` fuer eine read-only Berechtigungsmatrix als laufend einsehbare Positivliste zu gruppenbezogenen Nextcloud-Berechtigungen.
 
 ## Zweck
 
@@ -17,7 +17,7 @@ den Zugang zur App; fehlende Detailadapter bleiben unabhängig davon
 
 ## Art.-15-Selbstauskunft
 
-Ist die eigenständige App `filzmann_data_protection` kompatibel aktiviert,
+Ist die eigenständige App `flz_data_protection` kompatibel aktiviert,
 registriert die Permission-Matrix lazy einen öffentlichen V1-Provider. Die
 Auskunft ist serverseitig an die angemeldete Nextcloud-UID gebunden und
 enthält ausschließlich eigene:
@@ -65,8 +65,8 @@ Die Matrix deutet Rollen und Bereiche ausschließlich über
 Organisationssnapshot. Interne LocalBase-Klassen gehören nicht zum
 Consumervertrag. Vertragsversion, Definitionsversion und Prüfsumme werden mit
 jedem Matrixsnapshot festgehalten.
-Für die AdPlaner-Schemata `ad-ASN-<Kürzel>` und
-`ad-ASN-<Kürzel>-Urlaub` stehen bei gültigem Organisationsvertrag zusätzlich
+Für die Filzmann Assistenzplanung-Schemata `flz-ASN-<Kürzel>` und
+`flz-ASN-<Kürzel>-Urlaub` stehen bei gültigem Organisationsvertrag zusätzlich
 Team-, Familien- und vollständige Rohgruppenansichten zur Verfügung.
 
 Die Zusammenfassung ersetzt weder in den gescannten Daten noch in Baselines, Diffs oder Exporten die Rohgruppen. Abweichende Rechte innerhalb einer Familie werden als Teilbelegung oder `gemischt` markiert; die zugehoerigen Rohwerte bleiben in der Ansicht nachvollziehbar. Nicht ausdruecklich erkannte Namensvarianten bleiben sichtbare Einzelgruppen.
@@ -99,8 +99,8 @@ verfügbar.
 Die App wird in der gemeinsamen DDEV-Nextcloud per Mount eingebunden:
 
 ```text
-<WORKSPACE-ROOT>/filzmann_permission_matrix
--> /var/www/html/html/custom_apps/filzmann_permission_matrix
+<WORKSPACE-ROOT>/flz_permission_matrix
+-> /var/www/html/html/custom_apps/flz_permission_matrix
 ```
 
 Aktivieren:
@@ -108,9 +108,9 @@ Aktivieren:
 Aus dem dokumentierten `nextcloud-dev`-Root:
 
 ```bash
-ddev exec -d /var/www/html/html php occ app:enable filzmann_permission_matrix
+ddev exec -d /var/www/html/html php occ app:enable flz_permission_matrix
 ddev exec -d /var/www/html/html php occ status
-ddev exec -d /var/www/html/html php occ app:list | grep -i filzmann_permission_matrix
+ddev exec -d /var/www/html/html php occ app:list | grep -i flz_permission_matrix
 ```
 
 Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-Befehl. Migrationen laufen beim Aktivieren der App oder ueber `occ upgrade`, falls `occ status` einen DB-Upgrade-Bedarf meldet.
@@ -220,7 +220,7 @@ die native Nextcloud-App-Gruppeneinschränkung sichtbar; die Detailabdeckung wir
 kontrolliert als `UNSUPPORTED` ausgewiesen.
 
 Der öffentliche Vertrag liegt unter
-`OCA\FilzmannPermissionMatrix\PublicApi\V1`. Provider registrieren sich lazy am
+`OCA\FlzPermissionMatrix\PublicApi\V1`. Provider registrieren sich lazy am
 `RegisterPermissionProvidersEvent` und liefern ausschließlich Regeln aus ihrer
 eigenen kanonischen Berechtigungslogik. V1 unterscheidet Gruppenbedingungen
 (`group`, `all`, `any`) ausdrücklich von `self`, `authenticated` und
@@ -252,7 +252,7 @@ php occ permission-matrix:status
 ## Sicherheit
 
 - Die App veraendert keine Nextcloud-Berechtigungen.
-- Die App schreibt nur in eigene Tabellen mit Prefix `permission_matrix_*`.
+- Die App schreibt nur in eigene Tabellen mit Prefix `flz_pm_*`.
 - Exporte enthalten standardmaessig keine Dateiinhalte, Passwoerter, Tokens, privaten Schluessel, Benutzerlisten oder personenbezogenen Dateipfade.
 - Unbekannte oder nicht unterstuetzte Rechtequellen werden nicht als erlaubt dargestellt.
 - Matrix, Snapshots und Exporte sind auf konfigurierte Viewer-/Admin-Gruppen

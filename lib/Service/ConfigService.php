@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
-use OCA\FilzmannPermissionMatrix\AppInfo\Application;
-use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Exception\ConfigValidationException;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
 

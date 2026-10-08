@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Technische App-Identität auf `flz_permission_matrix` und
+  `OCA\\FlzPermissionMatrix` umgestellt. App-eigene Tabellen und Indizes
+  verwenden für den vereinbarten Fresh-Install-Neustart das Präfix `flz_pm`;
+  die sichtbare Filzmann-Produktbezeichnung bleibt erhalten.
 - Temporäre fachliche Adminfreigaben aus dem technischen Adminbereich in den
   rollenabhängigen App-Einstieg verschoben. Nur Mitglieder von
   `Datenschutzbeauftragte` können die Historie lesen und für aktuelle native

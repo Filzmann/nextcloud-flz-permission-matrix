@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "app_id": "filzmann_permission_matrix",
+  "app_id": "flz_permission_matrix",
   "processings": [
     {
       "processing_id": "permission_snapshot_and_matrix_management",
@@ -74,7 +74,7 @@
       "purposes": ["Durchsetzung einer höchstens 24 Stunden gültigen fachlichen Adminfreigabe", "Sicherheits- und Auditnachweis"],
       "access_roles": ["Erteilen und Widerrufen: Mitglied der kanonischen Nextcloud-Gruppe Datenschutzbeauftragte; nativer Adminstatus ist dafür weder erforderlich noch ausreichend", "Ziel: ausschließlich aktives Nextcloud-Administrationskonto", "Betroffene Person für eigene Projektion", "Ausdrücklich berechtigte Prüfrolle"],
       "recipients": [{"category":"Betroffene Person","allowed_disclosures":["Eigene Rolle und Zeitpunkte ohne Kennungen anderer Beteiligter"]},{"category":"Berechtigte Prüfrolle","allowed_disclosures":["Erforderliche Freigabenachweise"],"conditions":["Serverseitige Fachberechtigungsprüfung"]}],
-      "data_sources": ["App-lokaler Freigabevorgang in der rollenabhängigen Fachapp-Oberfläche", "App-eigene Tabelle pm_admin_access"],
+      "data_sources": ["App-lokaler Freigabevorgang in der rollenabhängigen Fachapp-Oberfläche", "App-eigene Tabelle flz_pm_admin_access"],
       "legal_basis": {"status":"PRIVACY-DECISION-REQUIRED","affected_data":"Personenbezogene Adminfreigabehistorie","planned_processing":"Sicherheitsprüfung und Audit","missing_decision":"Anwendbare Rechtsgrundlage","reason":"Fachlich und rechtlich zu entscheiden.","technical_impact":"Keine Rechtsgrundlage wird behauptet.","privacy_preserving_alternative":"Nur minimale UIDs und Zeitpunkte speichern.","responsible_party":"ungeklärt","blocking":false},
       "retention":{"policy_id":"temporary_admin_access_history_six_months","trigger":"Tatsächliches Ende der zeitlich begrenzten app-lokalen Adminfreigabe","duration_or_deadline":"P6M","action":"delete","conditions_or_holds":["Vollständige Löschung ohne anonymisierten oder statistischen Restbestand.","Nur Datenschutzbeauftragte dürfen einen zweck-, scope- und reviewterminbezogenen Hold setzen oder aufheben.","Restore reaktiviert keine Freigabe und plant abgelaufene ungesperrte Historie erneut zur Löschung ein.","Keine automatische Ausführung vor getestetem app-lokalem Lösch-, Restore-, Sperr-, Audit-, Nebenläufigkeits- und Fehlervertrag."]},
       "logging": {"audit_requirements":["Beginn, Ende und Widerruf nachvollziehbar halten"],"personal_data_policy":"Keine vollständigen Requests oder Kennungen unbeteiligter Personen in Standardlogs übernehmen."},
@@ -84,7 +84,7 @@
       "international_transfers":"Die Berechtigungsmatrix übermittelt die Freigabehistorie nicht an Drittländer.",
       "automated_decisions":"Der Server beendet den Vollzugriff spätestens nach 24 Stunden; keine automatisierte Personenentscheidung.",
       "special_safeguards": ["Nativer Adminstatus und aktive app-lokale Freigabe sind für den fachlichen Vollzugriff erforderlich", "Nur Mitglieder der kanonischen Gruppe Datenschutzbeauftragte können Freigaben lesen, erteilen und widerrufen; nativer Adminstatus allein genügt nicht", "Ablauf und Fehler führen deny by default zu keinem Vollzugriff", "Drittpersonen-UIDs werden neutralisiert", "Allow-, Deny- und Manipulationsprüfungen sind automatisiert belegt"],
-      "systems": ["Nextcloud", "Berechtigungsmatrix", "App-eigene Tabelle pm_admin_access"]
+      "systems": ["Nextcloud", "Berechtigungsmatrix", "App-eigene Tabelle flz_pm_admin_access"]
     }
   ]
 }

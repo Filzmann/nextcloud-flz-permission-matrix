@@ -12,7 +12,7 @@ namespace OCP {
 namespace OCP\AppFramework\Utility {
     interface ITimeFactory extends \Psr\Clock\ClockInterface { public function getTime(): int; public function getDateTime(string $time='now',?\DateTimeZone $timezone=null):\DateTime; public function withTimeZone(\DateTimeZone $timezone):static; public function getTimeZone(?string $timezone=null):\DateTimeZone; }
 }
-namespace OCA\FilzmannPermissionMatrix\Db {
+namespace OCA\FlzPermissionMatrix\Db {
     interface TemporaryAdminAccessRepositoryInterface {
         public function replaceActive(string $targetUid,string $grantedBy,\DateTimeImmutable $startsAt,\DateTimeImmutable $endsAt):array;
         public function revokeActive(string $targetUid,string $revokedBy,\DateTimeImmutable $revokedAt):bool;
@@ -21,8 +21,8 @@ namespace OCA\FilzmannPermissionMatrix\Db {
     }
 }
 namespace {
-    use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
-    use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+    use OCA\FlzPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
+    use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 
     $actor = new class implements OCP\IUser { public function getUID(): string { return 'privacy-officer'; } };
     $session = new class($actor) implements OCP\IUserSession { public function __construct(public ?OCP\IUser $user) {} public function getUser(): ?OCP\IUser { return $this->user; } };

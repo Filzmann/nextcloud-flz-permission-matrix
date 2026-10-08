@@ -29,7 +29,7 @@ namespace Psr\Log {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\Service\OrganizationSnapshotService;
+    use OCA\FlzPermissionMatrix\Service\OrganizationSnapshotService;
     use OCA\LocalBase\PublicApi\V1\OrganizationSnapshot;
     use OCA\LocalBase\PublicApi\V1\OrganizationSnapshotService as LocalBaseOrganizationSnapshotService;
     use OCP\App\IAppManager;

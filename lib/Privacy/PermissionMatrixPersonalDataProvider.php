@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Privacy;
+namespace OCA\FlzPermissionMatrix\Privacy;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataEntry;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataPage;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataProvider;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
-use OCA\FilzmannDataProtection\PublicApi\V1\ProviderDescriptor;
-use OCA\FilzmannPermissionMatrix\AppInfo\AppId;
-use OCA\FilzmannPermissionMatrix\Db\PersonalDataProjectionRepository;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataEntry;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataPage;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataProvider;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
+use OCA\FlzDataProtection\PublicApi\V1\ProviderDescriptor;
+use OCA\FlzPermissionMatrix\AppInfo\AppId;
+use OCA\FlzPermissionMatrix\Db\PersonalDataProjectionRepository;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
 
 final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider {
     private const MAX_PAGE_SIZE = 200;

@@ -8,13 +8,13 @@ namespace OCP\EventDispatcher {
 }
 
 namespace {
-    use OCA\FilzmannDataProtection\PublicApi\V1\DataSubjectRef;
-    use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
-    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
-    use OCA\FilzmannPermissionMatrix\Db\PersonalDataProjectionRepository;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProvider;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
-    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+    use OCA\FlzDataProtection\PublicApi\V1\DataSubjectRef;
+    use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
+    use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+    use OCA\FlzPermissionMatrix\Db\PersonalDataProjectionRepository;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixPersonalDataProvider;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
 
     if (!class_exists(PermissionMatrixPersonalDataProvider::class)) {
         throw new RuntimeException('Der Permission-Matrix-PersonalDataProvider fehlt.');
@@ -79,7 +79,7 @@ namespace {
     };
     $provider = new PermissionMatrixPersonalDataProvider($repository, $config);
 
-    assertSameValue('filzmann_permission_matrix', $provider->descriptor()->appId(), 'Provider-App-ID muss stabil sein.');
+    assertSameValue('flz_permission_matrix', $provider->descriptor()->appId(), 'Provider-App-ID muss stabil sein.');
     assertSameValue('1.0', $provider->descriptor()->contractVersion(), 'Provider muss den V1-Vertrag deklarieren.');
 
     $subject = new DataSubjectRef('nextcloud-user', 'subject-17');
@@ -99,12 +99,12 @@ namespace {
         'de',
         'access-report',
         2,
-        ['filzmann_permission_matrix' => $first->nextCursor()],
+        ['flz_permission_matrix' => $first->nextCursor()],
     ));
     assertSameValue('partial', $second->status(), 'Die zweite Seite muss wegen des verbleibenden Datensatzes teilweise bleiben.');
     assertSameValue(2, count($second->entries()), 'Die zweite Seite muss die nächsten Datensätze liefern.');
     if ($second->nextCursor() === null) throw new RuntimeException('Fünf Datensätze benötigen eine dritte Seite.');
-    $third = $provider->collect(new PersonalDataRequest($subject,'de','access-report',2,['filzmann_permission_matrix'=>$second->nextCursor()]));
+    $third = $provider->collect(new PersonalDataRequest($subject,'de','access-report',2,['flz_permission_matrix'=>$second->nextCursor()]));
     assertSameValue('complete',$third->status(),'Die dritte Seite muss vollständig abschließen.');
     assertSameValue(1,count($third->entries()),'Die dritte Seite muss den letzten Datensatz liefern.');
     assertSameValue(null, $third->nextCursor(), 'Die letzte Seite darf keinen weiteren Cursor behaupten.');
@@ -132,7 +132,7 @@ namespace {
     assertSameValue($requestsBeforeForeignType, count($repository->requests), 'Nicht unterstützte Subject-Typen dürfen keine Datenbankabfrage auslösen.');
 
     try {
-        $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 20, ['filzmann_permission_matrix' => 'manipuliert']));
+        $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 20, ['flz_permission_matrix' => 'manipuliert']));
         throw new RuntimeException('Ein manipulierter Cursor wurde akzeptiert.');
     } catch (InvalidArgumentException) {
     }
@@ -140,7 +140,7 @@ namespace {
     $listener = new PermissionMatrixPersonalDataProviderListener($provider);
     $event = new RegisterPersonalDataProvidersEvent();
     $listener->handle($event);
-    assertSameValue(['filzmann_permission_matrix'], array_keys($event->providers()), 'Der Provider wird nicht lazy registriert.');
+    assertSameValue(['flz_permission_matrix'], array_keys($event->providers()), 'Der Provider wird nicht lazy registriert.');
 
     echo 'Permission Matrix privacy provider tests passed' . PHP_EOL;
 }

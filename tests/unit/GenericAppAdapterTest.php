@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use OCA\FilzmannPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\FilzmannPermissionMatrix\Service\AdapterCatalogService;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
-use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
+use OCA\FlzPermissionMatrix\Adapter\GenericAppAdapter;
+use OCA\FlzPermissionMatrix\Service\AdapterCatalogService;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
 
 class GenericAdapterFakeInventory extends InventoryService {
     public function __construct() {
@@ -54,8 +54,8 @@ class GenericAdapterFakeInventory extends InventoryService {
                 'source' => 'shipped',
             ],
             [
-                'app_id' => 'adplaner',
-                'display_name' => 'AD-Planer',
+                'app_id' => 'flzplaner',
+                'display_name' => 'Filzmann Assistenzplanung',
                 'version' => '1.0',
                 'enabled' => true,
                 'restricted' => false,
@@ -85,7 +85,7 @@ assertSameValue('X', $rows[2]->cells()['Betriebsrat'], 'unsupported status must 
 assertSameValue('X', $rows[2]->cells()['IKT-Ausschuss'], 'global app availability should be independent of detail-adapter support');
 assertSameValue('X', $rows[3]->cells()['Betriebsrat'], 'an unrestricted shipped Calendar app must be shown as enabled for every scanned group');
 assertSameValue('X', $rows[3]->cells()['IKT-Ausschuss'], 'Calendar availability must not depend on its missing detail adapter');
-assertSameValue(['deck', 'notes', 'calendar', 'adplaner'], $result->unsupportedApps(), 'Apps without a public detail contract must remain unsupported, including native and custom apps with internal permission services.');
+assertSameValue(['deck', 'notes', 'calendar', 'flzplaner'], $result->unsupportedApps(), 'Apps without a public detail contract must remain unsupported, including native and custom apps with internal permission services.');
 assertSameValue('UNSUPPORTED', $result->adapterStatus()[0]['status'], 'detail coverage should remain unsupported independently of row access status');
 assertContainsText('öffentliche versionierte read-only Schnittstelle', implode(' ', $result->adapterStatus()[4]['warnings']), 'Custom apps should explain the missing public provider contract precisely.');
 

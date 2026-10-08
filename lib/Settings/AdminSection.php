@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Settings;
+namespace OCA\FlzPermissionMatrix\Settings;
 
-use OCA\FilzmannPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 

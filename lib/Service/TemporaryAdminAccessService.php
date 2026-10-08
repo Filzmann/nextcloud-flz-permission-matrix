@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 use InvalidArgumentException;
-use OCA\FilzmannPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
+use OCA\FlzPermissionMatrix\Db\TemporaryAdminAccessRepositoryInterface;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IGroupManager;
 use OCP\IUserSession;

@@ -23,8 +23,8 @@ namespace OCP {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener;
-    use OCA\FilzmannPermissionMatrix\Service\AccessService;
+    use OCA\FlzPermissionMatrix\Listener\StandaloneNavigationListener;
+    use OCA\FlzPermissionMatrix\Service\AccessService;
     use OCP\INavigationManager;
     use OCP\IURLGenerator;
     use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
@@ -48,9 +48,9 @@ namespace {
 
     $listener->handle(new LoadAdditionalEntriesEvent());
     $entry = ($navigation->entries[0] ?? static fn(): array => [])();
-    if (($entry['id'] ?? null) !== 'filzmann_permission_matrix'
-        || ($entry['href'] ?? null) !== '/route/filzmann_permission_matrix.page.index'
-        || ($entry['icon'] ?? null) !== '/image/filzmann_permission_matrix/app.svg') {
+    if (($entry['id'] ?? null) !== 'flz_permission_matrix'
+        || ($entry['href'] ?? null) !== '/route/flz_permission_matrix.page.index'
+        || ($entry['icon'] ?? null) !== '/image/flz_permission_matrix/app.svg') {
         throw new RuntimeException('Der neutrale Standalone-Einstieg fehlt.');
     }
 

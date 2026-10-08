@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
-use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Model\Snapshot;
+use OCA\FlzPermissionMatrix\Db\SnapshotMapper;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\Snapshot;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -74,7 +74,7 @@ class ScannerService {
             $this->snapshots->insert($snapshot, $createdBy, $baseline?->snapshotId());
             $this->snapshots->purgeOlderThanLatest($this->config->retention());
             $this->logger->info('Permission matrix scan completed', [
-                'app' => 'filzmann_permission_matrix',
+                'app' => 'flz_permission_matrix',
                 'snapshot' => $snapshot->snapshotId(),
                 'compliance' => $summary['compliance_status'] ?? 'UNKNOWN',
             ]);

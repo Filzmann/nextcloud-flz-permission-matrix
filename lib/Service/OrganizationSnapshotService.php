@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 use InvalidArgumentException;
 use OCA\LocalBase\PublicApi\V1\OrganizationSnapshot;
@@ -46,7 +46,7 @@ class OrganizationSnapshotService {
             );
         } catch (\Throwable $e) {
             $this->logger->warning('Permission matrix organization snapshot unavailable', [
-                'app' => 'filzmann_permission_matrix',
+                'app' => 'flz_permission_matrix',
                 'provider' => self::PROVIDER_APP_ID,
                 'exception' => $e,
             ]);

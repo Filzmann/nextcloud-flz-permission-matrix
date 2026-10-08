@@ -1,12 +1,12 @@
 <?php
 $hasMatrixAccess = (bool)($_['hasMatrixAccess'] ?? false);
-script('filzmann_permission_matrix', 'modules/api');
-script('filzmann_permission_matrix', 'admin-access');
+script('flz_permission_matrix', 'modules/api');
+script('flz_permission_matrix', 'admin-access');
 if ($hasMatrixAccess) {
-    script('filzmann_permission_matrix', 'modules/render');
-    script('filzmann_permission_matrix', 'main');
+    script('flz_permission_matrix', 'modules/render');
+    script('flz_permission_matrix', 'main');
 }
-style('filzmann_permission_matrix', 'style');
+style('flz_permission_matrix', 'style');
 ?>
 
 <div id="permission-matrix-app" data-can-manage="<?php p($_['can_manage'] ? '1' : '0'); ?>">

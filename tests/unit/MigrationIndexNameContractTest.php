@@ -16,11 +16,20 @@ foreach ($migrationFiles as $migrationFile) {
         );
     }
 
-    preg_match_all('/setPrimaryKey\(\s*\[[^\]]+\]\s*,\s*[\'\"]([^\'\"]+)[\'\"]\s*\)/', $migration, $matches);
+    preg_match_all(
+        '/(?:setPrimaryKey|addUniqueIndex|addIndex)\(\s*\[[^\]]+\]\s*,\s*[\'\"]([^\'\"]+)[\'\"]\s*\)/',
+        $migration,
+        $matches
+    );
     foreach ($matches[1] as $indexName) {
+        if (!str_starts_with($indexName, 'flz_pm_')) {
+            throw new RuntimeException(
+                basename($migrationFile) . ": Index {$indexName} verwendet nicht das kanonische FLZ-Prefix flz_pm_."
+            );
+        }
         if (strlen($indexName) > 30) {
             throw new RuntimeException(
-                basename($migrationFile) . ": Primärindex {$indexName} überschreitet 30 Zeichen."
+                basename($migrationFile) . ": Index {$indexName} überschreitet 30 Zeichen."
             );
         }
     }

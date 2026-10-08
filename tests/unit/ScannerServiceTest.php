@@ -20,14 +20,14 @@ namespace Psr\Log {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
-    use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-    use OCA\FilzmannPermissionMatrix\Service\BaselineService;
-    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
-    use OCA\FilzmannPermissionMatrix\Service\DiffService;
-    use OCA\FilzmannPermissionMatrix\Service\InventoryService;
-    use OCA\FilzmannPermissionMatrix\Service\MatrixBuilder;
-    use OCA\FilzmannPermissionMatrix\Service\ScannerService;
+    use OCA\FlzPermissionMatrix\Db\SnapshotMapper;
+    use OCA\FlzPermissionMatrix\Model\MatrixRow;
+    use OCA\FlzPermissionMatrix\Service\BaselineService;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Service\DiffService;
+    use OCA\FlzPermissionMatrix\Service\InventoryService;
+    use OCA\FlzPermissionMatrix\Service\MatrixBuilder;
+    use OCA\FlzPermissionMatrix\Service\ScannerService;
     use Psr\Log\LoggerInterface;
 
     class ScannerFakeMatrixBuilder extends MatrixBuilder {
@@ -86,7 +86,7 @@ namespace {
         public function __construct() {
         }
 
-        public function currentBaseline(): ?\OCA\FilzmannPermissionMatrix\Model\Snapshot {
+        public function currentBaseline(): ?\OCA\FlzPermissionMatrix\Model\Snapshot {
             return null;
         }
     }

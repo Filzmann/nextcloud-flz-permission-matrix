@@ -9,12 +9,12 @@ namespace OCP\EventDispatcher {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionCondition;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProvider;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProviderDescriptor;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProviderResult;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionRule;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionCondition;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProvider;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProviderDescriptor;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProviderResult;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionRule;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
 
     $condition = PermissionCondition::all([
         PermissionCondition::group('ad-team-a'),
@@ -49,7 +49,7 @@ namespace {
         'allow',
         'own-entry',
         PermissionCondition::self(),
-        'adplaner:policy',
+        'flzplaner:policy',
         'high'
     );
     $result = new PermissionProviderResult([$rule], false, ['A dynamic exception remains.']);
@@ -59,7 +59,7 @@ namespace {
     $compatible = new class($result) implements PermissionProvider {
         public function __construct(private PermissionProviderResult $result) {}
         public function descriptor(): PermissionProviderDescriptor {
-            return new PermissionProviderDescriptor('adplaner', 'AD-Planer', '1.0', ['permissions']);
+            return new PermissionProviderDescriptor('flzplaner', 'Filzmann Assistenzplanung', '1.0', ['permissions']);
         }
         public function collect(): PermissionProviderResult { return $this->result; }
     };
@@ -78,7 +78,7 @@ namespace {
 
     assertSameValue([], array_keys($event->providers()), 'A duplicate registration must exclude the ambiguous provider instead of choosing one silently.');
     assertSameValue(
-        ['legacy_app' => 'Provider incompatible.', 'adplaner' => 'Provider incompatible.'],
+        ['legacy_app' => 'Provider incompatible.', 'flzplaner' => 'Provider incompatible.'],
         $event->registrationFailures(),
         'Incompatible and duplicate providers must remain visible without breaking discovery.'
     );

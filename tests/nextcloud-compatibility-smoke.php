@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-use OCA\FilzmannPermissionMatrix\Service\OrganizationSnapshotService;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+use OCA\FlzPermissionMatrix\Service\OrganizationSnapshotService;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 
 return [
     'providerRegistrations' => [
-        'filzmann_data_protection' => [
-            OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class,
-            OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class,
-            OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class,
+        'flz_data_protection' => [
+            OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class,
+            OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class,
+            OCA\FlzDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class,
         ],
     ],
-    'uiPath' => '/index.php/apps/filzmann_permission_matrix/',
+    'uiPath' => '/index.php/apps/flz_permission_matrix/',
     'preGrantUiStatuses' => [200],
     'postGrantUiStatuses' => [200],
     'grantManagerGroups' => ['Datenschutzbeauftragte'],
@@ -31,6 +31,6 @@ return [
         return OCP\Server::get(TemporaryAdminAccessService::class)->hasActiveGrant($uid);
     },
     'apiSmokes' => [
-        ['/index.php/apps/filzmann_permission_matrix/api/state', [200]],
+        ['/index.php/apps/flz_permission_matrix/api/state', [200]],
     ],
 ];

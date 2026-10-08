@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
-use OCA\FilzmannPermissionMatrix\Model\AccessRule;
-use OCA\FilzmannPermissionMatrix\Model\Snapshot;
-use OCA\FilzmannPermissionMatrix\Exception\ExportFormatNotAllowedException;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
-use OCA\FilzmannPermissionMatrix\Service\ExportService;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\Snapshot;
+use OCA\FlzPermissionMatrix\Exception\ExportFormatNotAllowedException;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\Service\ExportService;
 
 class ExportTestConfig extends ConfigService {
     public function __construct(private array $formats, private bool $redact = true) {
@@ -27,22 +27,22 @@ $snapshot = new Snapshot(
     'pm-test',
     '2026-07-05T12:00:00+00:00',
     '34.0.0',
-    ['Betriebsrat', 'IKT-Ausschuss', 'ad-ASN-Ada', 'ad-ASN-Berta', 'ad-EB-Ada'],
+    ['Betriebsrat', 'IKT-Ausschuss', 'flz-ASN-Ada', 'flz-ASN-Berta', 'flz-EB-Ada'],
     [['app_id' => 'files', 'display_name' => 'Dateien', 'version' => '1.0', 'source' => 'shipped', 'restricted' => false, 'groups' => []]],
     [
         new MatrixRow('App', 'files', 'Dateien', 'App-Nutzung', 'App-Verfuegbarkeit', 'APPROVED', 'core-app-config', 'high', [
             'Betriebsrat' => 'X',
             'IKT-Ausschuss' => 'X',
-            'ad-ASN-Ada' => 'X',
-            'ad-ASN-Berta' => '-',
-            'ad-EB-Ada' => 'X',
+            'flz-ASN-Ada' => 'X',
+            'flz-ASN-Berta' => '-',
+            'flz-EB-Ada' => 'X',
         ], [], [new AccessRule(
             'app.use',
             'allow',
             'app:files',
             AccessCondition::all([
-                AccessCondition::group('ad-ASN-Ada'),
-                AccessCondition::group('ad-EB-Ada'),
+                AccessCondition::group('flz-ASN-Ada'),
+                AccessCondition::group('flz-EB-Ada'),
             ]),
             'test:files-policy',
             'high'
@@ -50,16 +50,16 @@ $snapshot = new Snapshot(
         new MatrixRow('Policy', 'core', 'Teilen', 'Dateioperation', 'Sharing', 'UNKNOWN', 'core-sharing', 'medium', [
             'Betriebsrat' => 'S',
             'IKT-Ausschuss' => 'S',
-            'ad-ASN-Ada' => 'S',
-            'ad-ASN-Berta' => '?',
-            'ad-EB-Ada' => 'S',
+            'flz-ASN-Ada' => 'S',
+            'flz-ASN-Berta' => '?',
+            'flz-EB-Ada' => 'S',
         ]),
         new MatrixRow('SharedFolder', 'files_sharing', '/Personal/Akte', 'Gruppenfreigabe · Referenz test', 'Lesen', 'NEW', 'nextcloud:OCP\\Share\\IManager::getSharesBy', 'high', [
             'Betriebsrat' => 'R',
             'IKT-Ausschuss' => '-',
-            'ad-ASN-Ada' => '-',
-            'ad-ASN-Berta' => '-',
-            'ad-EB-Ada' => '-',
+            'flz-ASN-Ada' => '-',
+            'flz-ASN-Berta' => '-',
+            'flz-EB-Ada' => '-',
         ]),
     ],
     [],
@@ -85,20 +85,20 @@ $snapshot = new Snapshot(
     ['compliance_status' => 'green', 'baseline_snapshot' => 'base'],
     [],
     [[
-        'key' => 'family:adplaner_assistance_teams',
-        'label' => 'AdPlaner · Assistenznehmer-Teams',
+        'key' => 'family:flzplaner_assistance_teams',
+        'label' => 'Filzmann Assistenzplanung · Assistenznehmer-Teams',
         'type' => 'family',
-        'source_app' => 'adplaner',
-        'family' => 'adplaner_assistance_teams',
-        'groups' => ['ad-ASN-Ada', 'ad-ASN-Berta'],
+        'source_app' => 'flzplaner',
+        'family' => 'flzplaner_assistance_teams',
+        'groups' => ['flz-ASN-Ada', 'flz-ASN-Berta'],
         'count' => 2,
     ], [
-        'key' => 'family:adplaner_eb_roles',
-        'label' => 'AdPlaner · Einsatzbegleitung',
+        'key' => 'family:flzplaner_eb_roles',
+        'label' => 'Filzmann Assistenzplanung · Einsatzbegleitung',
         'type' => 'family',
-        'source_app' => 'adplaner',
-        'family' => 'adplaner_eb_roles',
-        'groups' => ['ad-EB-Ada'],
+        'source_app' => 'flzplaner',
+        'family' => 'flzplaner_eb_roles',
+        'groups' => ['flz-EB-Ada'],
         'count' => 1,
     ], [
         'key' => 'Betriebsrat', 'label' => 'Betriebsrat', 'type' => 'group',
@@ -120,27 +120,27 @@ assertContainsText('"checksum": "' . str_repeat('a', 64) . '"', $json['content']
 assertContainsText('Objekttyp,App-ID', $csv['content'], 'csv export should contain header');
 assertContainsText(str_repeat('a', 64), $csv['content'], 'csv should record the organization source checksum.');
 assertContainsText('Bedingung,"Technische Quelle",Aussagesicherheit', $csv['content'], 'csv should expose the evidence columns separately from status.');
-assertContainsText('"(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)",test:files-policy,high', $csv['content'], 'csv should preserve composite access conditions and their source.');
+assertContainsText('"(Gruppe flz-ASN-Ada UND Gruppe flz-EB-Ada)",test:files-policy,high', $csv['content'], 'csv should preserve composite access conditions and their source.');
 assertContainsText('# Berechtigungsmatrix Nextcloud', $md['content'], 'markdown export should contain title');
 assertContainsText('Organisationsvertrag: VALID · Vertrag 1 · Definition 4 · Prüfsumme ' . str_repeat('a', 64), $md['content'], 'markdown should identify its canonical organization source.');
 assertContainsText('Keine Dateiinhalte', $md['content'], 'markdown export should contain security note');
 assertContainsText('AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein', $md['content'], 'markdown should explain composite group cells.');
 assertSameValue(1, substr_count($md['content'], 'AND = markierte Gruppenbedingungen muessen gemeinsam erfuellt sein'), 'The export legend must not duplicate the same contract line.');
 assertContainsText('Technische Quelle', $md['content'], 'markdown should expose the evidence source.');
-assertContainsText('(Gruppe ad-ASN-Ada UND Gruppe ad-EB-Ada)', $md['content'], 'markdown should preserve composite access conditions.');
+assertContainsText('(Gruppe flz-ASN-Ada UND Gruppe flz-EB-Ada)', $md['content'], 'markdown should preserve composite access conditions.');
 assertContainsText('## Hauptmatrix (Gruppenfamilien)', $md['content'], 'markdown should lead with the summarized group-family matrix.');
-assertContainsText('AdPlaner · Assistenznehmer-Teams (2 Gruppen)', $md['content'], 'markdown should identify summarized group families.');
-assertContainsText('AdPlaner · Einsatzbegleitung (1 Gruppe)', $md['content'], 'markdown should use the singular label for one-member families.');
+assertContainsText('Filzmann Assistenzplanung · Assistenznehmer-Teams (2 Gruppen)', $md['content'], 'markdown should identify summarized group families.');
+assertContainsText('Filzmann Assistenzplanung · Einsatzbegleitung (1 Gruppe)', $md['content'], 'markdown should use the singular label for one-member families.');
 assertContainsText('X (1/2)', $md['content'], 'markdown should make partial family permissions explicit.');
 assertContainsText('gemischt (2/2)', $md['content'], 'markdown should expose conflicting values within a family.');
 assertContainsText('## Rohmatrix', $md['content'], 'markdown should retain the complete auditable raw matrix.');
-assertContainsText('ad-ASN-Ada', $md['content'], 'markdown should name raw family members.');
+assertContainsText('flz-ASN-Ada', $md['content'], 'markdown should name raw family members.');
 assertContainsText('<table>', $html['content'], 'html export should contain table');
 assertContainsText('Organisationsvertrag: VALID', $html['content'], 'html should identify its canonical organization source.');
 assertContainsText('<th scope="col">Bedingung</th>', $html['content'], 'html should expose access conditions as their own column.');
 assertSameValue(false, str_contains($html['content'], '<td>test:files-policy</td><td>test:files-policy</td>'), 'HTML rows must align one-to-one with their declared evidence columns.');
 assertContainsText('Hauptmatrix (Gruppenfamilien)', $html['content'], 'html should lead with the summarized group-family matrix.');
-assertContainsText('title="ad-ASN-Ada: X; ad-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
+assertContainsText('title="flz-ASN-Ada: X; flz-ASN-Berta: -"', $html['content'], 'html should retain raw values on aggregated cells.');
 assertContainsText('<h2>Rohmatrix</h2>', $html['content'], 'html should retain the complete auditable raw matrix.');
 foreach ([$json['content'], $csv['content'], $md['content'], $html['content']] as $content) {
     assertSameValue(false, str_contains($content, '/Personal/Akte'), 'Default exports must redact concrete shared paths in every format.');

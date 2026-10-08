@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
-use OCA\FilzmannPermissionMatrix\Model\AccessRule;
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Service\AdapterCatalogService;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\AdapterCatalogService;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 /**
  * Zweck: Erzeugt fuer jede aktivierte App eine Zeile zur Nextcloud-App-Verfuegbarkeit.

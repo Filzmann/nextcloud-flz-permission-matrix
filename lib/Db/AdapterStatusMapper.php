@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use OCP\IDBConnection;
 
 class AdapterStatusMapper {
-    private const TABLE = 'permission_matrix_adapter_status';
+    private const TABLE = 'flz_pm_adapter_status';
 
     public function __construct(
         private IDBConnection $db,

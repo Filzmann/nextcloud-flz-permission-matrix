@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 class CoreAdapter implements PermissionAdapterInterface {
     public function __construct(

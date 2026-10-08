@@ -58,9 +58,9 @@ namespace OCP\AppFramework\Http\Attribute {
     }
 }
 
-namespace OCA\FilzmannPermissionMatrix\AppInfo {
+namespace OCA\FlzPermissionMatrix\AppInfo {
     class Application {
-        public const APP_ID = 'filzmann_permission_matrix';
+        public const APP_ID = 'flz_permission_matrix';
     }
 }
 
@@ -79,18 +79,18 @@ namespace Psr\Log {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\Controller\ApiController;
-    use OCA\FilzmannPermissionMatrix\Db\ExportMapper;
-    use OCA\FilzmannPermissionMatrix\Db\SnapshotMapper;
-    use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
-    use OCA\FilzmannPermissionMatrix\Model\Snapshot;
-    use OCA\FilzmannPermissionMatrix\Service\AccessService;
-    use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
-    use OCA\FilzmannPermissionMatrix\Service\BaselineService;
-    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
-    use OCA\FilzmannPermissionMatrix\Service\DiffService;
-    use OCA\FilzmannPermissionMatrix\Service\ExportService;
-    use OCA\FilzmannPermissionMatrix\Service\ScannerService;
+    use OCA\FlzPermissionMatrix\Controller\ApiController;
+    use OCA\FlzPermissionMatrix\Db\ExportMapper;
+    use OCA\FlzPermissionMatrix\Db\SnapshotMapper;
+    use OCA\FlzPermissionMatrix\Exception\AccessDeniedException;
+    use OCA\FlzPermissionMatrix\Model\Snapshot;
+    use OCA\FlzPermissionMatrix\Service\AccessService;
+    use OCA\FlzPermissionMatrix\Service\AuditLogService;
+    use OCA\FlzPermissionMatrix\Service\BaselineService;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Service\DiffService;
+    use OCA\FlzPermissionMatrix\Service\ExportService;
+    use OCA\FlzPermissionMatrix\Service\ScannerService;
     use OCP\IRequest;
     use Psr\Log\LoggerInterface;
 
@@ -239,7 +239,7 @@ namespace {
     assertSameValue('api.diff.not_found', $audit->actions[3], 'Missing snapshot access must have a distinct audit outcome.');
     assertSameValue(
         true,
-        class_exists(\OCA\FilzmannPermissionMatrix\Controller\ConfigController::class),
+        class_exists(\OCA\FlzPermissionMatrix\Controller\ConfigController::class),
         'ConfigController must remain compatible with the protected request property of the Nextcloud base controller.'
     );
 

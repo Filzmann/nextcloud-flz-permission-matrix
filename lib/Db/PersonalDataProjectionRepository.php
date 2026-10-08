@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -38,7 +38,7 @@ class PersonalDataProjectionRepository {
     /** @return list<array<string, scalar|null>> */
     private function snapshots(string $uid, int $limit, DateTimeImmutable $upperBound): array {
         $qb = $this->subjectQuery(
-            'permission_matrix_snapshots',
+            'flz_pm_snapshots',
             'created_by_uid',
             $uid,
             $limit,
@@ -71,7 +71,7 @@ class PersonalDataProjectionRepository {
     /** @return list<array<string, scalar|null>> */
     private function exports(string $uid, int $limit, DateTimeImmutable $upperBound): array {
         $qb = $this->subjectQuery(
-            'permission_matrix_exports',
+            'flz_pm_exports',
             'created_by_uid',
             $uid,
             $limit,
@@ -92,7 +92,7 @@ class PersonalDataProjectionRepository {
     /** @return list<array<string, scalar|null>> */
     private function auditRecords(string $uid, int $limit, DateTimeImmutable $upperBound): array {
         $qb = $this->subjectQuery(
-            'permission_matrix_audit_log',
+            'flz_pm_audit_log',
             'user_id',
             $uid,
             $limit,
@@ -122,7 +122,7 @@ class PersonalDataProjectionRepository {
             'revoked_by',
             'created_at',
         )
-            ->from('pm_admin_access')
+            ->from('flz_pm_admin_access')
             ->where($qb->expr()->orX(
                 $qb->expr()->eq('target_uid', $qb->createNamedParameter($uid, IQueryBuilder::PARAM_STR)),
                 $qb->expr()->eq('granted_by', $qb->createNamedParameter($uid, IQueryBuilder::PARAM_STR)),

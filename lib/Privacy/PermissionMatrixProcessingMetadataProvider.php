@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Privacy;
+namespace OCA\FlzPermissionMatrix\Privacy;
 
 use DomainException;
 use InvalidArgumentException;
 use JsonException;
-use OCA\FilzmannDataProtection\PublicApi\V1\ProcessingMetadataCatalog;
-use OCA\FilzmannDataProtection\PublicApi\V1\ProcessingMetadataProvider;
-use OCA\FilzmannDataProtection\PublicApi\V1\ProcessingMetadataProviderDescriptor;
-use OCA\FilzmannPermissionMatrix\AppInfo\AppId;
+use OCA\FlzDataProtection\PublicApi\V1\ProcessingMetadataCatalog;
+use OCA\FlzDataProtection\PublicApi\V1\ProcessingMetadataProvider;
+use OCA\FlzDataProtection\PublicApi\V1\ProcessingMetadataProviderDescriptor;
+use OCA\FlzPermissionMatrix\AppInfo\AppId;
 
 final class PermissionMatrixProcessingMetadataProvider implements ProcessingMetadataProvider {
     public function descriptor(): ProcessingMetadataProviderDescriptor {

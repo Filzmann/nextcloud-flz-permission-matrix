@@ -8,9 +8,9 @@ namespace OCP\EventDispatcher {
 }
 
 namespace {
-    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProvider;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener;
+    use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProvider;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener;
     use OCP\EventDispatcher\Event;
 
     if (!class_exists(PermissionMatrixProcessingMetadataProvider::class)) {
@@ -21,10 +21,10 @@ namespace {
     $catalog = $provider->catalog();
     $descriptor = $provider->descriptor();
 
-    assertSameValue('filzmann_permission_matrix', $descriptor->appId(), 'Die Provider-App-ID muss stabil sein.');
+    assertSameValue('flz_permission_matrix', $descriptor->appId(), 'Die Provider-App-ID muss stabil sein.');
     assertSameValue('Berechtigungsmatrix', $descriptor->displayName(), 'Der Produktname muss der App-Benennung folgen.');
     assertSameValue('1.0', $descriptor->contractVersion(), 'Der Provider muss den V1-Vertrag deklarieren.');
-    assertSameValue('filzmann_permission_matrix', $catalog->appId(), 'Der Katalog muss app-eigen bleiben.');
+    assertSameValue('flz_permission_matrix', $catalog->appId(), 'Der Katalog muss app-eigen bleiben.');
     assertSameValue([
         'permission_snapshot_and_matrix_management',
         'permission_matrix_export_generation',
@@ -44,7 +44,7 @@ namespace {
     $listener->handle(new Event());
     assertSameValue([], $registration->providers(), 'Ein Fremdevent darf keinen Provider registrieren.');
     $listener->handle($registration);
-    assertSameValue(['filzmann_permission_matrix'], array_keys($registration->providers()), 'Der Provider muss lazy registriert werden.');
+    assertSameValue(['flz_permission_matrix'], array_keys($registration->providers()), 'Der Provider muss lazy registriert werden.');
 
     $application = (string)file_get_contents(dirname(__DIR__, 2) . '/lib/AppInfo/Application.php');
     assertContainsText(

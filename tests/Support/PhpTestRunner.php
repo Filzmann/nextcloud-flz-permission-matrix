@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Tests\Support;
+namespace OCA\FlzPermissionMatrix\Tests\Support;
 
 use FilesystemIterator;
 use RecursiveDirectoryIterator;

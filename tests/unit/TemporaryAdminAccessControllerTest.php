@@ -7,7 +7,7 @@ namespace OCP\AppFramework { class Controller { public function __construct(stri
 namespace OCP\AppFramework\Http { final class JSONResponse { public function __construct(private array $data=[],private int $status=200){}public function getData():array{return $this->data;}public function getStatus():int{return $this->status;} } }
 namespace OCP\AppFramework\Http\Attribute { #[\Attribute(\Attribute::TARGET_METHOD)] final class NoCSRFRequired {} #[\Attribute(\Attribute::TARGET_METHOD)] final class NoAdminRequired {} }
 namespace Psr\Log { interface LoggerInterface { public function error(string $message,array $context=[]):void; } }
-namespace OCA\FilzmannPermissionMatrix\Service {
+namespace OCA\FlzPermissionMatrix\Service {
     final class TemporaryAdminAccessService {
         public string $mode='allowed'; public int $mutations=0;
         public function state():array { if($this->mode==='denied')throw new TemporaryAdminAccessDeniedException();return ['maxDurationMinutes'=>1440,'history'=>[]]; }
@@ -17,8 +17,8 @@ namespace OCA\FilzmannPermissionMatrix\Service {
     final class TemporaryAdminAccessDeniedException extends \RuntimeException {}
 }
 namespace {
-    use OCA\FilzmannPermissionMatrix\Controller\TemporaryAdminAccessController;
-    use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+    use OCA\FlzPermissionMatrix\Controller\TemporaryAdminAccessController;
+    use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
     use OCP\AppFramework\Http;
 
     $service=new TemporaryAdminAccessService();

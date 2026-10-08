@@ -1,5 +1,5 @@
 <?php
-style('filzmann_permission_matrix', 'style');
+style('flz_permission_matrix', 'style');
 ?>
 
 <div id="permission-matrix-app" class="pm-denied">

@@ -48,7 +48,7 @@ minimalen Auditnachweis.
 Der statische Processing-Katalog in `resources/privacy-processing.json` ist
 die app-eigene Policyquelle für Snapshot/Matrix, Export, Audit und temporäre
 Adminfreigaben. Er wird über den öffentlichen
-`OCA\FilzmannDataProtection\PublicApi\V1`-Vertrag lazy registriert und enthält
+`OCA\FlzDataProtection\PublicApi\V1`-Vertrag lazy registriert und enthält
 keine Laufzeitdatensätze. PersonalData- und Retention-Provider lesen weiterhin
 nur app-eigene Laufzeitdaten; sie werden nicht durch den Katalog ersetzt.
 Die fachliche Verantwortung für Matrix-, Snapshot-, Export- und Auditdaten

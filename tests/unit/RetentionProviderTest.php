@@ -8,12 +8,12 @@ namespace OCP\EventDispatcher {
 }
 
 namespace {
-    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
-    use OCA\FilzmannDataProtection\PublicApi\V1\RetentionPreviewRequest;
-    use OCA\FilzmannPermissionMatrix\Db\RetentionReviewRepository;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProvider;
-    use OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
-    use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+    use OCA\FlzDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent;
+    use OCA\FlzDataProtection\PublicApi\V1\RetentionPreviewRequest;
+    use OCA\FlzPermissionMatrix\Db\RetentionReviewRepository;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixRetentionProvider;
+    use OCA\FlzPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
 
     if (!class_exists(PermissionMatrixRetentionProvider::class)) throw new RuntimeException('Der REVIEW-Provider fehlt.');
 
@@ -35,7 +35,7 @@ namespace {
     };
     $provider = new PermissionMatrixRetentionProvider($repository, $config);
 
-    assertSameValue('filzmann_permission_matrix', $provider->descriptor()->appId(), 'Die Provider-ID ist nicht stabil.');
+    assertSameValue('flz_permission_matrix', $provider->descriptor()->appId(), 'Die Provider-ID ist nicht stabil.');
     assertSameValue(['export-metadata-review', 'audit-log-review'], array_map(static fn($policy): string => $policy->policyId(), $provider->policies()), 'Die beiden REVIEW-Policies fehlen.');
     assertSameValue([120, 240], array_map(static fn($policy): int => $policy->durationDays(), $provider->policies()), 'Konfigurierte Fristen werden nicht als kanonische Policies gemeldet.');
     assertSameValue(false, method_exists($provider, 'execute'), 'Der Provider darf keinen Ausführungspfad anbieten.');
@@ -60,7 +60,7 @@ namespace {
 
     $event = new RegisterRetentionProvidersEvent();
     (new PermissionMatrixRetentionProviderListener($provider))->handle($event);
-    assertSameValue(['filzmann_permission_matrix'], array_keys($event->providers()), 'Der REVIEW-Provider wird nicht lazy registriert.');
+    assertSameValue(['flz_permission_matrix'], array_keys($event->providers()), 'Der REVIEW-Provider wird nicht lazy registriert.');
 
     echo 'Permission Matrix retention provider tests passed' . PHP_EOL;
 }

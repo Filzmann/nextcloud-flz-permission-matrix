@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use OCA\FilzmannPermissionMatrix\Adapter\GroupFoldersAdapter;
-use OCA\FilzmannPermissionMatrix\Service\GroupFoldersSourceInterface;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Adapter\GroupFoldersAdapter;
+use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 class GroupFoldersAdapterInventory extends InventoryService {
     public function __construct(private string $appId = 'groupfolders', private string $version = '22.0.6') {

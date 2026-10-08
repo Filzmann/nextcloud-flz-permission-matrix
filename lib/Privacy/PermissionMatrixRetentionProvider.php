@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Privacy;
+namespace OCA\FlzPermissionMatrix\Privacy;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionCandidate;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionPolicy;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionPreviewPage;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionPreviewRequest;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionProvider;
-use OCA\FilzmannDataProtection\PublicApi\V1\RetentionProviderDescriptor;
-use OCA\FilzmannPermissionMatrix\AppInfo\AppId;
-use OCA\FilzmannPermissionMatrix\Db\RetentionReviewRepository;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionCandidate;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionPolicy;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionPreviewPage;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionPreviewRequest;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionProvider;
+use OCA\FlzDataProtection\PublicApi\V1\RetentionProviderDescriptor;
+use OCA\FlzPermissionMatrix\AppInfo\AppId;
+use OCA\FlzPermissionMatrix\Db\RetentionReviewRepository;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
 
 final class PermissionMatrixRetentionProvider implements RetentionProvider {
     private const MAX_PAGE_SIZE = 200;

@@ -6,7 +6,7 @@ $root = dirname(__DIR__, 2);
 $repository = (string)file_get_contents($root . '/lib/Db/PersonalDataProjectionRepository.php');
 $provider = (string)file_get_contents($root . '/lib/Privacy/PermissionMatrixPersonalDataProvider.php');
 
-foreach (['pm_admin_access', 'target_uid', 'granted_by', 'revoked_by', "'source' => 'admin_access'", 'createNamedParameter'] as $contract) {
+foreach (['flz_pm_admin_access', 'target_uid', 'granted_by', 'revoked_by', "'source' => 'admin_access'", 'createNamedParameter'] as $contract) {
     if (!str_contains($repository, $contract)) {
         throw new RuntimeException('Subject-gebundene Adminfreigabe-Projektion fehlt: ' . $contract);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Model;
+namespace OCA\FlzPermissionMatrix\Model;
 
 use DateTimeImmutable;
 

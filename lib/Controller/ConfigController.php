@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Controller;
+namespace OCA\FlzPermissionMatrix\Controller;
 
-use OCA\FilzmannPermissionMatrix\AppInfo\Application;
-use OCA\FilzmannPermissionMatrix\Exception\AccessDeniedException;
-use OCA\FilzmannPermissionMatrix\Exception\ConfigValidationException;
-use OCA\FilzmannPermissionMatrix\Service\AccessService;
-use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
-use OCA\FilzmannPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Exception\AccessDeniedException;
+use OCA\FlzPermissionMatrix\Exception\ConfigValidationException;
+use OCA\FlzPermissionMatrix\Service\AccessService;
+use OCA\FlzPermissionMatrix\Service\AuditLogService;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

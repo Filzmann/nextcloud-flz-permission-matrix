@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use OCA\FilzmannPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
-use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
+use OCA\FlzPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
+use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersSource;
 
 class GroupFoldersManagerProviderFake implements GroupFoldersManagerProviderInterface {
     public int $calls = 0;

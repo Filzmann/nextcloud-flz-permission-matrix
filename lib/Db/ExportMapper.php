@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Db;
+namespace OCA\FlzPermissionMatrix\Db;
 
 use DateTimeImmutable;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 class ExportMapper {
-    private const TABLE = 'permission_matrix_exports';
+    private const TABLE = 'flz_pm_exports';
 
     public function __construct(
         private IDBConnection $db

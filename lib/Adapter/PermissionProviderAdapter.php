@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Adapter;
+namespace OCA\FlzPermissionMatrix\Adapter;
 
-use OCA\FilzmannPermissionMatrix\Model\AccessCondition;
-use OCA\FilzmannPermissionMatrix\Model\AccessRule;
-use OCA\FilzmannPermissionMatrix\Model\MatrixRow;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionCondition;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionRule;
-use OCA\FilzmannPermissionMatrix\Service\InventoryService;
-use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
+use OCA\FlzPermissionMatrix\Model\AccessCondition;
+use OCA\FlzPermissionMatrix\Model\AccessRule;
+use OCA\FlzPermissionMatrix\Model\MatrixRow;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionCondition;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionRule;
+use OCA\FlzPermissionMatrix\Service\InventoryService;
+use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
 use Throwable;
 
 final class PermissionProviderAdapter implements PermissionAdapterInterface {

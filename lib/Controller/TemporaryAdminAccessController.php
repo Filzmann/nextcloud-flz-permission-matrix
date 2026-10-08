@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Controller;
+namespace OCA\FlzPermissionMatrix\Controller;
 
 use DateTimeInterface;
 use InvalidArgumentException;
-use OCA\FilzmannPermissionMatrix\AppInfo\AppId;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessDeniedException;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+use OCA\FlzPermissionMatrix\AppInfo\AppId;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessDeniedException;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

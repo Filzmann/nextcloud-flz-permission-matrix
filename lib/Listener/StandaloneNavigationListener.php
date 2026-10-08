@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Listener;
+namespace OCA\FlzPermissionMatrix\Listener;
 
-use OCA\FilzmannPermissionMatrix\Service\AccessService;
+use OCA\FlzPermissionMatrix\Service\AccessService;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\INavigationManager;
@@ -13,7 +13,7 @@ use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 
 /** @template-implements IEventListener<LoadAdditionalEntriesEvent> */
 final class StandaloneNavigationListener implements IEventListener {
-    private const APP_ID = 'filzmann_permission_matrix';
+    private const APP_ID = 'flz_permission_matrix';
 
     public function __construct(
         private AccessService $access,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Service;
+namespace OCA\FlzPermissionMatrix\Service;
 
 /**
  * Zweck: Begrenzt den Sharing-Adapter auf die oeffentlich auslesbaren Nextcloud-Daten.

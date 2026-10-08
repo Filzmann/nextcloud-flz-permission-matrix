@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\Controller;
+namespace OCA\FlzPermissionMatrix\Controller;
 
-use OCA\FilzmannPermissionMatrix\AppInfo\Application;
-use OCA\FilzmannPermissionMatrix\Service\AccessService;
-use OCA\FilzmannPermissionMatrix\Service\AuditLogService;
-use OCA\FilzmannPermissionMatrix\Service\TemporaryAdminAccessService;
+use OCA\FlzPermissionMatrix\AppInfo\Application;
+use OCA\FlzPermissionMatrix\Service\AccessService;
+use OCA\FlzPermissionMatrix\Service\AuditLogService;
+use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

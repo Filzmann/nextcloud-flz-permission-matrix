@@ -15,15 +15,15 @@ namespace OCP\AppFramework\Bootstrap {
 }
 
 namespace {
-    use OCA\FilzmannPermissionMatrix\AppInfo\Application;
-    use OCA\FilzmannPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
-    use OCA\FilzmannPermissionMatrix\Service\GroupFoldersSourceInterface;
-    use OCA\FilzmannPermissionMatrix\Service\NativeSharingSourceInterface;
-    use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
-    use OCA\FilzmannPermissionMatrix\Service\NextcloudGroupFoldersSource;
-    use OCA\FilzmannPermissionMatrix\Service\NextcloudSharingSource;
-    use OCA\FilzmannPermissionMatrix\Service\NextcloudPermissionProviderSource;
-    use OCA\FilzmannPermissionMatrix\Service\PermissionProviderSourceInterface;
+    use OCA\FlzPermissionMatrix\AppInfo\Application;
+    use OCA\FlzPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
+    use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
+    use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
+    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
+    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersSource;
+    use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
+    use OCA\FlzPermissionMatrix\Service\NextcloudPermissionProviderSource;
+    use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
     use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
     $context = new class implements IRegistrationContext {
@@ -62,23 +62,23 @@ namespace {
         'The optional V1 permission provider event must be discovered through one cached source.'
     );
     assertSameValue(
-        \OCA\FilzmannPermissionMatrix\Listener\StandaloneNavigationListener::class,
+        \OCA\FlzPermissionMatrix\Listener\StandaloneNavigationListener::class,
         $context->listeners[\OCP\Navigation\Events\LoadAdditionalEntriesEvent::class] ?? null,
         'The standalone app must register its own native navigation entry.'
     );
     assertSameValue(
-        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener::class,
-        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class] ?? null,
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixPersonalDataProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class] ?? null,
         'The app must register its optional V1 privacy provider lazily.'
     );
     assertSameValue(
-        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener::class,
-        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class] ?? null,
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixRetentionProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterRetentionProvidersEvent::class] ?? null,
         'The app must register its optional V1 retention preview provider lazily.'
     );
     assertSameValue(
-        \OCA\FilzmannPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener::class,
-        $context->listeners[\OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class] ?? null,
+        \OCA\FlzPermissionMatrix\Privacy\PermissionMatrixProcessingMetadataProviderListener::class,
+        $context->listeners[\OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class] ?? null,
         'The app must register its optional V1 processing metadata provider lazily.'
     );
 

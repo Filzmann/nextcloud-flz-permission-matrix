@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\AppInfo;
+namespace OCA\FlzPermissionMatrix\AppInfo;
 
 final class AppId {
-    public const VALUE = 'filzmann_permission_matrix';
+    public const VALUE = 'flz_permission_matrix';
 
     private function __construct() {
     }

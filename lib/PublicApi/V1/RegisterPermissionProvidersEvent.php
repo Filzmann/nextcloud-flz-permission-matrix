@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\FilzmannPermissionMatrix\PublicApi\V1;
+namespace OCA\FlzPermissionMatrix\PublicApi\V1;
 
 use OCP\EventDispatcher\Event;
 use Throwable;
