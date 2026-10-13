@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'candidate/WO-*']
   pull_request:
 
 permissions:
@@ -106,12 +106,3 @@ jobs:
             --check-coverage \
             --lines=50.94 \
             node tests/run-js.mjs
-
-  deploy-staging:
-    name: Staging-Deployment
-    if: github.event_name == 'push'
-    needs: [php, javascript]
-    uses: Filzmann/br-nextcloud-apps/.github/workflows/deploy-staging.yml@main
-    with:
-      app-id: flz_permission_matrix
-    secrets: inherit
