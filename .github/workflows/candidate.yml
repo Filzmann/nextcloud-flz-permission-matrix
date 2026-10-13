@@ -1,0 +1,28 @@
+name: Candidate nach erfolgreichem Prüflauf bereitstellen
+
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  stage-candidate:
+    name: Candidate auf Staging bereitstellen
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'candidate/WO-')
+    uses: Filzmann/br-nextcloud-apps/.github/workflows/candidate-staging.yml@main
+    with:
+      app-id: flz_permission_matrix
+      source-repository: ${{ github.event.workflow_run.head_repository.full_name }}
+      source-branch: ${{ github.event.workflow_run.head_branch }}
+      source-commit: ${{ github.event.workflow_run.head_sha }}
+      test-run-id: ${{ github.event.workflow_run.id }}
+      test-run-attempt: ${{ github.event.workflow_run.run_attempt }}
+    secrets: inherit
