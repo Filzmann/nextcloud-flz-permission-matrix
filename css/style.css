@@ -88,6 +88,7 @@
 #permission-matrix-app input:focus-visible,
 #permission-matrix-app select:focus-visible,
 #permission-matrix-app summary:focus-visible,
+#permission-matrix-app .pm-matrix-scroll-track:focus-visible,
 #permission-matrix-app .pm-table-wrap:focus-visible,
 .pm-admin button:focus-visible,
 .pm-admin input:focus-visible,

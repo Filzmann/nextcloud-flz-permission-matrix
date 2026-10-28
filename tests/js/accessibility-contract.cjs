@@ -51,6 +51,7 @@ assert(!style.includes('#content'));
 assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
 assert(/\.pm-admin\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none/s.test(style));
 assert(/\.pm-table-wrap\s*\{[^}]*overflow-x:\s*auto[^}]*overflow-y:\s*visible/s.test(style));
+assert(/\.pm-matrix-scroll-track:focus-visible\s*,\s*#permission-matrix-app \.pm-table-wrap:focus-visible/s.test(style));
 assert(!style.includes('max-height: calc(100vh - 300px)'));
 assert(/\.pm-head\s*\{[^}]*gap:\s*8px[^}]*margin-bottom:\s*8px/s.test(style));
 assert(/\.pm-filters\s*\{[^}]*gap:\s*6px[^}]*margin-bottom:\s*8px/s.test(style));

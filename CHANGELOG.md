@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Für breite Matrizen bleibt der synchronisierte horizontale Scroll-Track im
+  sichtbaren Matrix-Viewport fokussierbar; das Abnahmeformular beschreibt die
+  Prüfung kleiner Viewports, Tastaturfokus sowie kombiniertes Scrollen.
 - Technische App-Identität auf `flz_permission_matrix` und
   `OCA\\FlzPermissionMatrix` umgestellt. App-eigene Tabellen und Indizes
   verwenden für den vereinbarten Fresh-Install-Neustart das Präfix `flz_pm`;
