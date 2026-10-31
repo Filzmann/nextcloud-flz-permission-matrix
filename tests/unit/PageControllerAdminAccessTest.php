@@ -24,9 +24,10 @@ namespace OCP\AppFramework\Http\Attribute {
 namespace OCA\FlzPermissionMatrix\AppInfo { final class Application { public const APP_ID = 'flz_permission_matrix'; } }
 namespace OCA\FlzPermissionMatrix\Service {
     class AccessService {
-        public function __construct(public bool $view = false, public bool $manage = false) {}
+        public function __construct(public bool $view = false, public bool $manage = false, public bool $scan = false) {}
         public function canViewCurrentUser(): bool { return $this->view; }
         public function canManageCurrentUser(): bool { return $this->manage; }
+        public function canScanCurrentUser(): bool { return $this->scan; }
     }
     class AuditLogService {
         public array $actions = [];
@@ -37,14 +38,21 @@ namespace OCA\FlzPermissionMatrix\Service {
         public function canManage(): bool { return $this->manage; }
         public function currentAdminNeedsGrant(): bool { return $this->missing; }
     }
+    class ConfigService {
+        public int $reads = 0;
+        public function toArray(): array { $this->reads++; return ['scan_interval' => 'daily']; }
+    }
 }
 namespace {
     use OCA\FlzPermissionMatrix\Controller\PageController;
     use OCA\FlzPermissionMatrix\Service\AccessService;
     use OCA\FlzPermissionMatrix\Service\AuditLogService;
+    use OCA\FlzPermissionMatrix\Service\ConfigService;
     use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 
     $request = new class implements OCP\IRequest {};
+
+    function pageConfig(): ConfigService { return new ConfigService(); }
 
     $audit = new AuditLogService();
     $ordinaryResponse = (new PageController(
@@ -52,9 +60,22 @@ namespace {
         new AccessService(false, false),
         $audit,
         new TemporaryAdminAccessService(false, false),
+        pageConfig(),
     ))->index();
     assertSameValue(403, $ordinaryResponse->status(), 'An ordinary account must be denied at the main entry.');
     assertSameValue(['page.index.denied'], $audit->actions, 'The ordinary-account denial must be audited.');
+
+    $brConfig = pageConfig();
+    $brResponse = (new PageController(
+        $request,
+        new AccessService(true, false, true),
+        new AuditLogService(),
+        new TemporaryAdminAccessService(false, false),
+        $brConfig,
+    ))->index();
+    assertSameValue(true, $brResponse->params()['can_scan'], 'A canonical BR member must receive the separate manual-scan capability.');
+    assertSameValue(false, $brResponse->params()['can_manage'], 'A canonical BR member must not receive baseline or configuration rights.');
+    assertSameValue(0, $brConfig->reads, 'A BR-only account must not receive administrative configuration data.');
 
     $audit = new AuditLogService();
     $adminResponse = (new PageController(
@@ -62,6 +83,7 @@ namespace {
         new AccessService(false, false),
         $audit,
         new TemporaryAdminAccessService(false, true),
+        pageConfig(),
     ))->index();
     assertSameValue(200, $adminResponse->status(), 'A native admin without a grant must reach its own safe warning.');
     assertSameValue(false, $adminResponse->params()['hasMatrixAccess'], 'The warning must not disclose matrix data.');
@@ -71,23 +93,28 @@ namespace {
     assertSameValue(['page.index.admin_access'], $audit->actions, 'The warning-only entry must be distinguishably audited.');
 
     $audit = new AuditLogService();
+    $dpoConfig = pageConfig();
     $dpoResponse = (new PageController(
         $request,
-        new AccessService(false, false),
+        new AccessService(true, true, true),
         $audit,
         new TemporaryAdminAccessService(true, false),
+        $dpoConfig,
     ))->index();
     assertSameValue(200, $dpoResponse->status(), 'A DPO without native admin status must reach grant management.');
-    assertSameValue(false, $dpoResponse->params()['hasMatrixAccess'], 'DPO status alone must not disclose matrix data.');
+    assertSameValue(true, $dpoResponse->params()['hasMatrixAccess'], 'The fixed DPO role must include matrix access.');
     assertSameValue(true, $dpoResponse->params()['canManageAdminAccess'], 'DPO grant controls must be projected.');
+    assertSameValue(['scan_interval' => 'daily'], $dpoResponse->params()['config'], 'A DPO must receive the technical settings needed by the in-app settings tab.');
+    assertSameValue(1, $dpoConfig->reads, 'Administrative configuration must be read exactly once for a managing account.');
     assertSameValue(false, $dpoResponse->params()['showMissingAdminGrant'], 'A non-admin DPO must not receive an irrelevant missing-grant notice.');
-    assertSameValue(['page.index.admin_access'], $audit->actions, 'The grant-management-only entry must be distinguishably audited.');
+    assertSameValue(['page.index'], $audit->actions, 'The DPO matrix entry must use the regular authorized audit action.');
 
     $combinedResponse = (new PageController(
         $request,
         new AccessService(false, false),
         new AuditLogService(),
         new TemporaryAdminAccessService(true, true),
+        pageConfig(),
     ))->index();
     assertSameValue(true, $combinedResponse->params()['showMissingAdminGrant'], 'The combined admin/DPO account should see its missing-grant notice.');
     assertSameValue(true, $combinedResponse->params()['showAdminAccessLink'], 'Only the same combined account should receive the direct control link.');

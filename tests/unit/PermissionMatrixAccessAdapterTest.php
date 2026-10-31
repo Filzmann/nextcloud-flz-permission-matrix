@@ -3,69 +3,54 @@
 declare(strict_types=1);
 
 use OCA\FlzPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
-use OCA\FlzPermissionMatrix\Service\ConfigService;
+use OCA\FlzPermissionMatrix\Service\BrMembershipService;
 use OCA\FlzPermissionMatrix\Service\InventoryService;
 
 class MatrixAccessFakeInventory extends InventoryService {
-    public function __construct(private bool $withPrivacyOfficer = true) {
-    }
-
-    public function isAppEnabled(string $appId): bool {
-        return $appId === 'flz_permission_matrix';
-    }
-
+    public function __construct(private bool $withPrivacyOfficer = true, private bool $withBrGroup = true) {}
+    public function isAppEnabled(string $appId): bool { return $appId === 'flz_permission_matrix'; }
     public function groups(): array {
         return array_values(array_filter(
-            ['Andere', 'Datenschutzbeauftragte', 'Matrix-Admin', 'Matrix-Viewer', 'admin'],
-            fn(string $group): bool => $this->withPrivacyOfficer || $group !== 'Datenschutzbeauftragte',
+            ['Andere', 'Datenschutzbeauftragte', 'BR-Kanonisch', 'admin'],
+            fn(string $group): bool => ($this->withPrivacyOfficer || $group !== 'Datenschutzbeauftragte')
+                && ($this->withBrGroup || $group !== 'BR-Kanonisch'),
         ));
     }
 }
 
-class MatrixAccessFakeConfig extends ConfigService {
-    public function __construct(private bool $missing = false) {
-    }
-
-    public function viewerGroups(): array {
-        return $this->missing ? ['Nicht-Vorhanden'] : ['Matrix-Viewer'];
-    }
-
-    public function adminGroups(): array {
-        return ['Matrix-Admin'];
-    }
+class MatrixAccessFakeBrMembership extends BrMembershipService {
+    public function __construct(private ?string $groupId = 'BR-Kanonisch') {}
+    public function memberGroupId(): ?string { return $this->groupId; }
 }
 
-$result = (new PermissionMatrixAccessAdapter(
-    new MatrixAccessFakeInventory(),
-    new MatrixAccessFakeConfig()
-))->collect();
-$rows = $result->rows();
-assertSameValue(3, count($rows), 'The matrix should expose view, management, and DPO grant-management permissions.');
-assertSameValue('X', $rows[0]->cells()['Matrix-Viewer'], 'Configured viewer groups should be able to read.');
-assertSameValue('X', $rows[0]->cells()['Matrix-Admin'], 'Management must imply view access.');
-assertSameValue('-', $rows[0]->cells()['admin'], 'Native admin group membership alone must not imply view access.');
-assertSameValue('-', $rows[0]->cells()['Andere'], 'Unconfigured groups must remain denied.');
-assertSameValue('A', $rows[1]->cells()['Matrix-Admin'], 'Configured app admins should be able to manage.');
-assertSameValue('-', $rows[1]->cells()['admin'], 'Native admin group membership alone must not imply management access.');
-assertSameValue('-', $rows[1]->cells()['Matrix-Viewer'], 'Viewer groups must not gain management access.');
-assertContainsText('(Gruppe Matrix-Admin ODER Gruppe Matrix-Viewer ODER (Nextcloud-Administration UND Aktive zeitlich begrenzte App-Adminfreigabe))', $rows[0]->accessRules()[0]->conditionText(), 'The own view rule should expose the configured groups and the compound temporary admin grant.');
-assertContainsText('(Gruppe Matrix-Admin ODER (Nextcloud-Administration UND Aktive zeitlich begrenzte App-Adminfreigabe))', $rows[1]->accessRules()[0]->conditionText(), 'The own management rule should never describe native admin status as sufficient.');
-assertSameValue('A', $rows[2]->cells()['Datenschutzbeauftragte'], 'Only the DPO group should manage temporary app-admin grants.');
-assertSameValue('-', $rows[2]->cells()['admin'], 'Native admin membership must not manage temporary app-admin grants.');
-assertContainsText('Gruppe Datenschutzbeauftragte', $rows[2]->accessRules()[0]->conditionText(), 'The grant-management projection must expose the canonical DPO group.');
+$result = (new PermissionMatrixAccessAdapter(new MatrixAccessFakeInventory(), new MatrixAccessFakeBrMembership()))->collect();
+$rows = [];
+foreach ($result->rows() as $row) $rows[$row->objectName()] = $row;
 
-$missing = (new PermissionMatrixAccessAdapter(
-    new MatrixAccessFakeInventory(),
-    new MatrixAccessFakeConfig(true)
-))->collect();
-assertSameValue('UNKNOWN', $missing->rows()[0]->status(), 'A configured group missing from the inventory must stay fail-closed.');
-assertContainsText('nicht im Gruppeninventar', implode(' ', $missing->warnings()), 'A stale own access configuration needs a precise warning.');
+assertSameValue(6, count($rows), 'The matrix must expose the six independently assigned matrix permissions.');
+foreach (['Matrix ansehen', 'Exporte erzeugen', 'Manuelle Scans starten'] as $permission) {
+    assertSameValue('X', $rows[$permission]->cells()['BR-Kanonisch'], $permission . ' must be granted to the canonical BR member group.');
+    assertSameValue('X', $rows[$permission]->cells()['Datenschutzbeauftragte'], $permission . ' must be granted to the fixed DPO group.');
+    assertSameValue('-', $rows[$permission]->cells()['Andere'], $permission . ' must deny unrelated groups.');
+}
+foreach (['Baseline festlegen', 'App-Konfiguration ändern'] as $permission) {
+    assertSameValue('-', $rows[$permission]->cells()['BR-Kanonisch'], $permission . ' must not be granted through BR identity.');
+    assertSameValue('A', $rows[$permission]->cells()['Datenschutzbeauftragte'], $permission . ' must be granted to the fixed DPO group.');
+}
+assertSameValue('A', $rows['Temporären Admin-Vollzugriff verwalten']->cells()['Datenschutzbeauftragte'], 'Only the DPO group should manage temporary app-admin grants.');
+assertSameValue('-', $rows['Temporären Admin-Vollzugriff verwalten']->cells()['admin'], 'Native admin membership must not manage temporary app-admin grants.');
 
-$missingPrivacyOfficer = (new PermissionMatrixAccessAdapter(
-    new MatrixAccessFakeInventory(false),
-    new MatrixAccessFakeConfig()
-))->collect();
-assertSameValue('UNKNOWN', $missingPrivacyOfficer->rows()[2]->status(), 'A missing canonical DPO group must keep grant management fail-closed.');
-assertContainsText('Datenschutzbeauftragte', implode(' ', $missingPrivacyOfficer->warnings()), 'A missing DPO group needs a precise warning.');
+$missingProvider = (new PermissionMatrixAccessAdapter(new MatrixAccessFakeInventory(), new MatrixAccessFakeBrMembership(null)))->collect();
+assertSameValue('UNKNOWN', $missingProvider->rows()[0]->status(), 'A missing canonical BR provider must keep BR-derived permissions visibly fail-closed.');
+assertContainsText('BR-Mitgliedschaft', implode(' ', $missingProvider->warnings()), 'A missing BR provider needs a precise warning.');
+
+$missingBrGroup = (new PermissionMatrixAccessAdapter(new MatrixAccessFakeInventory(true, false), new MatrixAccessFakeBrMembership()))->collect();
+assertSameValue('UNKNOWN', $missingBrGroup->rows()[0]->status(), 'A canonical BR group missing from the native inventory must stay fail-closed.');
+
+$missingPrivacyOfficer = (new PermissionMatrixAccessAdapter(new MatrixAccessFakeInventory(false), new MatrixAccessFakeBrMembership()))->collect();
+$missingDpoRows = [];
+foreach ($missingPrivacyOfficer->rows() as $row) $missingDpoRows[$row->objectName()] = $row;
+assertSameValue('UNKNOWN', $missingDpoRows['App-Konfiguration ändern']->status(), 'A missing canonical DPO group must keep administration fail-closed.');
+assertSameValue('UNKNOWN', $missingDpoRows['Temporären Admin-Vollzugriff verwalten']->status(), 'A missing canonical DPO group must keep grant management fail-closed.');
 
 echo 'PermissionMatrixAccessAdapter tests passed' . PHP_EOL;

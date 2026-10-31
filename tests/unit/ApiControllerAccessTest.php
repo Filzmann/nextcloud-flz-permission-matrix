@@ -99,6 +99,7 @@ namespace {
 
     class ApiAccessTestAccess extends AccessService {
         public bool $viewAllowed = false;
+        public bool $scanAllowed = false;
         public bool $manageAllowed = false;
 
         public function __construct() {
@@ -114,6 +115,16 @@ namespace {
             if (!$this->manageAllowed) {
                 throw new AccessDeniedException('Zugriff verweigert.');
             }
+        }
+
+        public function assertCanScan(): void {
+            if (!$this->scanAllowed) {
+                throw new AccessDeniedException('Zugriff verweigert.');
+            }
+        }
+
+        public function canScanCurrentUser(): bool {
+            return $this->scanAllowed;
         }
 
         public function canManageCurrentUser(): bool {
@@ -149,7 +160,7 @@ namespace {
 
         public function scan(?string $createdBy = null, bool $persist = true): Snapshot {
             $this->scanCalls++;
-            throw new RuntimeException('Scanner must not run in this authorization test.');
+            return new Snapshot('scan-test', '2026-10-31T12:00:00+00:00', '34.0.0', [], [], []);
         }
     }
 
@@ -222,7 +233,7 @@ namespace {
     assertSameValue(['api.state.denied'], $audit->actions, 'Denied state access must be audited.');
 
     $deniedScan = $controller->scan();
-    assertSameValue(403, $deniedScan->getStatus(), 'Direct scan requests without management rights must be forbidden.');
+    assertSameValue(403, $deniedScan->getStatus(), 'Direct scan requests without scan rights must be forbidden.');
     assertSameValue(0, $scanner->scanCalls, 'Authorization must run before a scan changes state.');
     assertSameValue(['api.state.denied', 'api.scan.denied'], $audit->actions, 'Denied management access must be audited.');
 
@@ -234,9 +245,15 @@ namespace {
     assertSameValue(['md', 'csv', 'json', 'html'], $allowedState->getData()['export_formats'], 'State responses should expose the enforced export policy to the UI.');
     assertSameValue('api.state', $audit->actions[2], 'Allowed state access must be audited separately.');
 
+    $access->scanAllowed = true;
+    $allowedScan = $controller->scan();
+    assertSameValue(200, $allowedScan->getStatus(), 'A view-only BR member with the separate scan capability may start a manual scan.');
+    assertSameValue(1, $scanner->scanCalls, 'The authorized scan capability must reach the scanner exactly once.');
+    assertSameValue('api.scan', $audit->actions[3], 'An allowed manual scan must be audited.');
+
     $missingDiff = $controller->diff('missing-a', 'missing-b');
     assertSameValue(404, $missingDiff->getStatus(), 'Missing snapshots must not be reported as authorization failures.');
-    assertSameValue('api.diff.not_found', $audit->actions[3], 'Missing snapshot access must have a distinct audit outcome.');
+    assertSameValue('api.diff.not_found', $audit->actions[4], 'Missing snapshot access must have a distinct audit outcome.');
     assertSameValue(
         true,
         class_exists(\OCA\FlzPermissionMatrix\Controller\ConfigController::class),

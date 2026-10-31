@@ -88,18 +88,15 @@ Wichtige Pruefungen:
 
 ## Zugriff und Sicherheit
 
-- Matrix, Snapshots und Exporte sind nur fuer konfigurierte Viewer-Gruppen,
-  konfigurierte Admin-Gruppen oder Nextcloud-Admins mit aktiver app-lokaler
-  Vollzugriffsfreigabe sichtbar.
-- `Betriebsrat`, `IKT-Ausschuss`, `Datenschutzbeauftragte` und
-  `IT-Administration` sind anpassbare Ausgangsbeispiele, keine fest
-  vorausgesetzten Organisationsrollen. Ein Personalrat kann die
-  Betriebsratsgruppe vollständig ersetzen. Davon ausgenommen ist allein die
-  app-lokale Adminfreigabe: deren Steuerungsrolle ist die kanonische native
-  Gruppe `Datenschutzbeauftragte`.
-- App-Konfiguration, Baseline-Freigabe und manuelle Scans sind nur fuer
-  konfigurierte Admin-Gruppen oder Nextcloud-Admins mit aktiver app-lokaler
-  Vollzugriffsfreigabe erlaubt. Die Freigabe wird je Admin erteilt, endet
+- Matrix, Snapshots, Exporte und manuelle Scans sind fuer Mitglieder der
+  kanonischen BR-Mitgliedergruppe aus dem aktivierungs- und versionsgeprüften
+  öffentlichen LocalBase-V1-Vertrag sowie fuer die feste native Gruppe
+  `Datenschutzbeauftragte` erlaubt. Fehlt der BR-Provider oder ist er
+  deaktiviert, inkompatibel oder ungültig, entsteht daraus kein Zugriff.
+- BR-Leserechte sind nicht app-lokal konfigurierbar oder entziehbar.
+  App-Konfiguration und Baseline-Freigabe bleiben
+  `Datenschutzbeauftragte` vorbehalten. Nextcloud-Admins erhalten fachlichen
+  Vollzugriff nur mit aktiver app-lokaler Freigabe. Die Freigabe wird je Admin erteilt, endet
   spaetestens nach 24 Stunden und bleibt mit Beginn, geplantem Ende und
   gegebenenfalls vorzeitigem Widerruf nachvollziehbar. Nur Mitglieder von
   `Datenschutzbeauftragte` duerfen die Historie lesen sowie Freigaben fuer

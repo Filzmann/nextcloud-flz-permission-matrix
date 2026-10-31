@@ -27,6 +27,7 @@
         snapshot: null,
         snapshots: [],
         baseline: '',
+        canScan: false,
         canManage: false,
         exportFormats: ['md', 'csv', 'json', 'html'],
         filters: emptyFilters()
@@ -42,6 +43,7 @@
 
     async function init() {
         const root = render.byId('permission-matrix-app');
+        state.canScan = root.dataset.canScan === '1';
         state.canManage = root.dataset.canManage === '1';
         bindEvents();
         await loadState();
@@ -105,6 +107,7 @@
             const data = await api.state();
             state.snapshot = data.snapshot;
             state.baseline = data.baseline_snapshot || '';
+            state.canScan = Boolean(data.can_scan);
             state.canManage = Boolean(data.can_manage);
             state.exportFormats = Array.isArray(data.export_formats) ? data.export_formats : state.exportFormats;
             const snapshots = await api.snapshots();

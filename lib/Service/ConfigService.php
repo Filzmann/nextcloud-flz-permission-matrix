@@ -7,34 +7,22 @@ namespace OCA\FlzPermissionMatrix\Service;
 use OCA\FlzPermissionMatrix\AppInfo\Application;
 use OCA\FlzPermissionMatrix\Exception\ConfigValidationException;
 use OCP\IAppConfig;
-use OCP\IGroupManager;
 
 /**
  * Zweck: Zentralisiert sichere Defaults, Normalisierung und Persistenz der App-Konfiguration.
  *
  * Zusammenspiel:
- * - AccessService nutzt Gruppenrollen, ScannerService Scan-/Retention-Regeln und ExportService
- *   die serverseitig erzwungene Format-Allowlist.
+ * - ScannerService nutzt Scan-/Retention-Regeln und ExportService die serverseitig erzwungene
+ *   Format-Allowlist. Identitäten und App-Rechte sind ausdrücklich keine Konfiguration.
  */
 class ConfigService {
-    private const DEFAULT_VIEWER_GROUPS = ['Betriebsrat', 'IKT-Ausschuss', 'Datenschutzbeauftragte', 'IT-Administration'];
-    private const DEFAULT_ADMIN_GROUPS = ['IT-Administration'];
     private const DEFAULT_EXPORT_FORMATS = ['md', 'csv', 'json', 'html'];
     private const DEFAULT_RETENTION_DAYS = 180;
     private const MAX_RETENTION_DAYS = 3650;
 
     public function __construct(
         private IAppConfig $config,
-        private IGroupManager $groups
     ) {
-    }
-
-    public function viewerGroups(): array {
-        return $this->stringList('viewer_groups', self::DEFAULT_VIEWER_GROUPS);
-    }
-
-    public function adminGroups(): array {
-        return $this->stringList('admin_groups', self::DEFAULT_ADMIN_GROUPS);
     }
 
     public function scanInterval(): string {
@@ -89,8 +77,6 @@ class ConfigService {
 
     public function toArray(): array {
         return [
-            'viewer_groups' => $this->viewerGroups(),
-            'admin_groups' => $this->adminGroups(),
             'scan_interval' => $this->scanInterval(),
             'baseline_snapshot' => $this->baselineSnapshot(),
             'strict_mode' => $this->strictMode(),
@@ -107,8 +93,6 @@ class ConfigService {
     public function save(array $payload): array {
         $validated = $this->validatePayload($payload);
 
-        $this->setStringList('viewer_groups', $validated['viewer_groups']);
-        $this->setStringList('admin_groups', $validated['admin_groups']);
         $this->config->setValueString(Application::APP_ID, 'scan_interval', $validated['scan_interval'], true);
         $this->config->setValueBool(Application::APP_ID, 'strict_mode', $validated['strict_mode'], true);
         $this->config->setValueBool(Application::APP_ID, 'include_users', $validated['include_users'], true);
@@ -170,11 +154,6 @@ class ConfigService {
     }
 
     private function validatePayload(array $payload): array {
-        $viewerGroups = $this->normalizeStringList($payload['viewer_groups'] ?? self::DEFAULT_VIEWER_GROUPS);
-        $adminGroups = $this->normalizeStringList($payload['admin_groups'] ?? self::DEFAULT_ADMIN_GROUPS);
-        $this->assertKnownGroups($viewerGroups, 'Viewer-Gruppe');
-        $this->assertKnownGroups($adminGroups, 'Admin-Gruppe');
-
         $interval = $payload['scan_interval'] ?? 'daily';
         if (!is_string($interval) || !in_array($interval, ['hourly', 'daily', 'weekly'], true)) {
             throw new ConfigValidationException('Scan-Intervall muss hourly, daily oder weekly sein.');
@@ -207,8 +186,6 @@ class ConfigService {
         );
 
         return [
-            'viewer_groups' => $viewerGroups,
-            'admin_groups' => $adminGroups,
             'scan_interval' => $interval,
             'strict_mode' => $this->toBool($payload['strict_mode'] ?? true),
             'include_users' => $this->toBool($payload['include_users'] ?? false),
@@ -231,14 +208,6 @@ class ConfigService {
         }
 
         return $days;
-    }
-
-    private function assertKnownGroups(array $groupIds, string $label): void {
-        foreach ($groupIds as $groupId) {
-            if (!$this->groups->groupExists($groupId)) {
-                throw new ConfigValidationException($label . ' „' . $groupId . '“ existiert nicht.');
-            }
-        }
     }
 
     private function toBool(mixed $value): bool {

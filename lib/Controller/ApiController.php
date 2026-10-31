@@ -64,6 +64,7 @@ class ApiController extends Controller {
                 'ok' => true,
                 'snapshot' => $latest?->toArray(),
                 'baseline_snapshot' => $this->baseline->currentBaselineId(),
+                'can_scan' => $this->access->canScanCurrentUser(),
                 'can_manage' => $this->access->canManageCurrentUser(),
                 'export_formats' => $this->exports->allowedFormats(),
             ];
@@ -72,7 +73,7 @@ class ApiController extends Controller {
 
     #[NoAdminRequired]
     public function scan(): DataResponse {
-        return $this->respondManage('api.scan', function(): array {
+        return $this->respondScan('api.scan', function(): array {
             $snapshot = $this->scanner->scan($this->access->currentUserId());
             $this->auditLog->record('api.scan', false, $snapshot->snapshotId());
 
@@ -205,6 +206,22 @@ class ApiController extends Controller {
             $this->logger->error('Permission matrix API failed', ['app' => Application::APP_ID, 'exception' => $e]);
 
             return new DataResponse(['ok' => false, 'message' => 'Aktion konnte nicht ausgefuehrt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private function respondScan(string $action, callable $callback): DataResponse {
+        try {
+            $this->access->assertCanScan();
+
+            return new DataResponse($callback());
+        } catch (AccessDeniedException $e) {
+            $this->auditLog->record($action . '.denied');
+            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+        } catch (\Throwable $e) {
+            $this->auditLog->record($action . '.failed');
+            $this->logger->error('Permission matrix scan failed', ['app' => Application::APP_ID, 'exception' => $e]);
+
+            return new DataResponse(['ok' => false, 'message' => 'Scan konnte nicht ausgeführt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }

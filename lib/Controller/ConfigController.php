@@ -46,8 +46,6 @@ class ConfigController extends Controller {
     public function save(): DataResponse {
         return $this->respond('api.config.save', function(): array {
             $payload = array_intersect_key($this->request->getParams(), array_flip([
-                'viewer_groups',
-                'admin_groups',
                 'scan_interval',
                 'strict_mode',
                 'include_users',

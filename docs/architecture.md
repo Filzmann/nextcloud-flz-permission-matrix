@@ -17,6 +17,10 @@ aber weder Nextcloud-Rechte noch Konfigurationen anderer Apps.
   `OCA\\LocalBase\\PublicApi\\V1`. Die Matrix prüft App-Aktivierung und
   Vertragsversion vor der Nutzung; das Provider-DTO verantwortet
   Gültigkeit, eindeutige Gruppenabbildungen und Prüfsumme.
+- Die für den App-Zugriff maßgebliche BR-Mitgliedergruppe stammt separat aus
+  `OCA\LocalBase\PublicApi\V1\BrMembershipSnapshotService`. Der Consumer
+  prüft Aktivierung, Vertrags- und Definitionsversion sowie Gültigkeit; nur
+  ein gültiger Stand darf die BR-Lese-, Export- und Scanrechte erteilen.
 - Fehlende, mehrdeutige oder inkompatible Quellen liefern `UNKNOWN`,
   `UNSUPPORTED` oder eine sichtbar partielle Coverage und niemals eine
   vermutete Freigabe.
@@ -35,6 +39,16 @@ Standardscans und Exporte vermeiden Benutzerlisten, Secrets, Dateiinhalte und
 personenbezogene Pfade. Viewer-, Administrations-, Baseline-, Scan- und
 Exportrechte werden serverseitig geprüft. Native Administration allein
 erteilt keinen fachlichen Vollzugriff.
+
+Die sechs App-Rechte bleiben getrennt: Kanonische BR-Mitglieder und
+`Datenschutzbeauftragte` dürfen Matrix lesen, exportieren und manuell scannen.
+Nur `Datenschutzbeauftragte` dürfen Baselines und App-Konfiguration ändern
+oder temporäre Adminfreigaben steuern. Eine aktive temporäre Freigabe erteilt
+einem nativen Nextcloud-Admin den davon getrennten fachlichen Vollzugriff.
+BR-Leserechte sind keine frei konfigurierbare App-Gruppenzuordnung.
+Die technische Konfiguration wird für berechtigte Datenschutzbeauftragte im
+Fachapp-Tab `Einstellungen` und für den technischen Kontext im nativen
+Adminbereich aus demselben Template und demselben `ConfigService` gerendert.
 
 Die app-lokale Freigabesteuerung liegt rollenabhängig im Haupteinstieg und
 nicht im technischen Nextcloud-Adminbereich. Nur Mitglieder der kanonischen

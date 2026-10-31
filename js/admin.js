@@ -16,8 +16,6 @@
     function formPayload(form) {
         const data = new FormData(form);
         return new URLSearchParams({
-            viewer_groups: data.get('viewer_groups') || '',
-            admin_groups: data.get('admin_groups') || '',
             scan_interval: data.get('scan_interval') || 'daily',
             strict_mode: data.has('strict_mode') ? '1' : '0',
             include_users: data.has('include_users') ? '1' : '0',

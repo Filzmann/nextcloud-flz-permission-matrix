@@ -6,10 +6,13 @@ if ($hasMatrixAccess) {
     script('flz_permission_matrix', 'modules/render');
     script('flz_permission_matrix', 'main');
 }
+if ($_['can_manage'] ?? false) {
+    script('flz_permission_matrix', 'admin');
+}
 style('flz_permission_matrix', 'style');
 ?>
 
-<div id="permission-matrix-app" data-can-manage="<?php p($_['can_manage'] ? '1' : '0'); ?>">
+<div id="permission-matrix-app" data-can-scan="<?php p($_['can_scan'] ? '1' : '0'); ?>" data-can-manage="<?php p($_['can_manage'] ? '1' : '0'); ?>">
     <header class="pm-head">
         <div>
             <div class="pm-title-row">
@@ -29,8 +32,10 @@ style('flz_permission_matrix', 'style');
         </div>
         <?php if ($hasMatrixAccess): ?>
         <div class="pm-actions">
-            <?php if ($_['can_manage']): ?>
+            <?php if ($_['can_scan']): ?>
                 <button type="button" id="pm-run-scan">Scan</button>
+            <?php endif; ?>
+            <?php if ($_['can_manage']): ?>
                 <button type="button" id="pm-set-baseline">Baseline</button>
             <?php endif; ?>
             <button type="button" data-export="json">JSON</button>
@@ -68,6 +73,7 @@ style('flz_permission_matrix', 'style');
         <button type="button" id="pm-tab-groups" data-tab="groups" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-groups">Gruppen</button>
         <button type="button" id="pm-tab-diffs" data-tab="diffs" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-diffs">Abweichungen</button>
         <button type="button" id="pm-tab-snapshots" data-tab="snapshots" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-snapshots">Snapshots</button>
+        <?php if ($_['can_manage']): ?><button type="button" id="pm-tab-settings" data-tab="settings" role="tab" aria-selected="false" tabindex="-1" aria-controls="pm-view-settings">Einstellungen</button><?php endif; ?>
     </nav>
 
     <section id="pm-view-overview" class="pm-view active" role="tabpanel" aria-labelledby="pm-tab-overview">
@@ -116,5 +122,10 @@ style('flz_permission_matrix', 'style');
     <section id="pm-view-snapshots" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-snapshots" hidden>
         <div id="pm-snapshots"></div>
     </section>
+    <?php if ($_['can_manage']): ?>
+    <section id="pm-view-settings" class="pm-view" role="tabpanel" aria-labelledby="pm-tab-settings" hidden>
+        <?php $config = $_['config']; require __DIR__ . '/settings-form.php'; ?>
+    </section>
+    <?php endif; ?>
     <?php endif; ?>
 </div>

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Organisationsidentität und App-Rechte sind getrennt: Die kanonische
+  BR-Mitgliedergruppe aus dem öffentlichen LocalBase-V1-Vertrag erhält
+  unveränderlich Matrix-, Export- und manuelle Scanrechte;
+  `Datenschutzbeauftragte` erhalten zusätzlich Baseline- und
+  Konfigurationsrechte. Fehlende, deaktivierte, inkompatible oder ungültige
+  Providerstände erteilen fail-closed keine BR-Rechte.
+- Die technische App-Konfiguration ist für Datenschutzbeauftragte im eigenen
+  semantischen Einstellungstab erreichbar; der native Adminbereich verwendet
+  dasselbe Formular und keine zweite Konfigurationsquelle.
 - Für breite Matrizen bleibt der synchronisierte horizontale Scroll-Track im
   sichtbaren Matrix-Viewport fokussierbar; das Abnahmeformular beschreibt die
   Prüfung kleiner Viewports, Tastaturfokus sowie kombiniertes Scrollen.

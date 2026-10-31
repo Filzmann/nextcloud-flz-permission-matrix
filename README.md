@@ -117,13 +117,13 @@ Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-B
 
 ## Betrieb
 
-Admin-Einstellungen:
+App-Einstellungen:
 
-- `viewer_groups`: frei anpassbare Gruppen mit Matrix-/Export-Zugriff. Als
-  Ausgangsbeispiele dienen `Betriebsrat`, `IKT-Ausschuss`,
-  `Datenschutzbeauftragte` und `IT-Administration`.
-- `admin_groups`: frei anpassbare Gruppen mit Konfigurations-, Scan- und
-  Baseline-Rechten; Ausgangsbeispiel ist `IT-Administration`.
+Mitglieder von `Datenschutzbeauftragte` erreichen diese Werte im
+selbsterklärenden Tab **Einstellungen** der Fachapp. Der technische
+Nextcloud-Adminbereich verwendet dasselbe Formular; das serverseitige
+Verwaltungsrecht bleibt in beiden Fällen maßgeblich.
+
 - `scan_interval`: `hourly`, `daily` oder `weekly`.
 - `baseline_snapshot`: aktuell genehmigter Positivlistenstand.
 - `strict_mode`: neue/erweiterte Rechte werden strenger als nicht freigegeben bewertet.
@@ -137,22 +137,14 @@ Admin-Einstellungen:
 - `audit_retention_days`: Prüffrist für Auditprotokolle in Tagen, Standard
   `180`, zulässig `1` bis `3650`.
 
-Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
-Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
-Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
-Konfigurationsschlüssel geändert wird.
-
-Im Normalfall sollte die zuständige Beschäftigtenvertretung die Matrix lesen
-können. In Betrieben ist dies häufig der Betriebsrat, in Dienststellen der
-Personalrat; die Beispielgruppe `Betriebsrat` kann vollständig durch die real
-vorhandene Gruppe, etwa `Personalrat`, ersetzt werden. Ein IKT-Ausschuss und
-Datenschutzbeauftragte benötigen typischerweise Leserechte für technische
-Prüfung beziehungsweise datenschutzrechtliche Beratung, aber keine
-Konfigurations-, Scan- oder Baseline-Rechte. Diese administrativen Rechte
-sollten auf eine kleine zuständige Gruppe wie `IT-Administration` sowie
-native Nextcloud-Administrationskonten mit aktiver app-lokaler Freigabe
-begrenzt bleiben. Die Freigabe selbst steuert ausschließlich die kanonische
-Gruppe `Datenschutzbeauftragte`.
+Die Rechtezuordnung ist keine App-Konfiguration. Die kanonische
+BR-Mitgliedergruppe wird ausschließlich über den öffentlichen
+`OCA\LocalBase\PublicApi\V1\BrMembershipSnapshotService` aufgelöst. Nur ein
+aktivierter, kompatibler und gültiger Provider erteilt BR-Mitgliedern Zugriff
+auf Matrix, Exporte und manuelle Scans. Diese Leserechte können in der App
+nicht entfernt werden. Die feste native Gruppe `Datenschutzbeauftragte`
+erhält dieselben Rechte und darf zusätzlich Baselines sowie die technische
+App-Konfiguration verwalten.
 
 ### Native Nextcloud-Gruppenfreigaben
 
@@ -233,9 +225,9 @@ unabhängige Freigaben. Details und ein Integrationsbeispiel stehen in
 Die oben dokumentierte, versions- und releasegebundene Groupfolders-Quelle ist
 die einzige eng begrenzte Ausnahme von diesem öffentlichen Providerprinzip.
 
-Die Berechtigungsmatrix selbst liest ihre Viewer- und Admin-Gruppen direkt aus
-derselben `ConfigService`-Konfiguration, die der serverseitige `AccessService`
-erzwingt. Verwaltung umfasst Lesen; reine Viewer erhalten kein Verwaltungsrecht.
+Der serverseitige `AccessService` trennt BR-Identität, Datenschutzrolle,
+manuelles Scanrecht und Verwaltungsrecht. Weder Navigation noch gespeicherte
+freie Gruppennamen können Rechte erteilen.
 
 `occ`-Kommandos:
 
@@ -255,12 +247,12 @@ php occ permission-matrix:status
 - Die App schreibt nur in eigene Tabellen mit Prefix `flz_pm_*`.
 - Exporte enthalten standardmaessig keine Dateiinhalte, Passwoerter, Tokens, privaten Schluessel, Benutzerlisten oder personenbezogenen Dateipfade.
 - Unbekannte oder nicht unterstuetzte Rechtequellen werden nicht als erlaubt dargestellt.
-- Matrix, Snapshots und Exporte sind auf konfigurierte Viewer-/Admin-Gruppen
-  sowie Nextcloud-Admins mit aktiver app-lokaler Vollzugriffsfreigabe
-  beschraenkt.
-- Konfiguration, Baseline-Freigabe und manuelle Scans sind auf konfigurierte
-  Admin-Gruppen sowie Nextcloud-Admins mit aktiver app-lokaler
-  Vollzugriffsfreigabe beschraenkt. Die Freigabe gilt je Admin hoechstens 24
+- Matrix, Snapshots, Exporte und manuelle Scans sind auf die kanonische
+  BR-Mitgliedergruppe, `Datenschutzbeauftragte` sowie Nextcloud-Admins mit
+  aktiver app-lokaler Vollzugriffsfreigabe beschränkt.
+- Konfiguration und Baseline-Freigabe sind auf `Datenschutzbeauftragte` sowie
+  Nextcloud-Admins mit aktiver app-lokaler Vollzugriffsfreigabe beschränkt.
+  Die Freigabe gilt je Admin höchstens 24
   Stunden. Ausschliesslich Mitglieder der kanonischen Nextcloud-Gruppe
   `Datenschutzbeauftragte` koennen die Freigabehistorie in der Fachapp lesen
   sowie Freigaben fuer aktuelle Nextcloud-Administrationskonten erteilen und
