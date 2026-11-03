@@ -27,9 +27,6 @@ Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 - Die eigene PermissionProvider-Projektion bei jeder relevanten Weiterentwicklung
   gegen neue oder geänderte Berechtigungen und Scopes abgleichen.
-- Eine leere Gruppenbeschränkung als appweite Verfügbarkeit für jede erfasste
-  Gruppe behandeln; fehlende Detailabdeckung bleibt davon getrennt
-  `UNSUPPORTED`.
 - Files Access Control, externe Speicher und weitere öffentliche
   Files-Verträge als getrennte Quellen bewerten.
 - Metadaten und Rechte nur über öffentliche Files-Verträge erfassen;

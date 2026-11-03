@@ -25,9 +25,9 @@ assertContainsText(
     'Native Nextcloud permission sources need an explicit delivery stage.',
 );
 assertContainsText(
-    'leere Gruppenbeschränkung',
+    'Files Access Control, externe Speicher',
     $roadmap,
-    'An unrestricted app must be shown as available to every scanned group.',
+    'Incomplete native Files sources must remain an explicit delivery gate.',
 );
 assertContainsText(
     'OCP\\Calendar\\IManager',
