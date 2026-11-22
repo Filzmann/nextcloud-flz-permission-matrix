@@ -90,7 +90,7 @@ Wichtige Pruefungen:
 
 - Matrix, Snapshots, Exporte und manuelle Scans sind fuer Mitglieder der
   kanonischen BR-Mitgliedergruppe aus dem aktivierungs- und versionsgeprüften
-  öffentlichen LocalBase-V1-Vertrag sowie fuer die feste native Gruppe
+  öffentlichen flz_organization-V1-Vertrag sowie fuer die feste native Gruppe
   `Datenschutzbeauftragte` erlaubt. Fehlt der BR-Provider oder ist er
   deaktiviert, inkompatibel oder ungültig, entsteht daraus kein Zugriff.
 - BR-Leserechte sind nicht app-lokal konfigurierbar oder entziehbar.

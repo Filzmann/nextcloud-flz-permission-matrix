@@ -61,8 +61,8 @@ verdrängte Snapshotdaten.
 ## Gruppenfamilien
 
 Die Matrix deutet Rollen und Bereiche ausschließlich über
-`OCA\\LocalBase\\PublicApi\\V1` und dessen validierten, versionierten
-Organisationssnapshot. Interne LocalBase-Klassen gehören nicht zum
+`OCA\\FlzOrganization\\PublicApi\\V1` und dessen validierten, versionierten
+Organisationssnapshot. Interne flz_organization-Klassen gehören nicht zum
 Consumervertrag. Vertragsversion, Definitionsversion und Prüfsumme werden mit
 jedem Matrixsnapshot festgehalten.
 Für die Filzmann Assistenzplanung-Schemata `flz-ASN-<Kürzel>` und
@@ -75,24 +75,20 @@ Die Standardansicht sortiert Berechtigungen streng nach App. App-Abschnitte lass
 
 Die Teamansicht ordnet bekannte technische Gruppen verständlich, zum Beispiel
 `Team A1 · Assistenz`, während Rollen und Bereiche ihre fachlichen Labels aus
-LocalBase erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
+flz_organization erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
 N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team-
 und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu
 einem scheinbaren Einzelrecht verschmolzen.
 
-Fehlt LocalBase, ist sein Vertrag ungültig oder inkompatibel oder enthält er
+Fehlt flz_organization, ist sein Vertrag ungültig oder inkompatibel oder enthält er
 mehrdeutige Gruppenzuordnungen, bleibt der Scan verfügbar. Die Matrix zeigt
 dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
 speichert den konkreten Providerstatus im historischen Snapshot. Spätere
-Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Fresh Installs
-auf Nextcloud 34 sind sowohl ohne installierte LocalBase-App als auch mit dem
-realen V1-Provider geprüft. Zusätzlich bleiben Scan, Oberfläche und API bei
-Deaktivierung und Entfernung des Providers verfügbar. Die Wiederinstallation
-ist sowohl mit dem aktuellen V1-Stand als auch mit einem älteren LocalBase ohne
-V1-Service geprüft; der ältere Stand bleibt dabei kontrolliert `INCOMPATIBLE`.
-Das In-place-Update von LocalBase `0.12.0-dev.1` auf `0.12.0-dev.2` erhält die
-synthetische Organisationskonfiguration bytegenau und hält den Consumer
-verfügbar.
+Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Die
+app-lokalen Consumer-Contract-Tests decken einen gültigen Provider sowie
+fehlende, deaktivierte, inkompatible, ungültige und nicht verfügbare Zustände
+ab. Der reale Nextcloud-Lifecycle-Nachweis für Installation, Deaktivierung,
+Entfernung und Wiederinstallation steht als separates Runtime-Gate aus.
 
 ## Installation lokal
 
@@ -139,8 +135,9 @@ Verwaltungsrecht bleibt in beiden Fällen maßgeblich.
 
 Die Rechtezuordnung ist keine App-Konfiguration. Die kanonische
 BR-Mitgliedergruppe wird ausschließlich über den öffentlichen
-`OCA\LocalBase\PublicApi\V1\BrMembershipSnapshotService` aufgelöst. Nur ein
-aktivierter, kompatibler und gültiger Provider erteilt BR-Mitgliedern Zugriff
+`identityGroups['works_council_member']`-Eintrag desselben
+`OCA\FlzOrganization\PublicApi\V1`-Organisationssnapshots aufgelöst. Nur ein
+aktivierter, kompatibler und gültiger Snapshot erteilt BR-Mitgliedern Zugriff
 auf Matrix, Exporte und manuelle Scans. Diese Leserechte können in der App
 nicht entfernt werden. Die feste native Gruppe `Datenschutzbeauftragte`
 erhält dieselben Rechte und darf zusätzlich Baselines sowie die technische
@@ -274,7 +271,7 @@ MVP:
   konkrete Gruppenfreigaben mit getrennten R/W/C/D/S-Rechten.
 - Matrixansicht mit Filtern.
 - Semantische, per Pfeiltasten bedienbare Tabs und vollständiger Filter-Reset.
-- Versionierter LocalBase-Organisationssnapshot mit kontrolliertem
+- Versionierter flz_organization-Organisationssnapshot mit kontrolliertem
   `UNKNOWN`-Fallback.
 - Snapshot-Speicherung, Baseline und Diff-Grundlagen.
 - Background Job.

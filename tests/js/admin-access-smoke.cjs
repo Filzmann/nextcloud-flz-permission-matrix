@@ -32,9 +32,10 @@ const api = {
 class FormData {
     get(name) { return { enabled: 'on', targetUid: ' admin-target ', durationMinutes: '60' }[name]; }
 }
-vm.runInNewContext(readFileSync(join(__dirname, '..', '..', 'js', 'admin-access.js'), 'utf8'), {
+const filename = join(__dirname, '..', '..', 'js', 'admin-access.js');
+vm.runInNewContext(readFileSync(filename, 'utf8'), {
     window: { PermissionMatrix: { api } }, document, FormData, Date, Number, String,
-});
+}, { filename });
 
 (async () => {
     await new Promise(resolve => setImmediate(resolve));

@@ -8,7 +8,7 @@ namespace OCA\FlzPermissionMatrix\Service;
  * Erzeugt eine historische, verlustfreie Präsentationssicht auf rohe Nextcloud-Gruppen.
  *
  * Semantische Rollen und Bereiche stammen ausschließlich aus dem validierten
- * LocalBase-Organisationssnapshot. App-spezifische Filzmann Assistenzplanung-Teamfamilien werden nur dann
+ * flz_organization-Snapshot. App-spezifische Filzmann Assistenzplanung-Teamfamilien werden nur dann
  * ergänzt, wenn diese kanonische Organisationsquelle im selben Scan gültig war.
  */
 class GroupCatalogService {
@@ -56,7 +56,7 @@ class GroupCatalogService {
                     $group,
                     $semantic['prefix'] . ' · ' . $semantic['label'],
                     'group',
-                    'localbase',
+                    'flz_organization',
                     null,
                     [$group],
                     'KNOWN',

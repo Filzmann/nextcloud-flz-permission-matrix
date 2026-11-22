@@ -7,6 +7,17 @@ Architektur in `docs/architecture.md`.
 
 ## Nextcloud-Kompatibilitätsgate
 
+### BPM-ORGANIZATION-V1-LIFECYCLE – realen Provider-Lifecycle belegen
+
+Die app-lokalen Consumer-Contract-Tests für den öffentlichen
+`flz_organization`-V1-Vertrag sind vorhanden. Vor einer Auslieferung bleiben
+auf Nextcloud 34 ein Fresh Install mit und ohne Provider sowie Deaktivierung,
+Entfernung und Wiederinstallation zu prüfen. Matrix, Scan, Oberfläche und API
+müssen dabei verfügbar bleiben; ohne gültigen Provider bleiben semantische
+Gruppen `UNKNOWN` und BR-Zugriff verweigert. Der Lauf verändert den
+Nextcloud-/DDEV-Zustand und benötigt deshalb einen ausdrücklich beauftragten
+Runtime-Lauf.
+
 ### BPM-NC-COMPAT – RC-Kompatibilität und optionale Adapter getrennt belegen
 
 Die `min-version` muss beim Release Candidate die aktuelle, autoritativ

@@ -36,6 +36,7 @@ assertSameValue('role', $byKey['custom-eb']['semantic_type'], 'Canonical role me
 assertSameValue('eb', $byKey['custom-eb']['semantic_key'], 'Technical group IDs must not replace semantic role keys.');
 assertSameValue('Bereich · Büro Nord', $byKey['custom-area-north']['label'], 'Area labels must follow the canonical organization snapshot.');
 assertSameValue('KNOWN', $byKey['custom-area-north']['meaning_status'], 'Provider-backed group meaning must be marked as known.');
+assertSameValue('flz_organization', $byKey['custom-eb']['source_app'], 'Known semantic groups must name the standalone organization provider.');
 assertSameValue(
     ['flz-ASN-Team-mit-Bindestrich'],
     $byKey['flz-ASN-Team-mit-Bindestrich']['groups'],

@@ -14,11 +14,12 @@ aber weder Nextcloud-Rechte noch Konfigurationen anderer Apps.
   Permission-Provider gelesen. Native Nextcloud-Rechte und optionale
   Fremd-App-Adapter bleiben getrennte Quellen.
 - Semantische Rollen und Bereiche stammen ausschließlich aus
-  `OCA\\LocalBase\\PublicApi\\V1`. Die Matrix prüft App-Aktivierung und
+  `OCA\\FlzOrganization\\PublicApi\\V1`. Die Matrix prüft App-Aktivierung und
   Vertragsversion vor der Nutzung; das Provider-DTO verantwortet
   Gültigkeit, eindeutige Gruppenabbildungen und Prüfsumme.
-- Die für den App-Zugriff maßgebliche BR-Mitgliedergruppe stammt separat aus
-  `OCA\LocalBase\PublicApi\V1\BrMembershipSnapshotService`. Der Consumer
+- Die für den App-Zugriff maßgebliche BR-Mitgliedergruppe stammt aus dem
+  `identityGroups['works_council_member']`-Eintrag desselben
+  `OCA\FlzOrganization\PublicApi\V1`-Organisationssnapshots. Der Consumer
   prüft Aktivierung, Vertrags- und Definitionsversion sowie Gültigkeit; nur
   ein gültiger Stand darf die BR-Lese-, Export- und Scanrechte erteilen.
 - Fehlende, mehrdeutige oder inkompatible Quellen liefern `UNKNOWN`,
@@ -27,9 +28,9 @@ aber weder Nextcloud-Rechte noch Konfigurationen anderer Apps.
 - Die eng begrenzte Groupfolders-Ausnahme ist versionsgebunden und wird vor
   Releases gegen den offiziellen Quellstand geprüft.
 
-Der Matrixsnapshot hält den LocalBase-Status als `VALID`, `MISSING`,
+Der Matrixsnapshot hält den flz_organization-Status als `VALID`, `MISSING`,
 `INVALID`, `INCOMPATIBLE` oder `UNAVAILABLE` fest. Nur `VALID` liefert
-semantische Zuordnungen. LocalBase bleibt eine optionale Laufzeit-App; ihr
+semantische Zuordnungen. flz_organization bleibt eine optionale Laufzeit-App; ihr
 Fehlen verhindert weder Installation noch Scan oder Darstellung der
 Berechtigungsmatrix.
 

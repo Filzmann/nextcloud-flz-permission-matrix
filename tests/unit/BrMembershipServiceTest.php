@@ -2,126 +2,48 @@
 
 declare(strict_types=1);
 
-namespace OCP\App {
-    interface IAppManager {
-    }
+use OCA\FlzPermissionMatrix\Service\BrMembershipService;
+use OCA\FlzPermissionMatrix\Service\OrganizationSnapshotService;
+
+final class BrMembershipOrganizationSnapshot extends OrganizationSnapshotService {
+    public function __construct(private array $payload) {}
+    public function snapshot(): array { return $this->payload; }
 }
 
-namespace OCP {
-    final class Server {
-        public static mixed $service = null;
-        public static function get(string $name): mixed { return self::$service; }
-    }
+function brOrganizationSnapshot(
+    string $status = 'VALID',
+    array $identityGroups = ['works_council_member' => ['groupId' => 'BR-Kanonisch', 'label' => 'Betriebsratsmitglieder']],
+): array {
+    return [
+        'status' => $status,
+        'contract_version' => $status === 'VALID' ? '1.0' : '',
+        'definition_version' => $status === 'VALID' ? 5 : 0,
+        'checksum' => $status === 'VALID' ? 'organization-checksum' : '',
+        'roles' => [],
+        'areas' => [],
+        'identity_groups' => $identityGroups,
+        'warning' => $status === 'VALID' ? null : 'The organization provider is unavailable.',
+    ];
 }
 
-namespace Psr\Log {
-    interface LoggerInterface {
-        public function emergency($message, array $context = []): void;
-        public function alert($message, array $context = []): void;
-        public function critical($message, array $context = []): void;
-        public function error($message, array $context = []): void;
-        public function warning($message, array $context = []): void;
-        public function notice($message, array $context = []): void;
-        public function info($message, array $context = []): void;
-        public function debug($message, array $context = []): void;
-        public function log($level, $message, array $context = []): void;
-    }
+$valid = new BrMembershipService(new BrMembershipOrganizationSnapshot(brOrganizationSnapshot()));
+assertSameValue('VALID', $valid->snapshot()['status'], 'A valid organization snapshot must provide the canonical works-council membership identity.');
+assertSameValue('BR-Kanonisch', $valid->memberGroupId(), 'The canonical BR group must come from flz_organization.');
+
+foreach (['MISSING', 'INCOMPATIBLE', 'INVALID', 'UNAVAILABLE'] as $status) {
+    $failed = new BrMembershipService(new BrMembershipOrganizationSnapshot(brOrganizationSnapshot($status, [])));
+    assertSameValue($status, $failed->snapshot()['status'], "Organization provider state {$status} must remain fail-closed.");
+    assertSameValue(null, $failed->memberGroupId(), "Organization provider state {$status} must not authorize BR access.");
 }
 
-namespace {
-    use OCA\FlzPermissionMatrix\Service\BrMembershipService;
-    use OCA\LocalBase\PublicApi\V1\BrMembershipSnapshot;
-    use OCA\LocalBase\PublicApi\V1\BrMembershipSnapshotService as LocalBaseBrMembershipSnapshotService;
-    use OCP\App\IAppManager;
-    use OCP\Server;
-    use Psr\Log\LoggerInterface;
+$missingIdentity = new BrMembershipService(new BrMembershipOrganizationSnapshot(brOrganizationSnapshot(identityGroups: [])));
+assertSameValue('INVALID', $missingIdentity->snapshot()['status'], 'A valid organization snapshot without the canonical BR identity must fail closed.');
+assertSameValue(null, $missingIdentity->memberGroupId(), 'A missing identity mapping must not authorize BR access.');
 
-    final class BrMembershipTestApps implements IAppManager {
-    }
+$manipulatedIdentity = new BrMembershipService(new BrMembershipOrganizationSnapshot(brOrganizationSnapshot(identityGroups: [
+    'works_council_member' => ['groupId' => "BR\nInjected", 'label' => 'Betriebsratsmitglieder'],
+])));
+assertSameValue('INVALID', $manipulatedIdentity->snapshot()['status'], 'A manipulated group identity must fail closed.');
+assertSameValue(null, $manipulatedIdentity->memberGroupId(), 'A manipulated identity must not authorize BR access.');
 
-    final class BrMembershipEnabledApps implements IAppManager {
-        public function getEnabledApps(): array { return ['localbase']; }
-    }
-
-    final class BrMembershipTestLogger implements LoggerInterface {
-        public array $warnings = [];
-        public function emergency($message, array $context = []): void {}
-        public function alert($message, array $context = []): void {}
-        public function critical($message, array $context = []): void {}
-        public function error($message, array $context = []): void {}
-        public function warning($message, array $context = []): void { $this->warnings[] = [$message, $context]; }
-        public function notice($message, array $context = []): void {}
-        public function info($message, array $context = []): void {}
-        public function debug($message, array $context = []): void {}
-        public function log($level, $message, array $context = []): void {}
-    }
-
-    final class BrMembershipTestService extends BrMembershipService {
-        public function __construct(
-            private bool $enabled,
-            private mixed $providerSnapshot,
-            BrMembershipTestLogger $logger,
-        ) {
-            parent::__construct(new BrMembershipTestApps(), $logger);
-        }
-
-        protected function isProviderEnabled(): bool {
-            return $this->enabled;
-        }
-
-        protected function readProviderSnapshot(): object {
-            if ($this->providerSnapshot instanceof \Throwable) {
-                throw $this->providerSnapshot;
-            }
-            if ($this->providerSnapshot === null) {
-                throw new UnexpectedValueException('synthetic incompatible provider');
-            }
-            return $this->providerSnapshot;
-        }
-    }
-
-    $validSnapshot = new BrMembershipSnapshot(true, 1, 4, 'BR-Kanonisch');
-    $logger = new BrMembershipTestLogger();
-    Server::$service = new LocalBaseBrMembershipSnapshotService($validSnapshot);
-    $resolved = (new BrMembershipService(new BrMembershipEnabledApps(), $logger))->snapshot();
-    assertSameValue('VALID', $resolved['status'], 'The enabled public V1 BR service must be resolved lazily through the Nextcloud container.');
-    assertSameValue('BR-Kanonisch', $resolved['member_group_id'], 'The canonical BR member group must come from LocalBase.');
-
-    $valid = (new BrMembershipTestService(true, $validSnapshot, $logger))->snapshot();
-    assertSameValue('VALID', $valid['status'], 'A matching and valid provider snapshot must authorize the canonical BR identity.');
-    assertSameValue('1.0', $valid['contract_version'], 'The public BR contract version must be checked.');
-    assertSameValue(1, $valid['definition_version'], 'The supported BR definition version must be checked.');
-    assertSameValue(4, $valid['definition_revision'], 'The persisted BR definition revision must be recorded.');
-
-    $missing = (new BrMembershipTestService(false, $validSnapshot, new BrMembershipTestLogger()))->snapshot();
-    assertSameValue('MISSING', $missing['status'], 'A disabled LocalBase provider must fail closed.');
-    assertSameValue(null, $missing['member_group_id'], 'A disabled provider must not contribute BR identity.');
-
-    $incompatible = new class {
-        public function contractVersion(): string { return '2.0'; }
-        public function isValid(): bool { return true; }
-        public function definitionVersion(): int { return 1; }
-        public function definitionRevision(): int { return 1; }
-        public function memberGroupId(): ?string { return 'BR-Kanonisch'; }
-        public function checksum(): string { return 'incompatible'; }
-    };
-    $incompatibleResult = (new BrMembershipTestService(true, $incompatible, new BrMembershipTestLogger()))->snapshot();
-    assertSameValue('INCOMPATIBLE', $incompatibleResult['status'], 'An incompatible public contract version must fail closed.');
-    assertSameValue(null, $incompatibleResult['member_group_id'], 'An incompatible provider must not authorize BR access.');
-
-    $invalid = (new BrMembershipTestService(
-        true,
-        new BrMembershipSnapshot(false, 1, 0, null),
-        new BrMembershipTestLogger(),
-    ))->snapshot();
-    assertSameValue('INVALID', $invalid['status'], 'An invalid BR definition must fail closed.');
-
-    $failedLogger = new BrMembershipTestLogger();
-    $failed = (new BrMembershipTestService(true, new RuntimeException('private provider detail'), $failedLogger))->snapshot();
-    assertSameValue('UNAVAILABLE', $failed['status'], 'Unexpected provider failures need a stable fail-closed state.');
-    assertSameValue(null, $failed['member_group_id'], 'A failed provider must not authorize BR access.');
-    assertSameValue(1, count($failedLogger->warnings), 'Unexpected provider failures must be diagnosable.');
-    assertSameValue(false, str_contains((string)$failed['warning'], 'private provider detail'), 'Private provider failure details must not reach users.');
-
-    echo 'BrMembershipService tests passed' . PHP_EOL;
-}
+echo 'BrMembershipService tests passed' . PHP_EOL;

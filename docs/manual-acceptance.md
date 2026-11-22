@@ -84,6 +84,27 @@ Begründung verpflichtend.
 | E8 | DPO-gesteuerte Adminfreigabe | Mit Datenschutzbeauftragten-Konto ohne nativen Adminstatus Historie lesen, einem aktuellen Test-Admin maximal 24 Stunden Zugriff erteilen und widerrufen; dieselben Requests als nativer Admin allein, gewöhnliches Konto und mit manipuliertem Ziel wiederholen. | Nur die Datenschutzrolle kann steuern; ungültige und unberechtigte Fälle bleiben mutationsfrei, Schreibrequests ohne CSRF-Token werden abgewiesen, und die Freigabehistorie nennt Beginn, Ende sowie handelnde UIDs. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 
+## Automatisierter Integrationsnachweis vom 17. November 2026
+
+Der öffentliche `flz_organization`-V1-Consumer wurde mit einem gültigen
+synthetischen Snapshot über die unveränderte Providerauflösung geprüft. Der
+vorherige Adapter aus dem geprüften Git-Stand verwendete weiterhin LocalBase
+und scheiterte mit Exit 255 an der erwarteten Organisations- und BR-Identität;
+der aktuelle Adapter bestand mit Exit 0. Die app-lokalen Tests decken zusätzlich
+fehlende, ungültige, inkompatible und fehlerhafte Provider sowie manipulierte
+Gruppenkennungen ohne Rechtefreigabe ab.
+
+In der lokalen Nextcloud lieferten die real über `OCP\\Server` aufgelösten
+Organisations- und BR-Mitgliedschaftsdienste jeweils `VALID`. Dieser Nachweis
+prüft Dependency Injection und die aktuellen Providerdaten, aber weder den
+Browser noch eine Neuinstallation oder den vollständigen Provider-Lifecycle.
+Die weiterhin offene Lifecycle-Aufgabe bleibt in `ROADMAP.md` benannt.
+
+Der ursprüngliche zeitliche Red–Green-Ablauf der übernommenen Adapteränderung
+ist nicht rekonstruierbar. Die nachträglich reproduzierte Verhaltensregression
+und die Runtime-Probe sichern den aktuellen Stand; die fehlende historische
+Reihenfolge bleibt ausdrücklich eine begründete TDD-Abweichung.
+
 ## Abschlussentscheidung
 
 | Feld | Eintrag |

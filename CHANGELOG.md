@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+- Organisationsproviderfehler werden mit ihrer technischen Exceptionklasse
+  protokolliert; Exceptionobjekt und interne Details gelangen nicht ins Log.
+  Der bestehende Verhaltenstest wurde dafür zuerst rot und nach der Korrektur
+  grün ausgeführt.
+- Der Adminzugriffs-Smoke ordnet seine VM-Ausführung über den absoluten Pfad
+  der gelesenen JavaScript-Datei der Coverage zu.
 - Organisationsidentität und App-Rechte sind getrennt: Die kanonische
-  BR-Mitgliedergruppe aus dem öffentlichen LocalBase-V1-Vertrag erhält
+  BR-Mitgliedergruppe aus dem öffentlichen
+  `OCA\\FlzOrganization\\PublicApi\\V1`-Organisationssnapshot erhält
   unveränderlich Matrix-, Export- und manuelle Scanrechte;
   `Datenschutzbeauftragte` erhalten zusätzlich Baseline- und
   Konfigurationsrechte. Fehlende, deaktivierte, inkompatible oder ungültige
@@ -28,17 +35,14 @@
 - App-eigenen Processing-Metadata-Katalog für Snapshot/Matrix, Export, Audit
   und temporäre Adminfreigaben über den optionalen V1-Vertrag des
   Datenschutz-Centers veröffentlicht.
-- Organisationsconsumer auf `OCA\\LocalBase\\PublicApi\\V1` umgestellt und
-  fehlende, ungültige sowie inkompatible Provider weiterhin fail-closed
-  behandelt.
-- Die optionale Providerklasse wird erst nach Aktivierungs- und Klassenprüfung
-  über `OCP\\Server` aufgelöst. Damit bleibt auch ein aktivierter älterer
-  LocalBase-Stand ohne V1-Service kontrolliert inkompatibel.
-- Fresh Install und Runtime auf Nextcloud 34 mit und ohne LocalBase geprüft.
-- Deaktivierung, Entfernung und Wiederinstallation des aktuellen V1-Providers
-  sowie eines älteren LocalBase-Stands ohne V1 auf Nextcloud 34 geprüft.
-- In-place-Update von LocalBase `0.12.0-dev.1` auf `0.12.0-dev.2` mit
-  unverändertem synthetischem Organisationszustand geprüft.
+- Organisationsconsumer vom bisherigen LocalBase-Vertrag auf den öffentlichen
+  `OCA\\FlzOrganization\\PublicApi\\V1`-Vertrag umgestellt. Semantische Rollen,
+  Bereiche und die kanonische BR-Mitgliedergruppe stammen damit aus demselben
+  validierten Snapshot.
+- Die optionale Providerklasse wird erst nach Aktivierungs-, Versions- und
+  Klassenprüfung über `OCP\\Server` aufgelöst. Fehlende, deaktivierte,
+  inkompatible, ungültige und nicht verfügbare Providerzustände bleiben
+  kontrolliert und erteilen keine BR-Rechte.
 - Standalone-Testlauf von benachbarten Repositories entkoppelt, JavaScript-
   Tests für ESM-Hostprojekte als CommonJS gekennzeichnet und das
   Groupfolders-Quellgate um einen `grep`-Fallback für Images ohne `rg`

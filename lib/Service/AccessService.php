@@ -13,7 +13,7 @@ use OCP\IUserSession;
  *
  * Zusammenspiel:
  * - Controller prüfen hier vor jedem Datenzugriff; Navigation nutzt dieselbe Regel nur für
- *   die Sichtbarkeit. LocalBase liefert ausschließlich die kanonische BR-Identität.
+ *   die Sichtbarkeit. flz_organization liefert ausschließlich die kanonische BR-Identität.
  *
  * Vertrag:
  * - Deny by default: anonyme und nicht zugeordnete Nutzer*innen erhalten keinen Zugriff.
