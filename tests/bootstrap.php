@@ -9,7 +9,7 @@ spl_autoload_register(static function(string $class) use ($appRoot): void {
         'OCA\\FlzPermissionMatrix\\Tests\\' => $appRoot . '/tests/',
         'OCA\\FlzPermissionMatrix\\' => $appRoot . '/lib/',
         'OCA\\FlzDataProtection\\' => $appRoot . '/tests/stubs/FlzDataProtection/',
-        'OCA\\LocalBase\\' => $appRoot . '/tests/stubs/LocalBase/',
+        'OCA\\FlzOrganization\\' => $appRoot . '/tests/stubs/FlzOrganization/',
     ];
     foreach ($prefixes as $prefix => $directory) {
         if (!str_starts_with($class, $prefix)) {

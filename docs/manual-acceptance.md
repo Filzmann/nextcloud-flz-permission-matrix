@@ -20,7 +20,7 @@ Testgruppen, synthetische Snapshots und redigierte Belege verwenden.
 | Nextcloud-Version | |
 | Browser und Version | |
 | Fenstergröße / Zoom | |
-| Neutrale Viewer-, Admin- und Deny-Konten | |
+| Neutrale BR-, Datenschutz-, Admin- und Deny-Konten | |
 | Getesteter Snapshot / Baseline | |
 
 Ergebniskennzeichnung: `[ ] erfolgreich` / `[ ] nicht erfolgreich` /
@@ -31,8 +31,8 @@ Begründung verpflichtend.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| A1 | Viewer-Zugriff | Mit einem Konto aus einer konfigurierten Viewer-Gruppe die App öffnen und vorhandene Snapshots ansehen. | Matrix und erlaubte Exporte sind sichtbar; Verwaltungsaktionen fehlen oder sind nicht ausführbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A2 | Matrix-Admin | Mit einem Konto aus einer konfigurierten Admin-Gruppe die App öffnen, einen Scan starten und eine Baseline setzen. | Die vorgesehenen Verwaltungsaktionen sind serverseitig erlaubt und nachvollziehbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A1 | BR-Zugriff | Mit einem Konto aus der kanonischen BR-Mitgliedergruppe die App öffnen, exportieren und einen manuellen Scan starten. | Matrix, erlaubte Exporte und Scan sind verfügbar; Baseline und Konfiguration bleiben serverseitig verweigert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A2 | Datenschutzverwaltung | Mit einem Konto aus `Datenschutzbeauftragte` die App öffnen, einen Scan starten, eine Baseline setzen und die Konfiguration ändern. | Die sechs getrennten Rechte werden wie vorgesehen serverseitig erlaubt und nachvollziehbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A3 | Nextcloud-Admin | Dieselben Verwaltungswege zuerst ohne und danach mit aktiver app-lokaler Freigabe prüfen. | Nativer Adminstatus allein legt keine Matrixdaten offen; erst die höchstens 24 Stunden gültige, UID-genaue Freigabe erlaubt den vorgesehenen fachlichen Zugriff. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A4 | Nicht berechtigtes Konto | App, Snapshot, Export und Scan mit einem Konto außerhalb aller erlaubten Gruppen direkt aufrufen. | Alle Wege werden serverseitig verweigert; keine Matrixdaten werden offengelegt und kein Scan gestartet. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A5 | Keine Rechteänderung | Vor und nach Scan, Filterung, Baseline und Export eine vorbereitete Nextcloud-Berechtigung vergleichen. | Die Quellberechtigung bleibt unverändert; die App schreibt ausschließlich ihre eigenen Matrixdaten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
@@ -42,7 +42,7 @@ Begründung verpflichtend.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| B1 | Manueller Scan | Mit Verwaltungsrecht einen Scan starten und nach Abschluss Übersicht, Apps, Gruppen und Snapshotliste öffnen. | Ein neuer Snapshot erscheint mit konsistenten Zählwerten und verständlichem Status. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B1 | Manueller Scan | Mit BR- oder Datenschutzrecht einen Scan starten und nach Abschluss Übersicht, Apps, Gruppen und Snapshotliste öffnen. | Ein neuer Snapshot erscheint mit konsistenten Zählwerten und verständlichem Status. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B2 | Nicht unterstützte App | Eine aktivierte App ohne Detailadapter in den Scan aufnehmen. | Sie wird als `UNSUPPORTED` beziehungsweise mit fehlender Detailabdeckung sichtbar und niemals still als freigegeben dargestellt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B3 | Unklare Quelle | Eine ausschließlich für Tests vorbereitete nicht eindeutig auslesbare Rechtequelle prüfen. | Die betroffenen Werte erscheinen als `UNKNOWN`; aus Unsicherheit entsteht keine Freigabe. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B4 | App-Sortierung und Klappen | Apps einzeln sowie gemeinsam ein- und ausklappen. | Matrixzeilen bleiben streng nach App gegliedert; Klappen verändert nur die Darstellung. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
@@ -58,7 +58,7 @@ Begründung verpflichtend.
 | C2 | Erweiterte Berechtigung | Eine neutrale Testberechtigung in der Quelle erweitern, neu scannen und den Diff öffnen. | Die Erweiterung wird gegenüber der Baseline sichtbar und nicht als unverändert dargestellt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C3 | Entfernte Berechtigung | Die Testberechtigung wieder entfernen und erneut scannen. | Die Entfernung wird mit korrekter Richtung ausgewiesen; historische Snapshots bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C4 | Strict Mode | Strict Mode aktivieren und einen neuen oder nicht vollständig adaptergestützten Wert scannen. | Der Wert wird compliance-relevant beziehungsweise nicht freigegeben bewertet, nicht still akzeptiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| C5 | Unberechtigte Baseline | Als reines Viewer-Konto eine Baseline über UI und direkten Request setzen. | Beide Wege werden abgewiesen; die bestehende Baseline bleibt unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| C5 | Unberechtigte Baseline | Als BR-Mitglied eine Baseline über UI und direkten Request setzen. | Beide Wege werden abgewiesen; die bestehende Baseline bleibt unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## D. Exporte und Datenschutz
 
@@ -75,14 +75,35 @@ Begründung verpflichtend.
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
 | E1 | Auditierbare Aktionen | App-Aufruf, Export, Scan und Baseline-Aktion mit neutralen Konten ausführen und den Auditstand administrativ prüfen. | Zeitpunkt, Benutzer-ID, Aktion, Export-Flag und gegebenenfalls Snapshot-ID werden erfasst, ohne sensible Inhalte zu protokollieren. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| E2 | Adminvalidierung | Ungültige Gruppen, Scanintervalle, Aufbewahrungswerte und Exportformate speichern. | Ungültige Werte werden verständlich abgewiesen; es entsteht keine Teilkonfiguration. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| E2 | Adminvalidierung | Manipulierte `viewer_groups`-/`admin_groups`-Parameter direkt an den Speicherendpunkt senden und Scanintervalle, Aufbewahrungswerte sowie Exportformate ungültig setzen. | Freie Gruppenparameter verändern die feste BR-/Datenschutz-Zuordnung nicht; ungültige technische Werte werden verständlich und ohne Teilkonfiguration abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E3 | CSRF-Schutz | Einen schreibenden Scan-, Baseline- oder Konfigurationsrequest ohne gültiges Requesttoken senden. | Der Request wird abgewiesen und verändert keinen Zustand. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E4 | Tastatur und Fokus | Tabs, Filter, Klappsteuerung, Matrix, Snapshotliste und Adminformular nur mit Tastatur bedienen. | Alle Funktionen sind erreichbar, Fokus ist sichtbar und Status wird nicht ausschließlich farblich vermittelt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| E5 | Große Matrix | Viele Apps und Gruppen bei kleinem Fenster anzeigen und in beide Richtungen scrollen. | Matrix und Snapshotliste bleiben innerhalb ihrer Wrapper bedienbar; Kopf- und Kontextinformationen bleiben verständlich. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| E5 | Große Matrix und dauerhaft erreichbarer Horizontal-Track | Eine Matrix mit vielen Apps und Gruppen bei höchstens 360 CSS-Pixel Breite und 200&nbsp;% Zoom öffnen. Vertikal bis in eine tiefe Matrixzeile scrollen; prüfen, dass der Horizontal-Track am unteren sichtbaren Rand des Matrix-Viewports bleibt. Den Track per Tab fokussieren und mit Tastatur horizontal bewegen; danach am App-Root vertikal weiter scrollen. Beide Scrollrichtungen abwechselnd verwenden und die fixierte Tabellenkopfzeile sowie die erste Kontextspalte prüfen. | Der fokussierte Track ist sichtbar markiert und bleibt bei horizontalem Überlauf erreichbar, ohne einen vertikalen Scrollbereich zu erzeugen. Horizontaler Track und Tabellenwrapper bleiben synchron; der App-Root bleibt vertikal bedienbar. Tabellenkopf und Kontextspalte bleiben beim kombinierten Scrollen verständlich. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E6 | Datensparsame Abnahme | Formular, Screenshots, Exporte und Auditbelege prüfen. | Es wurden nur synthetische beziehungsweise redigierte Daten dokumentiert; keine Secrets oder Dateiinhalte sind enthalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E7 | Datenschutz-REVIEW-Fristen | Für Exportmetadaten und Auditprotokolle unterschiedliche Fristen speichern und die Art.-15-Auskunft mit synthetischen alten Datensätzen öffnen. | Beide Werte bleiben unabhängig erhalten; fällige Datensätze erscheinen als `REVIEW erforderlich`, ohne dass ein Datensatz gelöscht wird. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | E8 | DPO-gesteuerte Adminfreigabe | Mit Datenschutzbeauftragten-Konto ohne nativen Adminstatus Historie lesen, einem aktuellen Test-Admin maximal 24 Stunden Zugriff erteilen und widerrufen; dieselben Requests als nativer Admin allein, gewöhnliches Konto und mit manipuliertem Ziel wiederholen. | Nur die Datenschutzrolle kann steuern; ungültige und unberechtigte Fälle bleiben mutationsfrei, Schreibrequests ohne CSRF-Token werden abgewiesen, und die Freigabehistorie nennt Beginn, Ende sowie handelnde UIDs. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
+
+## Automatisierter Integrationsnachweis vom 17. November 2026
+
+Der öffentliche `flz_organization`-V1-Consumer wurde mit einem gültigen
+synthetischen Snapshot über die unveränderte Providerauflösung geprüft. Der
+vorherige Adapter aus dem geprüften Git-Stand verwendete weiterhin LocalBase
+und scheiterte mit Exit 255 an der erwarteten Organisations- und BR-Identität;
+der aktuelle Adapter bestand mit Exit 0. Die app-lokalen Tests decken zusätzlich
+fehlende, ungültige, inkompatible und fehlerhafte Provider sowie manipulierte
+Gruppenkennungen ohne Rechtefreigabe ab.
+
+In der lokalen Nextcloud lieferten die real über `OCP\\Server` aufgelösten
+Organisations- und BR-Mitgliedschaftsdienste jeweils `VALID`. Dieser Nachweis
+prüft Dependency Injection und die aktuellen Providerdaten, aber weder den
+Browser noch eine Neuinstallation oder den vollständigen Provider-Lifecycle.
+Die weiterhin offene Lifecycle-Aufgabe bleibt in `ROADMAP.md` benannt.
+
+Der ursprüngliche zeitliche Red–Green-Ablauf der übernommenen Adapteränderung
+ist nicht rekonstruierbar. Die nachträglich reproduzierte Verhaltensregression
+und die Runtime-Probe sichern den aktuellen Stand; die fehlende historische
+Reihenfolge bleibt ausdrücklich eine begründete TDD-Abweichung.
 
 ## Abschlussentscheidung
 
@@ -91,7 +112,7 @@ Begründung verpflichtend.
 | Anzahl erfolgreich | |
 | Anzahl nicht erfolgreich | |
 | Anzahl nicht geprüft | |
-| Kritische Abweichungen / Ticketreferenzen | E5: Die horizontale Scrollleiste war nicht dauerhaft im sichtbaren Matrixbereich erreichbar; siehe `BPM-MATRIX-SCROLL` in `ROADMAP.md`. |
+| Kritische Abweichungen / Ticketreferenzen | |
 | Erneute Prüfung erforderlich bis | |
 | Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [ ] nicht abgenommen |
 | Begründung der Gesamtentscheidung | |

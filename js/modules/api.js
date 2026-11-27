@@ -1,4 +1,6 @@
 (function() {
+    const translate = (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t : (_app, text, params) => Object.entries(params || {}).reduce((s, [k, v]) => s.split('{' + k + '}').join(String(v)), text)
+
     const base = '/apps/flz_permission_matrix';
 
     function url(path) {
@@ -17,7 +19,7 @@
         const response = await fetch(url(path), { credentials: 'same-origin', ...options, headers });
         const data = await response.json();
         if (!response.ok || data.ok === false) {
-            throw new Error(data.message || 'Request failed');
+            throw new Error(data.message || translate('flz_permission_matrix', 'Anfrage fehlgeschlagen'));
         }
 
         return data;

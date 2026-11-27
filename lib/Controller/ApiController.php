@@ -24,6 +24,7 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\Response;
+use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -48,9 +49,16 @@ class ApiController extends Controller {
         private ExportService $exports,
         private ExportMapper $exportLog,
         private AuditLogService $auditLog,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private ?IL10N $l10n = null,
     ) {
         parent::__construct(Application::APP_ID, $request);
+    }
+
+    /** Lokalisierung fachlicher Texte; im Test ohne IL10N identity. */
+    private function t(string $text): string
+    {
+        return $this->l10n?->t($text) ?? $text;
     }
 
     #[NoAdminRequired]
@@ -64,6 +72,7 @@ class ApiController extends Controller {
                 'ok' => true,
                 'snapshot' => $latest?->toArray(),
                 'baseline_snapshot' => $this->baseline->currentBaselineId(),
+                'can_scan' => $this->access->canScanCurrentUser(),
                 'can_manage' => $this->access->canManageCurrentUser(),
                 'export_formats' => $this->exports->allowedFormats(),
             ];
@@ -72,7 +81,7 @@ class ApiController extends Controller {
 
     #[NoAdminRequired]
     public function scan(): DataResponse {
-        return $this->respondManage('api.scan', function(): array {
+        return $this->respondScan('api.scan', function(): array {
             $snapshot = $this->scanner->scan($this->access->currentUserId());
             $this->auditLog->record('api.scan', false, $snapshot->snapshotId());
 
@@ -146,7 +155,7 @@ class ApiController extends Controller {
             $snapshot = $snapshotId === null ? $this->snapshots->latest() : $this->snapshots->find($snapshotId);
             if ($snapshot === null) {
                 $this->auditLog->record('api.export.not_found');
-                return new DataResponse(['ok' => false, 'message' => 'Snapshot nicht gefunden.'], Http::STATUS_NOT_FOUND);
+                return new DataResponse(['ok' => false, 'message' => $this->t('Snapshot nicht gefunden.')], Http::STATUS_NOT_FOUND);
             }
             $export = $this->exports->export($snapshot, $format);
             $this->exportLog->insert($snapshot->snapshotId(), $this->access->currentUserId(), $format, $export['filename'], strlen($export['content']));
@@ -155,18 +164,18 @@ class ApiController extends Controller {
             return new DataDownloadResponse($export['content'], $export['filename'], $export['content_type']);
         } catch (ExportFormatNotAllowedException $e) {
             $this->auditLog->record('api.export.denied', false, null, ['reason' => 'format_disabled']);
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
         } catch (InvalidArgumentException $e) {
             $this->auditLog->record('api.export.rejected', false, null, ['reason' => 'invalid_format']);
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_BAD_REQUEST);
         } catch (AccessDeniedException $e) {
             $this->auditLog->record('api.export.denied');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
         } catch (\Throwable $e) {
             $this->auditLog->record('api.export.failed');
-            $this->logger->error('Permission matrix export failed', ['app' => Application::APP_ID, 'exception' => $e]);
+            $this->logger->error('Export der Berechtigungsmatrix fehlgeschlagen', ['app' => Application::APP_ID, 'exception' => $e]);
 
-            return new DataResponse(['ok' => false, 'message' => 'Export konnte nicht erzeugt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new DataResponse(['ok' => false, 'message' => $this->t('Export konnte nicht erzeugt werden.')], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -177,15 +186,15 @@ class ApiController extends Controller {
             return new DataResponse($callback());
         } catch (AccessDeniedException $e) {
             $this->auditLog->record($action . '.denied');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
         } catch (DomainException $e) {
             $this->auditLog->record($action . '.not_found');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_NOT_FOUND);
         } catch (\Throwable $e) {
             $this->auditLog->record($action . '.failed');
-            $this->logger->error('Permission matrix API failed', ['app' => Application::APP_ID, 'exception' => $e]);
+            $this->logger->error('API der Berechtigungsmatrix fehlgeschlagen', ['app' => Application::APP_ID, 'exception' => $e]);
 
-            return new DataResponse(['ok' => false, 'message' => 'Aktion konnte nicht ausgefuehrt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new DataResponse(['ok' => false, 'message' => $this->t('Aktion konnte nicht ausgefuehrt werden.')], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -196,15 +205,31 @@ class ApiController extends Controller {
             return new DataResponse($callback());
         } catch (AccessDeniedException $e) {
             $this->auditLog->record($action . '.denied');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
         } catch (DomainException $e) {
             $this->auditLog->record($action . '.not_found');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_NOT_FOUND);
         } catch (\Throwable $e) {
             $this->auditLog->record($action . '.failed');
-            $this->logger->error('Permission matrix API failed', ['app' => Application::APP_ID, 'exception' => $e]);
+            $this->logger->error('API der Berechtigungsmatrix fehlgeschlagen', ['app' => Application::APP_ID, 'exception' => $e]);
 
-            return new DataResponse(['ok' => false, 'message' => 'Aktion konnte nicht ausgefuehrt werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new DataResponse(['ok' => false, 'message' => $this->t('Aktion konnte nicht ausgefuehrt werden.')], Http::STATUS_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private function respondScan(string $action, callable $callback): DataResponse {
+        try {
+            $this->access->assertCanScan();
+
+            return new DataResponse($callback());
+        } catch (AccessDeniedException $e) {
+            $this->auditLog->record($action . '.denied');
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
+        } catch (\Throwable $e) {
+            $this->auditLog->record($action . '.failed');
+            $this->logger->error('Scan der Berechtigungsmatrix fehlgeschlagen', ['app' => Application::APP_ID, 'exception' => $e]);
+
+            return new DataResponse(['ok' => false, 'message' => $this->t('Scan konnte nicht ausgeführt werden.')], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }

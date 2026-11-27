@@ -23,7 +23,7 @@ final class PermissionMatrixRetentionProvider implements RetentionProvider {
     public function __construct(private RetentionReviewRepository $records, private ConfigService $config) {}
 
     public function descriptor(): RetentionProviderDescriptor {
-        return new RetentionProviderDescriptor(AppId::VALUE, 'Filzmann Permission Matrix', '1.0', self::MAX_PAGE_SIZE);
+        return new RetentionProviderDescriptor(AppId::VALUE, 'Filzmann Berechtigungsmatrix', '1.0', self::MAX_PAGE_SIZE);
     }
 
     public function policies(): array {
@@ -37,7 +37,7 @@ final class PermissionMatrixRetentionProvider implements RetentionProvider {
         [$source, $days] = match ($request->policyId()) {
             'export-metadata-review' => ['export', $this->config->exportMetadataRetentionDays()],
             'audit-log-review' => ['audit', $this->config->auditRetentionDays()],
-            default => throw new InvalidArgumentException('Unknown Permission Matrix retention policy.'),
+            default => throw new InvalidArgumentException('Unbekannte Retention-Richtlinie der Berechtigungsmatrix.'),
         };
         $offset = $this->offset($request->cursor(), $request->policyId(), $request->evaluatedAt());
         $limit = min($request->limit(), self::MAX_PAGE_SIZE);
@@ -71,7 +71,7 @@ final class PermissionMatrixRetentionProvider implements RetentionProvider {
         $decoded = base64_decode(strtr($cursor . str_repeat('=', $padding), '-_', '+/'), true);
         $state = $decoded === false ? null : json_decode($decoded, true);
         if (!is_array($state) || ($state['policyId'] ?? null) !== $policyId || ($state['evaluatedAt'] ?? null) !== $evaluatedAt || !is_int($state['offset'] ?? null) || $state['offset'] < 1 || $state['offset'] > self::MAX_OFFSET) {
-            throw new InvalidArgumentException('Invalid Permission Matrix retention cursor.');
+            throw new InvalidArgumentException('Ungültiger Retention-Cursor der Berechtigungsmatrix.');
         }
         return $state['offset'];
     }

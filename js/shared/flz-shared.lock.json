@@ -1,0 +1,14 @@
+{
+    "schema": 1,
+    "component": "browser",
+    "app_id": "flz_permission_matrix",
+    "app_namespace": "FlzPermissionMatrix",
+    "browser_global": "window.OCA.FlzPermissionMatrix.Shared",
+    "packages": {
+        "browser": {
+            "name": "@filzmann/shared-browser",
+            "version": "0.1.0",
+            "sha256": "1c40294520dbfc9fd82c6696075ee14a65b0c9798fad05797ba00bebbe34a4d7"
+        }
+    }
+}

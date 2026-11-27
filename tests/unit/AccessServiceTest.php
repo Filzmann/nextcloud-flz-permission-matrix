@@ -21,7 +21,7 @@ namespace OCA\FlzPermissionMatrix\Service { interface TemporaryAdminAccessChecke
 namespace {
     use OCA\FlzPermissionMatrix\Exception\AccessDeniedException;
     use OCA\FlzPermissionMatrix\Service\AccessService;
-    use OCA\FlzPermissionMatrix\Service\ConfigService;
+    use OCA\FlzPermissionMatrix\Service\BrMembershipService;
     use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessChecker;
     use OCP\IGroupManager;
     use OCP\IUser;
@@ -58,42 +58,38 @@ namespace {
         }
     }
 
-    class AccessTestConfig extends ConfigService {
-        public function __construct() {
-        }
-
-        public function viewerGroups(): array {
-            return ['Matrix-Viewer'];
-        }
-
-        public function adminGroups(): array {
-            return ['Matrix-Admin'];
-        }
+    class AccessTestBrMembership extends BrMembershipService {
+        public function __construct(private ?string $memberGroupId) {}
+        public function memberGroupId(): ?string { return $this->memberGroupId; }
     }
 
-    function accessServiceFor(?string $uid, bool $activeGrant = false): AccessService {
+    function accessServiceFor(?string $uid, bool $activeGrant = false, ?string $brGroupId = 'BR-Kanonisch'): AccessService {
         return new AccessService(
             new AccessTestSession($uid === null ? null : new AccessTestUser($uid)),
             new AccessTestGroups(
                 ['cloud-admin'],
                 [
-                    'viewer' => ['Matrix-Viewer'],
-                    'app-admin' => ['Matrix-Admin'],
+                    'br-member' => ['BR-Kanonisch'],
+                    'dpo' => ['Datenschutzbeauftragte'],
                     'other' => ['Unrelated'],
                 ]
             ),
-            new AccessTestConfig(),
+            new AccessTestBrMembership($brGroupId),
             new class($activeGrant) implements TemporaryAdminAccessChecker { public function __construct(private bool $active) {} public function hasActiveGrant(string $uid): bool { return $this->active; } }
         );
     }
 
     assertSameValue(false, accessServiceFor(null)->canViewCurrentUser(), 'Anonymous sessions must be denied.');
-    assertSameValue(true, accessServiceFor('viewer')->canViewCurrentUser(), 'Configured viewer groups may read the matrix.');
-    assertSameValue(false, accessServiceFor('viewer')->canManageCurrentUser(), 'Viewer groups must not gain management rights.');
-    assertSameValue(true, accessServiceFor('app-admin')->canManageCurrentUser(), 'Configured app admins may manage the matrix.');
-    assertSameValue(true, accessServiceFor('app-admin')->canViewCurrentUser(), 'Management rights include read access.');
+    assertSameValue(true, accessServiceFor('br-member')->canViewCurrentUser(), 'Canonical BR members must be able to read the matrix.');
+    assertSameValue(true, accessServiceFor('br-member')->canScanCurrentUser(), 'Canonical BR members must be able to start a manual scan.');
+    assertSameValue(false, accessServiceFor('br-member')->canManageCurrentUser(), 'BR identity must not imply baseline or configuration rights.');
+    assertSameValue(true, accessServiceFor('dpo')->canManageCurrentUser(), 'The fixed DPO group must have administrative matrix rights.');
+    assertSameValue(true, accessServiceFor('dpo')->canViewCurrentUser(), 'DPO administration rights include read access.');
+    assertSameValue(true, accessServiceFor('dpo')->canScanCurrentUser(), 'DPO administration rights include manual scans.');
     assertSameValue(false, accessServiceFor('cloud-admin')->canManageCurrentUser(), 'Nextcloud admins must not manage the matrix without an app-local grant.');
     assertSameValue(true, accessServiceFor('cloud-admin', true)->canManageCurrentUser(), 'An active app-local grant enables matrix management for a Nextcloud admin.');
+    assertSameValue(false, accessServiceFor('br-member', false, null)->canViewCurrentUser(), 'Missing BR provider data must deny the BR-derived grant.');
+    assertSameValue(true, accessServiceFor('dpo', false, null)->canManageCurrentUser(), 'A missing BR provider must not remove the independent fixed DPO grant.');
     assertSameValue(false, accessServiceFor('other')->canViewCurrentUser(), 'Unrelated group membership must be denied.');
 
     try {

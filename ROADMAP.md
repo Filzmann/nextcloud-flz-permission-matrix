@@ -5,7 +5,29 @@ Produktentscheidungen und Freigabegates. Der aktuelle Coverage-Stand steht in
 `README.md`, erledigte Änderungen in `CHANGELOG.md` und geltende
 Architektur in `docs/architecture.md`.
 
+## Schreibender Verwaltungsvertrag (DP-10)
+
+### BPM-WRITE-UI – Schreibende Matrix-Bedienoberfläche nach ADR-0003-Erweiterung
+
+Freigegeben 27.11.2026 (Parent `docs/change-report-2026-11-27.md`,
+ADR 0003 „Erweiterung 2026-11-27"): Änderungen an Berechtigungen nimmt
+ausschließlich die native Nextcloud-Gruppe „Datenschutzbeauftragte“ vor;
+Owner-/Source-of-Truth-Matrix je Berechtigungsquelle; öffentlicher opt-in
+Verwaltungsvertrag mit CSRF, app-lokalem Audit und Allow-/Deny-/Manipulations-
+sowie Lifecycle-Tests; UI gebündelt in einem zugänglichen Overlay.
+
 ## Nextcloud-Kompatibilitätsgate
+
+### BPM-ORGANIZATION-V1-LIFECYCLE – realen Provider-Lifecycle belegen
+
+Die app-lokalen Consumer-Contract-Tests für den öffentlichen
+`flz_organization`-V1-Vertrag sind vorhanden. Vor einer Auslieferung bleiben
+auf Nextcloud 34 ein Fresh Install mit und ohne Provider sowie Deaktivierung,
+Entfernung und Wiederinstallation zu prüfen. Matrix, Scan, Oberfläche und API
+müssen dabei verfügbar bleiben; ohne gültigen Provider bleiben semantische
+Gruppen `UNKNOWN` und BR-Zugriff verweigert. Der Lauf verändert den
+Nextcloud-/DDEV-Zustand und benötigt deshalb einen ausdrücklich beauftragten
+Runtime-Lauf.
 
 ### BPM-NC-COMPAT – RC-Kompatibilität und optionale Adapter getrennt belegen
 
@@ -27,9 +49,6 @@ Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 - Die eigene PermissionProvider-Projektion bei jeder relevanten Weiterentwicklung
   gegen neue oder geänderte Berechtigungen und Scopes abgleichen.
-- Eine leere Gruppenbeschränkung als appweite Verfügbarkeit für jede erfasste
-  Gruppe behandeln; fehlende Detailabdeckung bleibt davon getrennt
-  `UNSUPPORTED`.
 - Files Access Control, externe Speicher und weitere öffentliche
   Files-Verträge als getrennte Quellen bewerten.
 - Metadaten und Rechte nur über öffentliche Files-Verträge erfassen;
@@ -60,14 +79,6 @@ Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
   Update- und Releaseentscheidung implementieren.
 
 ## Staging und weitere Produkte
-
-### BPM-MATRIX-SCROLL – horizontale Matrixnavigation dauerhaft erreichbar machen
-
-- Die horizontale Scrollleiste der Matrix unabhängig von der Inhaltshöhe am
-  unteren Rand des sichtbaren Matrix-Viewports erreichbar halten.
-- Kleine Viewports, Tastaturbedienung, Fokus, fixierte Kontextinformationen
-  und gleichzeitiges horizontales sowie vertikales Scrollen manuell
-  nachprüfen.
 
 - Viewer-, Admin-, Export- und Auditgrenzen positiv und negativ prüfen.
 - Danach Detailadapter für Deck, Collectives, Tables, Talk, Contacts, Forms,

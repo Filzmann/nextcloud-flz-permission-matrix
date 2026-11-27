@@ -1,4 +1,6 @@
 (function() {
+    const translate = (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t : (_app, text, params) => Object.entries(params || {}).reduce((s, [k, v]) => s.split('{' + k + '}').join(String(v)), text)
+
     const api = window.PermissionMatrix ? window.PermissionMatrix.api : null;
 
     function byId(id) {
@@ -16,8 +18,6 @@
     function formPayload(form) {
         const data = new FormData(form);
         return new URLSearchParams({
-            viewer_groups: data.get('viewer_groups') || '',
-            admin_groups: data.get('admin_groups') || '',
             scan_interval: data.get('scan_interval') || 'daily',
             strict_mode: data.has('strict_mode') ? '1' : '0',
             include_users: data.has('include_users') ? '1' : '0',
@@ -39,9 +39,9 @@
             event.preventDefault();
             try {
                 await api.saveConfig(formPayload(form));
-                notice('Gespeichert.', 'success');
+                notice(translate('flz_permission_matrix', 'Gespeichert.'), 'success');
             } catch (error) {
-                notice(error.message || 'Speichern fehlgeschlagen.', 'error');
+                notice(error.message || translate('flz_permission_matrix', 'Speichern fehlgeschlagen.'), 'error');
             }
         });
     }

@@ -14,7 +14,7 @@ final class PermissionProviderResult {
     ) {
         foreach ($rules as $rule) {
             if (!$rule instanceof PermissionRule) {
-                throw new InvalidArgumentException('Invalid permission provider rule.');
+                throw new InvalidArgumentException('Ungültige Berechtigungsanbieter-Regel.');
             }
         }
         $this->rules = array_values($rules);

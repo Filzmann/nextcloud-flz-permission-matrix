@@ -18,13 +18,13 @@ class PersonalDataProjectionRepository {
     /** @return list<array<string, scalar|null>> */
     public function collectForSubject(string $uid, int $limit, string $asOf): array {
         if (trim($uid) === '' || $limit < 1 || $limit > 1000201) {
-            throw new InvalidArgumentException('Invalid personal-data projection request.');
+            throw new InvalidArgumentException('Ungültige personenbezogene Projektionsanfrage.');
         }
 
         try {
             $upperBound = new DateTimeImmutable($asOf);
         } catch (\Throwable) {
-            throw new InvalidArgumentException('Invalid personal-data projection timestamp.');
+            throw new InvalidArgumentException('Ungültiger personenbezogener Projektionszeitstempel.');
         }
 
         return [

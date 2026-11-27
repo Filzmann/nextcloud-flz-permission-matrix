@@ -13,17 +13,17 @@ final class PermissionCondition {
         private array $children = [],
     ) {
         if (!in_array($operator, ['group', 'all', 'any', 'self', 'authenticated', 'nextcloud-admin', 'app-admin-grant'], true)) {
-            throw new InvalidArgumentException('Invalid permission condition operator.');
+            throw new InvalidArgumentException('Ungültiger Berechtigungsbedingungs-Operator.');
         }
         if ($operator === 'group' && ($groupId === null || trim($groupId) === '')) {
-            throw new InvalidArgumentException('Group conditions require a group ID.');
+            throw new InvalidArgumentException('Gruppenbedingungen erfordern eine Gruppen-ID.');
         }
         if (in_array($operator, ['all', 'any'], true) && $children === []) {
-            throw new InvalidArgumentException('Composite permission conditions must not be empty.');
+            throw new InvalidArgumentException('Zusammengesetzte Berechtigungsbedingungen dürfen nicht leer sein.');
         }
         foreach ($children as $child) {
             if (!$child instanceof self) {
-                throw new InvalidArgumentException('Invalid child permission condition.');
+                throw new InvalidArgumentException('Ungültige untergeordnete Berechtigungsbedingung.');
             }
         }
     }

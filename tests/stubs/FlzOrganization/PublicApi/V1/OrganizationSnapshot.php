@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\LocalBase\PublicApi\V1;
+namespace OCA\FlzOrganization\PublicApi\V1;
 
-/** App-lokaler Test-Double; der reale Vertrag wird im Parent gegen LocalBase geprüft. */
+/** App-local consumer double; provider behavior is verified in flz_organization. */
 final class OrganizationSnapshot {
     public const CONTRACT_VERSION = '1.0';
 
@@ -13,10 +13,12 @@ final class OrganizationSnapshot {
         private int $definitionVersion,
         private array $roles,
         private array $areas,
+        private array $identityGroups = [],
     ) {
         if (!$valid) {
             $this->roles = [];
             $this->areas = [];
+            $this->identityGroups = [];
         }
     }
 
@@ -25,6 +27,7 @@ final class OrganizationSnapshot {
     public function definitionVersion(): int { return $this->definitionVersion; }
     public function roles(): array { return $this->roles; }
     public function areas(): array { return $this->areas; }
+    public function identityGroups(): array { return $this->identityGroups; }
 
     public function checksum(): string {
         return hash('sha256', json_encode([
@@ -33,6 +36,7 @@ final class OrganizationSnapshot {
             'definitionVersion' => $this->definitionVersion,
             'roles' => $this->roles,
             'areas' => $this->areas,
+            'identityGroups' => $this->identityGroups,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
     }
 }

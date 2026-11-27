@@ -73,7 +73,7 @@ class ScannerService {
         if ($persist) {
             $this->snapshots->insert($snapshot, $createdBy, $baseline?->snapshotId());
             $this->snapshots->purgeOlderThanLatest($this->config->retention());
-            $this->logger->info('Permission matrix scan completed', [
+            $this->logger->info('Scan der Berechtigungsmatrix abgeschlossen', [
                 'app' => 'flz_permission_matrix',
                 'snapshot' => $snapshot->snapshotId(),
                 'compliance' => $summary['compliance_status'] ?? 'UNKNOWN',

@@ -1,4 +1,6 @@
 (function() {
+    const translate = (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t : (_app, text, params) => Object.entries(params || {}).reduce((s, [k, v]) => s.split('{' + k + '}').join(String(v)), text)
+
     const api = window.PermissionMatrix.api;
     const render = window.PermissionMatrix.render;
 
@@ -27,6 +29,7 @@
         snapshot: null,
         snapshots: [],
         baseline: '',
+        canScan: false,
         canManage: false,
         exportFormats: ['md', 'csv', 'json', 'html'],
         filters: emptyFilters()
@@ -42,6 +45,7 @@
 
     async function init() {
         const root = render.byId('permission-matrix-app');
+        state.canScan = root.dataset.canScan === '1';
         state.canManage = root.dataset.canManage === '1';
         bindEvents();
         await loadState();
@@ -105,6 +109,7 @@
             const data = await api.state();
             state.snapshot = data.snapshot;
             state.baseline = data.baseline_snapshot || '';
+            state.canScan = Boolean(data.can_scan);
             state.canManage = Boolean(data.can_manage);
             state.exportFormats = Array.isArray(data.export_formats) ? data.export_formats : state.exportFormats;
             const snapshots = await api.snapshots();
@@ -113,12 +118,12 @@
             draw();
             notice('');
         } catch (error) {
-            notice(error.message || 'Daten konnten nicht geladen werden.', 'error');
+            notice(error.message || translate('flz_permission_matrix', 'Daten konnten nicht geladen werden.'), 'error');
         }
     }
 
     async function runScan() {
-        notice('Scan laeuft ...');
+        notice(translate('flz_permission_matrix', 'Scan laeuft ...'));
         try {
             const data = await api.scan();
             state.snapshot = data.snapshot;
@@ -126,15 +131,15 @@
             state.snapshots = snapshots.snapshots || [];
             render.fillFilters(state.snapshot, state.filters.groupMode);
             draw();
-            notice('Scan abgeschlossen.', 'success');
+            notice(translate('flz_permission_matrix', 'Scan abgeschlossen.'), 'success');
         } catch (error) {
-            notice(error.message || 'Scan fehlgeschlagen.', 'error');
+            notice(error.message || translate('flz_permission_matrix', 'Scan fehlgeschlagen.'), 'error');
         }
     }
 
     async function setLatestBaseline() {
         if (!state.snapshot) {
-            notice('Kein Snapshot vorhanden.', 'error');
+            notice(translate('flz_permission_matrix', 'Kein Snapshot vorhanden.'), 'error');
             return;
         }
         await setBaseline(state.snapshot.snapshot_id);
@@ -147,9 +152,9 @@
             const snapshots = await api.snapshots();
             state.snapshots = snapshots.snapshots || [];
             draw();
-            notice('Baseline gesetzt.', 'success');
+            notice(translate('flz_permission_matrix', 'Baseline gesetzt.'), 'success');
         } catch (error) {
-            notice(error.message || 'Baseline konnte nicht gesetzt werden.', 'error');
+            notice(error.message || translate('flz_permission_matrix', 'Baseline konnte nicht gesetzt werden.'), 'error');
         }
     }
 
@@ -207,8 +212,8 @@
     function draw() {
         const summary = state.snapshot ? state.snapshot.summary || {} : {};
         render.byId('pm-status-line').innerHTML = state.snapshot
-            ? `Scan ${render.esc(state.snapshot.created_at)} ${render.badge(summary.compliance_status || 'UNKNOWN')}`
-            : 'Noch kein Scan';
+            ? translate('flz_permission_matrix', 'Scan {date}', {date: render.esc(state.snapshot.created_at)}) + ' ' + render.badge(summary.compliance_status || 'UNKNOWN')
+            : translate('flz_permission_matrix', 'Noch kein Scan');
         render.byId('pm-overview').innerHTML = render.renderOverview(state.snapshot);
         drawMatrix();
         render.byId('pm-apps').innerHTML = render.renderApps(state.snapshot);

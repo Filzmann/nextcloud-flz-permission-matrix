@@ -29,7 +29,7 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
     public function descriptor(): ProviderDescriptor {
         return new ProviderDescriptor(
             AppId::VALUE,
-            'Filzmann Permission Matrix',
+            'Filzmann Berechtigungsmatrix',
             '1.0',
             ['nextcloud-user'],
             ['personal-data'],
@@ -84,7 +84,7 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
             'export' => $this->exportEntry($record, $asOf),
             'audit' => $this->auditEntry($record, $asOf),
             'admin_access' => $this->adminAccessEntry($record, $subjectUid),
-            default => throw new InvalidArgumentException('Unknown personal-data projection record.'),
+            default => throw new InvalidArgumentException('Unbekannter personenbezogener Projektionsdatensatz.'),
         };
     }
 
@@ -225,12 +225,12 @@ final class PermissionMatrixPersonalDataProvider implements PersonalDataProvider
             || $state['offset'] < 1
             || $state['offset'] > self::MAX_OFFSET
         ) {
-            throw new InvalidArgumentException('Invalid Permission Matrix privacy cursor.');
+            throw new InvalidArgumentException('Ungültiger Privacy-Cursor der Berechtigungsmatrix.');
         }
         try {
             $asOf = (new DateTimeImmutable($state['asOf']))->format(DATE_ATOM);
         } catch (\Throwable) {
-            throw new InvalidArgumentException('Invalid Permission Matrix privacy cursor.');
+            throw new InvalidArgumentException('Ungültiger Privacy-Cursor der Berechtigungsmatrix.');
         }
 
         return [$asOf, $state['offset']];

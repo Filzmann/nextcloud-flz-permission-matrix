@@ -7,6 +7,7 @@ namespace OCA\FlzPermissionMatrix\Controller;
 use OCA\FlzPermissionMatrix\AppInfo\Application;
 use OCA\FlzPermissionMatrix\Service\AccessService;
 use OCA\FlzPermissionMatrix\Service\AuditLogService;
+use OCA\FlzPermissionMatrix\Service\ConfigService;
 use OCA\FlzPermissionMatrix\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
@@ -21,6 +22,7 @@ class PageController extends Controller {
         private AccessService $access,
         private AuditLogService $auditLog,
         private TemporaryAdminAccessService $temporaryAdminAccess,
+        private ConfigService $config,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -39,10 +41,14 @@ class PageController extends Controller {
             return $response;
         }
 
+        $canManage = $hasMatrixAccess && $this->access->canManageCurrentUser();
+
         $this->auditLog->record($hasMatrixAccess ? 'page.index' : 'page.index.admin_access');
 
         return new TemplateResponse(Application::APP_ID, 'index', [
-            'can_manage' => $hasMatrixAccess && $this->access->canManageCurrentUser(),
+            'can_scan' => $hasMatrixAccess && $this->access->canScanCurrentUser(),
+            'can_manage' => $canManage,
+            'config' => $canManage ? $this->config->toArray() : [],
             'hasMatrixAccess' => $hasMatrixAccess,
             'canManageAdminAccess' => $canManageAdminAccess,
             'showMissingAdminGrant' => $showMissingAdminGrant,

@@ -61,8 +61,8 @@ verdrängte Snapshotdaten.
 ## Gruppenfamilien
 
 Die Matrix deutet Rollen und Bereiche ausschließlich über
-`OCA\\LocalBase\\PublicApi\\V1` und dessen validierten, versionierten
-Organisationssnapshot. Interne LocalBase-Klassen gehören nicht zum
+`OCA\\FlzOrganization\\PublicApi\\V1` und dessen validierten, versionierten
+Organisationssnapshot. Interne flz_organization-Klassen gehören nicht zum
 Consumervertrag. Vertragsversion, Definitionsversion und Prüfsumme werden mit
 jedem Matrixsnapshot festgehalten.
 Für die Filzmann Assistenzplanung-Schemata `flz-ASN-<Kürzel>` und
@@ -75,24 +75,20 @@ Die Standardansicht sortiert Berechtigungen streng nach App. App-Abschnitte lass
 
 Die Teamansicht ordnet bekannte technische Gruppen verständlich, zum Beispiel
 `Team A1 · Assistenz`, während Rollen und Bereiche ihre fachlichen Labels aus
-LocalBase erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
+flz_organization erhalten. Die zugrunde liegenden Rohgruppen bleiben getrennt. Eine
 N:N-Teamzuordnung entsteht erst durch die fachliche UND-Bedingung aus Team-
 und Rollengruppe; sie wird nicht aus einem Gruppensuffix erfunden oder zu
 einem scheinbaren Einzelrecht verschmolzen.
 
-Fehlt LocalBase, ist sein Vertrag ungültig oder inkompatibel oder enthält er
+Fehlt flz_organization, ist sein Vertrag ungültig oder inkompatibel oder enthält er
 mehrdeutige Gruppenzuordnungen, bleibt der Scan verfügbar. Die Matrix zeigt
 dann jede Gruppe einzeln, markiert ihre fachliche Bedeutung als `UNKNOWN` und
 speichert den konkreten Providerstatus im historischen Snapshot. Spätere
-Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Fresh Installs
-auf Nextcloud 34 sind sowohl ohne installierte LocalBase-App als auch mit dem
-realen V1-Provider geprüft. Zusätzlich bleiben Scan, Oberfläche und API bei
-Deaktivierung und Entfernung des Providers verfügbar. Die Wiederinstallation
-ist sowohl mit dem aktuellen V1-Stand als auch mit einem älteren LocalBase ohne
-V1-Service geprüft; der ältere Stand bleibt dabei kontrolliert `INCOMPATIBLE`.
-Das In-place-Update von LocalBase `0.12.0-dev.1` auf `0.12.0-dev.2` erhält die
-synthetische Organisationskonfiguration bytegenau und hält den Consumer
-verfügbar.
+Konfigurationsänderungen deuten vorhandene Snapshots nicht neu. Die
+app-lokalen Consumer-Contract-Tests decken einen gültigen Provider sowie
+fehlende, deaktivierte, inkompatible, ungültige und nicht verfügbare Zustände
+ab. Der reale Nextcloud-Lifecycle-Nachweis für Installation, Deaktivierung,
+Entfernung und Wiederinstallation steht als separates Runtime-Gate aus.
 
 ## Installation lokal
 
@@ -117,13 +113,13 @@ Die lokale Nextcloud 34-Umgebung hat keinen separaten `occ migrations:migrate`-B
 
 ## Betrieb
 
-Admin-Einstellungen:
+App-Einstellungen:
 
-- `viewer_groups`: frei anpassbare Gruppen mit Matrix-/Export-Zugriff. Als
-  Ausgangsbeispiele dienen `Betriebsrat`, `IKT-Ausschuss`,
-  `Datenschutzbeauftragte` und `IT-Administration`.
-- `admin_groups`: frei anpassbare Gruppen mit Konfigurations-, Scan- und
-  Baseline-Rechten; Ausgangsbeispiel ist `IT-Administration`.
+Mitglieder von `Datenschutzbeauftragte` erreichen diese Werte im
+selbsterklärenden Tab **Einstellungen** der Fachapp. Der technische
+Nextcloud-Adminbereich verwendet dasselbe Formular; das serverseitige
+Verwaltungsrecht bleibt in beiden Fällen maßgeblich.
+
 - `scan_interval`: `hourly`, `daily` oder `weekly`.
 - `baseline_snapshot`: aktuell genehmigter Positivlistenstand.
 - `strict_mode`: neue/erweiterte Rechte werden strenger als nicht freigegeben bewertet.
@@ -137,22 +133,15 @@ Admin-Einstellungen:
 - `audit_retention_days`: Prüffrist für Auditprotokolle in Tagen, Standard
   `180`, zulässig `1` bis `3650`.
 
-Beim Speichern werden Viewer-/Admin-Gruppen gegen die vorhandenen
-Nextcloud-Gruppen geprüft. Ungültige Gruppen, Intervalle, Exportformate oder
-Aufbewahrungswerte werden vollständig abgewiesen, bevor ein
-Konfigurationsschlüssel geändert wird.
-
-Im Normalfall sollte die zuständige Beschäftigtenvertretung die Matrix lesen
-können. In Betrieben ist dies häufig der Betriebsrat, in Dienststellen der
-Personalrat; die Beispielgruppe `Betriebsrat` kann vollständig durch die real
-vorhandene Gruppe, etwa `Personalrat`, ersetzt werden. Ein IKT-Ausschuss und
-Datenschutzbeauftragte benötigen typischerweise Leserechte für technische
-Prüfung beziehungsweise datenschutzrechtliche Beratung, aber keine
-Konfigurations-, Scan- oder Baseline-Rechte. Diese administrativen Rechte
-sollten auf eine kleine zuständige Gruppe wie `IT-Administration` sowie
-native Nextcloud-Administrationskonten mit aktiver app-lokaler Freigabe
-begrenzt bleiben. Die Freigabe selbst steuert ausschließlich die kanonische
-Gruppe `Datenschutzbeauftragte`.
+Die Rechtezuordnung ist keine App-Konfiguration. Die kanonische
+BR-Mitgliedergruppe wird ausschließlich über den öffentlichen
+`identityGroups['works_council_member']`-Eintrag desselben
+`OCA\FlzOrganization\PublicApi\V1`-Organisationssnapshots aufgelöst. Nur ein
+aktivierter, kompatibler und gültiger Snapshot erteilt BR-Mitgliedern Zugriff
+auf Matrix, Exporte und manuelle Scans. Diese Leserechte können in der App
+nicht entfernt werden. Die feste native Gruppe `Datenschutzbeauftragte`
+erhält dieselben Rechte und darf zusätzlich Baselines sowie die technische
+App-Konfiguration verwalten.
 
 ### Native Nextcloud-Gruppenfreigaben
 
@@ -233,9 +222,9 @@ unabhängige Freigaben. Details und ein Integrationsbeispiel stehen in
 Die oben dokumentierte, versions- und releasegebundene Groupfolders-Quelle ist
 die einzige eng begrenzte Ausnahme von diesem öffentlichen Providerprinzip.
 
-Die Berechtigungsmatrix selbst liest ihre Viewer- und Admin-Gruppen direkt aus
-derselben `ConfigService`-Konfiguration, die der serverseitige `AccessService`
-erzwingt. Verwaltung umfasst Lesen; reine Viewer erhalten kein Verwaltungsrecht.
+Der serverseitige `AccessService` trennt BR-Identität, Datenschutzrolle,
+manuelles Scanrecht und Verwaltungsrecht. Weder Navigation noch gespeicherte
+freie Gruppennamen können Rechte erteilen.
 
 `occ`-Kommandos:
 
@@ -255,12 +244,12 @@ php occ permission-matrix:status
 - Die App schreibt nur in eigene Tabellen mit Prefix `flz_pm_*`.
 - Exporte enthalten standardmaessig keine Dateiinhalte, Passwoerter, Tokens, privaten Schluessel, Benutzerlisten oder personenbezogenen Dateipfade.
 - Unbekannte oder nicht unterstuetzte Rechtequellen werden nicht als erlaubt dargestellt.
-- Matrix, Snapshots und Exporte sind auf konfigurierte Viewer-/Admin-Gruppen
-  sowie Nextcloud-Admins mit aktiver app-lokaler Vollzugriffsfreigabe
-  beschraenkt.
-- Konfiguration, Baseline-Freigabe und manuelle Scans sind auf konfigurierte
-  Admin-Gruppen sowie Nextcloud-Admins mit aktiver app-lokaler
-  Vollzugriffsfreigabe beschraenkt. Die Freigabe gilt je Admin hoechstens 24
+- Matrix, Snapshots, Exporte und manuelle Scans sind auf die kanonische
+  BR-Mitgliedergruppe, `Datenschutzbeauftragte` sowie Nextcloud-Admins mit
+  aktiver app-lokaler Vollzugriffsfreigabe beschränkt.
+- Konfiguration und Baseline-Freigabe sind auf `Datenschutzbeauftragte` sowie
+  Nextcloud-Admins mit aktiver app-lokaler Vollzugriffsfreigabe beschränkt.
+  Die Freigabe gilt je Admin höchstens 24
   Stunden. Ausschliesslich Mitglieder der kanonischen Nextcloud-Gruppe
   `Datenschutzbeauftragte` koennen die Freigabehistorie in der Fachapp lesen
   sowie Freigaben fuer aktuelle Nextcloud-Administrationskonten erteilen und
@@ -282,7 +271,7 @@ MVP:
   konkrete Gruppenfreigaben mit getrennten R/W/C/D/S-Rechten.
 - Matrixansicht mit Filtern.
 - Semantische, per Pfeiltasten bedienbare Tabs und vollständiger Filter-Reset.
-- Versionierter LocalBase-Organisationssnapshot mit kontrolliertem
+- Versionierter flz_organization-Organisationssnapshot mit kontrolliertem
   `UNKNOWN`-Fallback.
 - Snapshot-Speicherung, Baseline und Diff-Grundlagen.
 - Background Job.
@@ -324,6 +313,7 @@ dokumentiert.
 
 - [Architektur](docs/architecture.md)
 - [Permission-Provider-V1](docs/permission-provider-v1.md)
+- [Lokalisierungsinventar](docs/l10n-inventory.md)
 - [Manuelle Abnahme](docs/manual-acceptance.md)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)

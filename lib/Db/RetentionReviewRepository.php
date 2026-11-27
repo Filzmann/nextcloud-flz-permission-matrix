@@ -18,13 +18,13 @@ class RetentionReviewRepository {
         $table = match ($source) {
             'export' => 'flz_pm_exports',
             'audit' => 'flz_pm_audit_log',
-            default => throw new InvalidArgumentException('Invalid retention review source.'),
+            default => throw new InvalidArgumentException('Ungültige Retention-Prüfungsquelle.'),
         };
-        if ($limit < 1 || $limit > 1000201) throw new InvalidArgumentException('Invalid retention review limit.');
+        if ($limit < 1 || $limit > 1000201) throw new InvalidArgumentException('Ungültiges Retention-Prüfungslimit.');
         try {
             $cutoffDate = new DateTimeImmutable($cutoff);
         } catch (\Throwable) {
-            throw new InvalidArgumentException('Invalid retention review cutoff.');
+            throw new InvalidArgumentException('Ungültiger Retention-Prüfungsstichtag.');
         }
 
         $qb = $this->db->getQueryBuilder();
