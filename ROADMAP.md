@@ -5,6 +5,17 @@ Produktentscheidungen und Freigabegates. Der aktuelle Coverage-Stand steht in
 `README.md`, erledigte Änderungen in `CHANGELOG.md` und geltende
 Architektur in `docs/architecture.md`.
 
+## Schreibender Verwaltungsvertrag (DP-10)
+
+### BPM-WRITE-UI – Schreibende Matrix-Bedienoberfläche nach ADR-0003-Erweiterung
+
+Freigegeben 27.11.2026 (Parent `docs/change-report-2026-11-27.md`,
+ADR 0003 „Erweiterung 2026-11-27"): Änderungen an Berechtigungen nimmt
+ausschließlich die native Nextcloud-Gruppe „Datenschutzbeauftragte“ vor;
+Owner-/Source-of-Truth-Matrix je Berechtigungsquelle; öffentlicher opt-in
+Verwaltungsvertrag mit CSRF, app-lokalem Audit und Allow-/Deny-/Manipulations-
+sowie Lifecycle-Tests; UI gebündelt in einem zugänglichen Overlay.
+
 ## Nextcloud-Kompatibilitätsgate
 
 ### BPM-ORGANIZATION-V1-LIFECYCLE – realen Provider-Lifecycle belegen
