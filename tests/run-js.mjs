@@ -13,6 +13,7 @@ const checks = [
     ['node', ['tests/js/accessibility-contract.cjs']],
     ['node', ['tests/js/navigation-smoke.cjs']],
     ['node', ['tests/js/admin-access-smoke.cjs']],
+    ['node', ['tests/js/shared-bundle-runtime-smoke.cjs']],
 ];
 
 for (const [command, args] of checks) {

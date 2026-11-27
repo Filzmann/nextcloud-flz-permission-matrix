@@ -9,6 +9,7 @@ const settingsForm = readFileSync(join(root, 'templates', 'settings-form.php'), 
 const main = readFileSync(join(root, 'js', 'main.js'), 'utf8');
 const admin = readFileSync(join(root, 'js', 'admin.js'), 'utf8');
 const adminAccess = readFileSync(join(root, 'js', 'admin-access.js'), 'utf8');
+const bundleOverlay = readFileSync(join(root, 'js', 'shared', 'overlay.js'), 'utf8');
 const style = readFileSync(join(root, 'css', 'style.css'), 'utf8');
 const info = readFileSync(join(root, 'appinfo', 'info.xml'), 'utf8');
 
@@ -56,7 +57,10 @@ assert(admin.includes("type === 'error' ? 'alert' : 'status'"));
 assert(admin.includes("export_metadata_retention_days: data.get('export_metadata_retention_days') || '180'"));
 assert(admin.includes("audit_retention_days: data.get('audit_retention_days') || '180'"));
 assert(template.includes("script('flz_permission_matrix', 'admin-access')"));
-assert(adminAccess.includes("type === 'error' ? 'alert' : 'status'"));
+assert(adminAccess.includes('AdminAccessOverlay'));
+assert(bundleOverlay.includes("isError ? 'alert' : 'status'"));
+assert(template.includes("script('flz_permission_matrix', 'shared/overlay')"));
+assert(template.includes('class="flz-shared-overlay"') && template.includes('class="flz-shared-warn-trigger"'));
 assert(!adminTemplate.includes('pm-full-access-form'));
 assert(!style.includes('#content'));
 assert(/#permission-matrix-app\s*\{[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*height:\s*100%[^}]*min-height:\s*0[^}]*overflow-y:\s*auto[^}]*background:\s*var\(--color-main-background\)/s.test(style));
