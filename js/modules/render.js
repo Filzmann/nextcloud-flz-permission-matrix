@@ -1,4 +1,6 @@
 (function() {
+    const translate = (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t : (_app, text, params) => Object.entries(params || {}).reduce((s, [k, v]) => s.split('{' + k + '}').join(String(v)), text)
+
     function esc(value) {
         return String(value ?? '').replace(/[&<>"']/g, (char) => ({
             '&': '&amp;',
@@ -23,31 +25,31 @@
     }
 
     function groupCountLabel(count) {
-        return `${count} ${count === 1 ? 'Gruppe' : 'Gruppen'}`;
+        return count === 1 ? translate('flz_permission_matrix', '{count} Gruppe', {count: count}) : translate('flz_permission_matrix', '{count} Gruppen', {count: count});
     }
 
     function permissionCountLabel(count) {
-        return `${count} ${count === 1 ? 'Berechtigung' : 'Berechtigungen'}`;
+        return count === 1 ? translate('flz_permission_matrix', '{count} Berechtigung', {count: count}) : translate('flz_permission_matrix', '{count} Berechtigungen', {count: count});
     }
 
     function renderOverview(snapshot) {
         if (!snapshot) {
-            return empty('Noch kein Snapshot vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Noch kein Snapshot vorhanden.'));
         }
         const summary = snapshot.summary || {};
         const organization = (snapshot.metadata || {}).organization_snapshot || {};
         const stats = [
-            ['Nextcloud-Version', snapshot.nextcloud_version],
-            ['Letzter Scan', snapshot.created_at],
-            ['Organisationsvertrag', `${organization.status || 'UNKNOWN'} · v${organization.contract_version || 0} / Definition ${organization.definition_version || 0}`],
-            ['Organisationsprüfsumme', organization.checksum || 'nicht verfügbar'],
-            ['Gruppen', summary.group_count],
-            ['Gruppenfamilien', summary.group_family_count],
-            ['Aktivierte Apps', summary.app_count],
-            ['Gruppenbeschraenkte Apps', summary.restricted_app_count],
-            ['Berechtigungsobjekte', summary.object_count],
-            ['Warnungen', summary.warning_count],
-            ['Nicht unterstuetzte Apps', summary.unsupported_count]
+            [translate('flz_permission_matrix', 'Nextcloud-Version'), snapshot.nextcloud_version],
+            [translate('flz_permission_matrix', 'Letzter Scan'), snapshot.created_at],
+            [translate('flz_permission_matrix', 'Organisationsvertrag'), `${organization.status || 'UNKNOWN'} · v${organization.contract_version || 0} / Definition ${organization.definition_version || 0}`],
+            [translate('flz_permission_matrix', 'Organisationsprüfsumme'), organization.checksum || translate('flz_permission_matrix', 'nicht verfügbar')],
+            [translate('flz_permission_matrix', 'Gruppen'), summary.group_count],
+            [translate('flz_permission_matrix', 'Gruppenfamilien'), summary.group_family_count],
+            [translate('flz_permission_matrix', 'Aktivierte Apps'), summary.app_count],
+            [translate('flz_permission_matrix', 'Gruppenbeschraenkte Apps'), summary.restricted_app_count],
+            [translate('flz_permission_matrix', 'Berechtigungsobjekte'), summary.object_count],
+            [translate('flz_permission_matrix', 'Warnungen'), summary.warning_count],
+            [translate('flz_permission_matrix', 'Nicht unterstuetzte Apps'), summary.unsupported_count]
         ];
 
         return `
@@ -143,7 +145,7 @@
 
         const sections = [];
         rows.forEach((row) => {
-            const appId = String(row.app_id || 'unbekannt');
+            const appId = String(row.app_id || translate('flz_permission_matrix', 'unbekannt'));
             let section = sections[sections.length - 1];
             if (!section || section.appId !== appId) {
                 section = { appId, label: labels.get(appId) || appId, rows: [] };
@@ -157,7 +159,7 @@
 
     function renderMatrix(snapshot, filters) {
         if (!snapshot) {
-            return empty('Keine Matrixdaten vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Keine Matrixdaten vorhanden.'));
         }
         const groupFilter = filters.group || '';
         const availableColumns = groupColumns(snapshot, filters.groupMode || 'summary');
@@ -169,7 +171,7 @@
         const columnCount = 4 + groups.length;
 
         if (!sections.length) {
-            return empty('Keine Matrixzeilen fuer diese Filter.');
+            return empty(translate('flz_permission_matrix', 'Keine Matrixzeilen fuer diese Filter.'));
         }
 
         return `
@@ -224,7 +226,7 @@
 
     function renderApps(snapshot) {
         if (!snapshot) {
-            return empty('Keine Appdaten vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Keine Appdaten vorhanden.'));
         }
         return `
             <div class="pm-list">
@@ -235,8 +237,8 @@
                             <dt>App-ID</dt><dd>${esc(app.app_id)}</dd>
                             <dt>Version</dt><dd>${esc(app.version)}</dd>
                             <dt>Quelle</dt><dd>${esc(app.source)}</dd>
-                            <dt>Gruppenbeschraenkt</dt><dd>${esc(app.restricted ? 'ja' : 'nein')}</dd>
-                            <dt>Gruppen</dt><dd>${esc(app.groups && app.groups.length ? app.groups.join(', ') : 'global')}</dd>
+                            <dt>${translate('flz_permission_matrix', 'Gruppenbeschraenkt')}</dt><dd>${esc(app.restricted ? translate('flz_permission_matrix', 'ja') : translate('flz_permission_matrix', 'nein'))}</dd>
+                            <dt>${translate('flz_permission_matrix', 'Gruppen')}</dt><dd>${esc(app.groups && app.groups.length ? app.groups.join(', ') : translate('flz_permission_matrix', 'global'))}</dd>
                             <dt>Detailabdeckung</dt><dd>${badge(adapterCoverage(snapshot, app.app_id))}</dd>
                         </dl>
                     </article>
@@ -247,7 +249,7 @@
 
     function renderGroups(snapshot) {
         if (!snapshot) {
-            return empty('Keine Gruppendaten vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Keine Gruppendaten vorhanden.'));
         }
         return `
             <div class="pm-list">
@@ -264,13 +266,13 @@
                         <article class="pm-list-item">
                             <h2>${esc(entry.label)}</h2>
                             <dl>
-                                <dt>Typ</dt><dd>${entry.type === 'family' ? 'Gruppenfamilie' : 'Einzelgruppe'}</dd>
-                                <dt>Bedeutung</dt><dd>${badge(entry.meaning_status || 'UNKNOWN')}</dd>
+                                <dt>${translate('flz_permission_matrix', 'Typ')}</dt><dd>${entry.type === 'family' ? translate('flz_permission_matrix', 'Gruppenfamilie') : translate('flz_permission_matrix', 'Einzelgruppe')}</dd>
+                                <dt>${translate('flz_permission_matrix', 'Bedeutung')}</dt><dd>${badge(entry.meaning_status || 'UNKNOWN')}</dd>
                                 <dt>Enthaltene Gruppen</dt><dd>${esc(entry.count)}</dd>
                                 <dt>Relevante Rechte</dt><dd>${esc(active.length)}</dd>
                                 <dt>Unklare Bereiche</dt><dd>${esc(unknown.length)}</dd>
                             </dl>
-                            ${entry.type === 'family' ? `<details><summary>Rohgruppen anzeigen</summary><ul>${entry.groups.map((group) => `<li>${esc(group)}</li>`).join('')}</ul></details>` : ''}
+                            ${entry.type === 'family' ? `<details><summary>${translate('flz_permission_matrix', 'Rohgruppen anzeigen')}</summary><ul>${entry.groups.map((group) => `<li>${esc(group)}</li>`).join('')}</ul></details>` : ''}
                         </article>
                     `;
                 }).join('')}
@@ -280,11 +282,11 @@
 
     function renderDiffs(snapshot) {
         if (!snapshot) {
-            return empty('Keine Abweichungsdaten vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Keine Abweichungsdaten vorhanden.'));
         }
         const diffs = snapshot.diff_to_baseline || [];
         if (!diffs.length) {
-            return empty('Keine Abweichungen.');
+            return empty(translate('flz_permission_matrix', 'Keine Abweichungen.'));
         }
 
         return `
@@ -302,7 +304,7 @@
 
     function renderSnapshots(items, baselineId, canManage) {
         if (!items || !items.length) {
-            return empty('Keine Snapshots vorhanden.');
+            return empty(translate('flz_permission_matrix', 'Keine Snapshots vorhanden.'));
         }
         return `
             <div class="pm-table-wrap" tabindex="0" aria-label="Snapshotliste, horizontal und vertikal scrollbar">
@@ -333,8 +335,8 @@
         const statusSelect = byId('pm-filter-status');
         const selectedStatus = statusSelect.value;
         const statuses = Array.from(new Set((snapshot.matrix || []).map((row) => row.status))).sort();
-        groupSelect.innerHTML = '<option value="">Alle</option>' + groupColumns(snapshot, mode).map((group) => `<option value="${esc(group.key)}">${esc(group.label)}${group.type === 'family' ? ` (${group.count})` : ''}</option>`).join('');
-        statusSelect.innerHTML = '<option value="">Alle</option>' + statuses.map((status) => `<option value="${esc(status)}">${esc(status)}</option>`).join('');
+        groupSelect.innerHTML = '<option value="">' + translate('flz_permission_matrix', 'Alle') + '</option>' + groupColumns(snapshot, mode).map((group) => `<option value="${esc(group.key)}">${esc(group.label)}${group.type === 'family' ? ` (${group.count})` : ''}</option>`).join('');
+        statusSelect.innerHTML = '<option value="">' + translate('flz_permission_matrix', 'Alle') + '</option>' + statuses.map((status) => `<option value="${esc(status)}">${esc(status)}</option>`).join('');
         if (statuses.includes(selectedStatus)) {
             statusSelect.value = selectedStatus;
         }
@@ -435,7 +437,7 @@
                 title
             };
         }
-        return { value: `gemischt (${relevant.length}/${values.length})`, className: 'mixed', title };
+        return { value: translate('flz_permission_matrix', 'gemischt ({shown}/{total})', {shown: relevant.length, total: values.length}), className: 'mixed', title };
     }
 
     /**

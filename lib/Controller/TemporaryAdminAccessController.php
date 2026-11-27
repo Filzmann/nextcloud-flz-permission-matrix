@@ -14,14 +14,21 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 /** Dünne Admin-API für app-lokale, zeitbegrenzte Vollzugriffszeiträume. */
 final class TemporaryAdminAccessController extends Controller {
-    public function __construct(IRequest $request, private TemporaryAdminAccessService $service, private LoggerInterface $logger) {
+    public function __construct(IRequest $request, private TemporaryAdminAccessService $service, private LoggerInterface $logger, private ?IL10N $l10n = null) {
         parent::__construct(AppId::VALUE, $request);
+    }
+
+    /** Lokalisierung fachlicher Texte; im Test ohne IL10N identity. */
+    private function t(string $text): string
+    {
+        return $this->l10n?->t($text) ?? $text;
     }
 
     #[NoCSRFRequired]
@@ -43,7 +50,7 @@ final class TemporaryAdminAccessController extends Controller {
         try {
             return new JSONResponse(['grant' => $this->serializeGrant($this->service->activate($targetUid, $durationMinutes))]);
         } catch (InvalidArgumentException $error) {
-            return new JSONResponse(['message' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+            return new JSONResponse(['message' => $this->t($error->getMessage())], Http::STATUS_BAD_REQUEST);
         } catch (TemporaryAdminAccessDeniedException) {
             return $this->denied();
         } catch (Throwable $error) {
@@ -56,7 +63,7 @@ final class TemporaryAdminAccessController extends Controller {
         try {
             return new JSONResponse(['revoked' => $this->service->revoke($targetUid)]);
         } catch (InvalidArgumentException $error) {
-            return new JSONResponse(['message' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+            return new JSONResponse(['message' => $this->t($error->getMessage())], Http::STATUS_BAD_REQUEST);
         } catch (TemporaryAdminAccessDeniedException) {
             return $this->denied();
         } catch (Throwable $error) {
@@ -73,7 +80,7 @@ final class TemporaryAdminAccessController extends Controller {
         return $grant;
     }
 
-    private function denied(): JSONResponse { return new JSONResponse(['message' => 'Keine Berechtigung.'], Http::STATUS_FORBIDDEN); }
+    private function denied(): JSONResponse { return new JSONResponse(['message' => $this->t('Keine Berechtigung.')], Http::STATUS_FORBIDDEN); }
 
     private function failed(Throwable $error): JSONResponse {
         $this->logger->error('Temporärer Admin-Vollzugriff konnte nicht verarbeitet werden.', ['exception' => $error]);

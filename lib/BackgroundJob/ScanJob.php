@@ -31,7 +31,7 @@ class ScanJob extends TimedJob {
             }
             $this->scanner->scan(null);
         } catch (\Throwable $e) {
-            $this->logger->error('Permission matrix background scan failed', [
+            $this->logger->error('Hintergrund-Scan der Berechtigungsmatrix fehlgeschlagen', [
                 'app' => 'flz_permission_matrix',
                 'exception' => $e,
             ]);

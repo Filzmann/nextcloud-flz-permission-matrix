@@ -33,7 +33,7 @@ class AuditLogService {
         try {
             $this->mapper->insert($uid, $action, $exportGenerated, $snapshotId, $safeDetails);
         } catch (\Throwable $e) {
-            $this->logger->warning('Permission matrix audit log write failed', [
+            $this->logger->warning('Schreiben des Audit-Logs der Berechtigungsmatrix fehlgeschlagen', [
                 'app' => 'flz_permission_matrix',
                 'action' => $action,
                 'exception' => $e,

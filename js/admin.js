@@ -1,4 +1,6 @@
 (function() {
+    const translate = (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t : (_app, text, params) => Object.entries(params || {}).reduce((s, [k, v]) => s.split('{' + k + '}').join(String(v)), text)
+
     const api = window.PermissionMatrix ? window.PermissionMatrix.api : null;
 
     function byId(id) {
@@ -37,9 +39,9 @@
             event.preventDefault();
             try {
                 await api.saveConfig(formPayload(form));
-                notice('Gespeichert.', 'success');
+                notice(translate('flz_permission_matrix', 'Gespeichert.'), 'success');
             } catch (error) {
-                notice(error.message || 'Speichern fehlgeschlagen.', 'error');
+                notice(error.message || translate('flz_permission_matrix', 'Speichern fehlgeschlagen.'), 'error');
             }
         });
     }

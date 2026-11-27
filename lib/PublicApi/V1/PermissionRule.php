@@ -21,11 +21,11 @@ final class PermissionRule {
     ) {
         foreach ([$objectType, $objectName, $permission, $permissionLabel, $scope, $source] as $value) {
             if (trim($value) === '') {
-                throw new InvalidArgumentException('Permission rule fields must not be empty.');
+                throw new InvalidArgumentException('Berechtigungsregel-Felder dürfen nicht leer sein.');
             }
         }
         if (!in_array($effect, ['allow', 'deny'], true) || !in_array($confidence, ['high', 'medium', 'low'], true)) {
-            throw new InvalidArgumentException('Invalid permission rule effect or confidence.');
+            throw new InvalidArgumentException('Ungültige Berechtigungsregel-Wirkung oder -Vertrauensstufe.');
         }
     }
 

@@ -15,6 +15,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -24,9 +25,16 @@ class ConfigController extends Controller {
         private AccessService $access,
         private ConfigService $config,
         private AuditLogService $auditLog,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private ?IL10N $l10n = null,
     ) {
         parent::__construct(Application::APP_ID, $request);
+    }
+
+    /** Lokalisierung fachlicher Texte; im Test ohne IL10N identity. */
+    private function t(string $text): string
+    {
+        return $this->l10n?->t($text) ?? $text;
     }
 
     #[NoAdminRequired]
@@ -73,15 +81,15 @@ class ConfigController extends Controller {
             return new DataResponse($callback());
         } catch (AccessDeniedException $e) {
             $this->auditLog->record($action . '.denied');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_FORBIDDEN);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_FORBIDDEN);
         } catch (ConfigValidationException $e) {
             $this->auditLog->record($action . '.rejected');
-            return new DataResponse(['ok' => false, 'message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+            return new DataResponse(['ok' => false, 'message' => $this->t($e->getMessage())], Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $e) {
             $this->auditLog->record($action . '.failed');
-            $this->logger->error('Permission matrix config API failed', ['app' => Application::APP_ID, 'exception' => $e]);
+            $this->logger->error('Konfigurations-API der Berechtigungsmatrix fehlgeschlagen', ['app' => Application::APP_ID, 'exception' => $e]);
 
-            return new DataResponse(['ok' => false, 'message' => 'Konfiguration konnte nicht gespeichert werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new DataResponse(['ok' => false, 'message' => $this->t('Konfiguration konnte nicht gespeichert werden.')], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }

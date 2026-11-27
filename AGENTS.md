@@ -28,6 +28,9 @@ Kernprinzipien:
 
 ## Repository und gemeinsamer Arbeitsablauf
 
+- Lokalisierung (ZM-06): Sichtbare Texte ausschließlich über Nextcloud-l10n — deutsche Quelltexte via `IL10N::t()`/`window.t('flz_permission_matrix', …)`, Kataloge `l10n/en.*` und `l10n/en_GB.*` (Englisch); technische IDs bleiben unübersetzt. `tests/Ui/L10nCatalogContractTest.php` erzwingt das Rohtext-Gate (siehe `docs/l10n-inventory.md`).
+
+
 - Dieses Verzeichnis ist ein eigenstaendiges Git-Repository fuer die Nextcloud-App `flz_permission_matrix`.
 - Andere Apps und der Parent-Workspace werden nicht aus diesem Repo heraus gestaged oder committed.
 - Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.

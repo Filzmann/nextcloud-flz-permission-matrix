@@ -16,12 +16,12 @@ class NextcloudGroupFoldersManagerProvider implements GroupFoldersManagerProvide
 
     public function manager(): object {
         if (!class_exists(self::MANAGER_CLASS)) {
-            throw new RuntimeException('The Team Folders runtime service is unavailable.');
+            throw new RuntimeException('Der Team-Folders-Laufzeitdienst ist nicht verfügbar.');
         }
 
         $manager = Server::get(self::MANAGER_CLASS);
         if (!is_object($manager)) {
-            throw new RuntimeException('The Team Folders runtime service could not be resolved.');
+            throw new RuntimeException('Der Team-Folders-Laufzeitdienst konnte nicht aufgelöst werden.');
         }
 
         return $manager;

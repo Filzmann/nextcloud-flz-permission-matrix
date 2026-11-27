@@ -313,6 +313,7 @@ dokumentiert.
 
 - [Architektur](docs/architecture.md)
 - [Permission-Provider-V1](docs/permission-provider-v1.md)
+- [Lokalisierungsinventar](docs/l10n-inventory.md)
 - [Manuelle Abnahme](docs/manual-acceptance.md)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
