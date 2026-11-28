@@ -16,12 +16,8 @@ namespace OCP\AppFramework\Bootstrap {
 
 namespace {
     use OCA\FlzPermissionMatrix\AppInfo\Application;
-    use OCA\FlzPermissionMatrix\Service\GroupFoldersManagerProviderInterface;
-    use OCA\FlzPermissionMatrix\Service\GroupFoldersSourceInterface;
-    use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
-    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersManagerProvider;
-    use OCA\FlzPermissionMatrix\Service\NextcloudGroupFoldersSource;
-    use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
+            use OCA\FlzPermissionMatrix\Service\NativeSharingSourceInterface;
+            use OCA\FlzPermissionMatrix\Service\NextcloudSharingSource;
     use OCA\FlzPermissionMatrix\Service\NextcloudPermissionProviderSource;
     use OCA\FlzPermissionMatrix\Service\PermissionProviderSourceInterface;
     use OCP\AppFramework\Bootstrap\IRegistrationContext;
@@ -45,16 +41,6 @@ namespace {
         NextcloudSharingSource::class,
         $context->aliases[NativeSharingSourceInterface::class] ?? null,
         'The narrow read-only source contract must resolve to the native Nextcloud implementation.'
-    );
-    assertSameValue(
-        NextcloudGroupFoldersSource::class,
-        $context->aliases[GroupFoldersSourceInterface::class] ?? null,
-        'The version-aware Team Folders source must be wired through its narrow read-only contract.'
-    );
-    assertSameValue(
-        NextcloudGroupFoldersManagerProvider::class,
-        $context->aliases[GroupFoldersManagerProviderInterface::class] ?? null,
-        'The optional foreign runtime service must be resolved lazily behind an app-local boundary.'
     );
     assertSameValue(
         NextcloudPermissionProviderSource::class,
