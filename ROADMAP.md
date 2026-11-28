@@ -40,8 +40,8 @@ lückenlos nachgewiesenen Major aus offiziellen, gepinnten Nextcloud-Git-Quellen
 eine offiziell benannte und testbare künftige Major (z. B. NC36) wird dabei
 geprüft. Der regelmäßige Check der neuesten veröffentlichten Entwicklungsruntime
 ist davon getrennt und ersetzt keinen RC-Nachweis. Die private Groupfolders-
-Ausnahme bleibt separat versionsgebunden und liefert auf unbekannten
-Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
+Ausnahme wurde mit FR-06 entfernt; auf unbekannten Kombinationen liefern
+unbekannte Apps sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 ## Priorisierte offene Adapter
 
@@ -61,9 +61,9 @@ Kombinationen sichtbar `UNKNOWN` oder `UNSUPPORTED`.
 
 ### BPM-FOLDER-RIGHTS – weitere konkrete Ordnerrechte
 
-- Erweiterte Groupfolders-ACLs, Files Access Control und externe Speicher
-  jeweils über eigene read-only Adapter mit Quellen- und Confidence-Angabe
-  abbilden.
+- Files Access Control und externe Speicher jeweils über eigene read-only
+  Adapter mit Quellen- und Confidence-Angabe abbilden (Groupfolders-ACLs
+  sind mit FR-06 entfallen).
 - Lesen, Schreiben/Ändern, Erstellen, Löschen, Teilen und nur tatsächlich
   gelieferte Ausführungsrechte getrennt darstellen.
 - Pfadredaktion, Datenschutzgrenzen sowie positive, negative, unbekannte und

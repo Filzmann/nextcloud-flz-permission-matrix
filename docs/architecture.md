@@ -25,8 +25,10 @@ aber weder Nextcloud-Rechte noch Konfigurationen anderer Apps.
 - Fehlende, mehrdeutige oder inkompatible Quellen liefern `UNKNOWN`,
   `UNSUPPORTED` oder eine sichtbar partielle Coverage und niemals eine
   vermutete Freigabe.
-- Die eng begrenzte Groupfolders-Ausnahme ist versionsgebunden und wird vor
-  Releases gegen den offiziellen Quellstand geprüft.
+- Die ehemalige private Groupfolders-22.x-Ausnahme wurde mit FR-06 entfernt
+  (Mindest-Nextcloud 33+); `groupfolders`/`files_groupfolders` werden wie jede
+  andere fremde App über den GenericAppAdapter sichtbar als `UNSUPPORTED`
+  geführt, unbekannte Kombinationen bleiben `UNKNOWN`.
 
 Der Matrixsnapshot hält den flz_organization-Status als `VALID`, `MISSING`,
 `INVALID`, `INCOMPATIBLE` oder `UNAVAILABLE` fest. Nur `VALID` liefert

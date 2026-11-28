@@ -9,7 +9,6 @@ use OCA\FlzPermissionMatrix\Adapter\CoreAdapter;
 use OCA\FlzPermissionMatrix\Adapter\FilesAccessControlAdapter;
 use OCA\FlzPermissionMatrix\Adapter\FilesAdapter;
 use OCA\FlzPermissionMatrix\Adapter\GenericAppAdapter;
-use OCA\FlzPermissionMatrix\Adapter\GroupFoldersAdapter;
 use OCA\FlzPermissionMatrix\Adapter\PermissionMatrixAccessAdapter;
 use OCA\FlzPermissionMatrix\Adapter\PermissionProviderAdapter;
 use OCA\FlzPermissionMatrix\Adapter\SharingAdapter;
@@ -29,7 +28,6 @@ class MatrixBuilder {
         private CoreAdapter $core,
         private FilesAdapter $files,
         private SharingAdapter $sharing,
-        private GroupFoldersAdapter $groupFolders,
         private FilesAccessControlAdapter $filesAccessControl,
         private PermissionMatrixAccessAdapter $permissionMatrixAccess,
         private PermissionProviderAdapter $permissionProviders,
@@ -44,7 +42,6 @@ class MatrixBuilder {
             ->merge($this->core->collect())
             ->merge($this->files->collect())
             ->merge($this->sharing->collect())
-            ->merge($this->groupFolders->collect())
             ->merge($this->filesAccessControl->collect())
             ->merge($this->permissionProviders->collect());
         $result = $result->merge($this->permissionMatrixAccess->collect());

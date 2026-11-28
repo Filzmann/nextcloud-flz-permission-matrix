@@ -20,8 +20,6 @@ class AdapterCatalogService {
         'files_external',
         'files_sharing',
         'files_accesscontrol',
-        'groupfolders',
-        'files_groupfolders',
         'flz_permission_matrix',
     ];
 
@@ -30,8 +28,6 @@ class AdapterCatalogService {
         'files',
         'files_sharing',
         'files_accesscontrol',
-        'groupfolders',
-        'files_groupfolders',
         'activity',
         'notifications',
         'spreed',
